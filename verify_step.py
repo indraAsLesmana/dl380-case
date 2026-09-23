@@ -21,7 +21,7 @@ import Part
 from FreeCAD import Vector
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-_DEFAULT = os.path.join(HERE, "out", "dl380_cage_case_body.step")
+_DEFAULT = os.path.join(HERE, "out", "dl380_cage_case.step")
 # NB: under freecadcmd sys.argv[1] is the script name itself, so only accept an
 # argument that actually looks like a STEP file.
 _arg = sys.argv[1] if len(sys.argv) > 1 else ""
@@ -73,6 +73,20 @@ PSU_BORE_Z = PSU_Z0 + PSU_BOSS_L / 2.0                    # 192.0
 # DC input jack
 DC_JACK_X, DC_JACK_Y = 60.0, 52.0
 DC_JACK_DIA, DC_JACK_PAD, DC_JACK_DEPTH = 8.0, 16.0, 5.0
+
+# drop-on housing lid
+SKIRT_T, SKIRT_D, SKIRT_FRONT_D = 2.8, 14.0, 8.0
+SKIRT_CLEAR, SKIRT_BEAD, SKIRT_BEAD_H, SKIRT_BEAD_UP = 0.2, 0.35, 4.0, 10.0
+LID_T, LID_LIP_T, LID_LIP_GAP = 3.0, 1.5, 6.0
+FAN_INSET = 25.0
+FAN_Z0 = Z_RIN - FAN_INSET                                # 248.0
+FAN_TOP = FAN_CY + FAN_SIZE / 2.0                         # 98.0
+LID_Z0 = Z_BAY + SKIRT_CLEAR                              # 165.2
+LID_Z1 = Z_OUT + SKIRT_CLEAR + SKIRT_T                    # 284.4
+LID_OX = XW + SKIRT_CLEAR + SKIRT_T                       # 78.7
+LID_LIP_END = FAN_Z0 - LID_LIP_GAP                        # 242.0
+LID_BEAD_LO = REAR_H - SKIRT_D + SKIRT_BEAD_UP            # 98.8
+LID_BEAD_Z1 = Z_OUT + SKIRT_CLEAR                         # 281.6
 
 # the first honeycomb cell sits on the fan axis; the next column is offset
 _GR = (GRILLE_CELL + GRILLE_WEB) / math.sqrt(3.0)
@@ -130,47 +144,103 @@ CASES = [
     ("fillets  wall kept",        (XW - 1.7, FAN_CY, Z_OUT - 2.4),   "solid"),
 ]
 
+# ---- probes against the LID (loaded as the second-largest solid) -------------
+#  Probe radii matter here: the lip is only 1.5 mm deep and the skirt 2.8 mm
+#  thick, so the default 1.0 mm sphere will not fit in either.
+LID_CASES = [
+    ("plate material",            (0.0, REAR_H + LID_T / 2.0, 220.0), "solid"),
+    ("skirt, right wall",         (XW + SKIRT_CLEAR + SKIRT_T / 2.0, 95.0, 220.0),
+                                                                     "solid"),
+    ("skirt, left wall",          (-(XW + SKIRT_CLEAR + SKIRT_T / 2.0), 95.0, 220.0),
+                                                                     "solid"),
+    ("skirt, rear wall",          (0.0, 95.0, Z_OUT + SKIRT_CLEAR + SKIRT_T / 2.0),
+                                                                     "solid"),
+    ("skirt, front wall",         (0.0, 98.0, LID_Z0 - SKIRT_T / 2.0), "solid"),
+    ("lid clear of the case wall", (XW - 1.2, 95.0, 220.0),          "void"),
+    ("front skirt stops at roof", (0.0, 92.0, LID_Z0 - SKIRT_T / 2.0), "void"),
+    ("lip material",              (0.0, REAR_H - LID_LIP_T / 2.0, 200.0),
+                                                                     "solid", 0.5),
+    ("lip ends before the fan",   (0.0, REAR_H - LID_LIP_T / 2.0, 245.0),
+                                                                     "void", 0.5),
+    ("open over the fan",         (0.0, REAR_H - LID_LIP_T / 2.0, FAN_Z0 + 10.0),
+                                                                     "void", 0.5),
+    ("lid screw hole",            (LID_SCREW_X, REAR_H + LID_T / 2.0, LID_SCREW_Z),
+                                                                     "void"),
+]
 
-def load(path):
+
+def load_all(path):
+    """Every distinct solid in the file, largest first.
+
+    Import.insert() can hand back both a compound holding all the solids and the
+    individual solids, which double-counts them - so flatten to solids and dedupe
+    by volume rather than trusting the document's object list.
+    """
     Import = __import__("Import")
     Import.insert(path, "verify")
-    shapes = [o.Shape for o in App.ActiveDocument.Objects
-              if hasattr(o, "Shape") and o.Shape.Volume > 0]
-    if not shapes:
+    found = {}
+    for o in App.ActiveDocument.Objects:
+        sh = getattr(o, "Shape", None)
+        if sh is None:
+            continue
+        for s in sh.Solids:
+            if s.Volume > 0.0:
+                found.setdefault(round(s.Volume), s)
+    if not found:
         raise SystemExit("no solids found in %s" % path)
-    return max(shapes, key=lambda s: s.Volume)
+    return sorted(found.values(), key=lambda s: -s.Volume)
+
+
+def run_table(title, solid, cases):
+    print("  %s" % title)
+    print("  %-26s %-7s %8s  %s" % ("feature", "expect", "inside", "verdict"))
+    print("  " + "-" * 62)
+    failures = 0
+    for case in cases:
+        name, (x, y, z), want = case[0], case[1], case[2]
+        probe_r = case[3] if len(case) > 3 else 1.0
+        s = Part.makeSphere(probe_r, Vector(x, y, z))
+        frac = s.common(solid).Volume / s.Volume
+        ok = frac < 0.05 if want == "void" else frac > 0.95
+        failures += 0 if ok else 1
+        print("  %-26s %-7s %7.0f%%  %s"
+              % (name, want, frac * 100, "OK" if ok else "*** FAIL ***"))
+    return failures
 
 
 def main():
     if not os.path.exists(STEP):
         raise SystemExit("missing %s - run dl380_cage_case.py first" % STEP)
 
-    body = load(STEP)
+    solids = load_all(STEP)
     print("probing %s" % STEP)
-    print("  solid: valid=%s closed=%s volume=%.0f mm3"
-          % (body.isValid(), body.isClosed(), body.Volume))
+    for i, s in enumerate(solids):
+        bb = s.BoundBox
+        print("  solid %d: valid=%s closed=%s volume=%8.0f mm3  bbox %.1f x %.1f x %.1f"
+              % (i, s.isValid(), s.isClosed(), s.Volume,
+                 bb.XLength, bb.YLength, bb.ZLength))
+    if len(solids) < 2:
+        print("  (only one solid found - the lid probes are being skipped)")
     print("")
-    print("  %-26s %-7s %8s  %s" % ("feature", "expect", "inside", "verdict"))
-    print("  " + "-" * 62)
 
-    failures = 0
-    for case in CASES:
-        name, (x, y, z), want = case[0], case[1], case[2]
-        probe_r = case[3] if len(case) > 3 else 1.0
-        s = Part.makeSphere(probe_r, Vector(x, y, z))
-        frac = s.common(body).Volume / s.Volume
-        ok = frac < 0.05 if want == "void" else frac > 0.95
-        failures += 0 if ok else 1
-        print("  %-26s %-7s %7.0f%%  %s"
-              % (name, want, frac * 100, "OK" if ok else "*** FAIL ***"))
-
+    total = len(CASES)
+    failures = run_table("BODY", solids[0], CASES)
+    if len(solids) > 1:
+        print("  " + "-" * 62)
+        total += len(LID_CASES)
+        failures += run_table("LID", solids[1], LID_CASES)
     print("  " + "-" * 62)
-    print("  %d probes, %d failures" % (len(CASES), failures))
+    print("  %d probes, %d failures" % (total, failures))
     return 1 if failures else 0
 
 
 if __name__ in ("__main__",                    # python3 verify_step.py
                 os.path.splitext(os.path.basename(__file__))[0]):  # freecadcmd ...
     _rc = main()
+    # flush BEFORE raising: an uncaught SystemExit tears the process down and
+    # discards whatever is still sitting in the stdout buffer, so a failing run
+    # would exit non-zero with no output at all - exactly when you need it.
+    sys.stdout.flush()
+    sys.stderr.flush()
     if _rc:
         raise SystemExit(_rc)

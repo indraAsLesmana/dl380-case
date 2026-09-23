@@ -64,14 +64,30 @@
    clearance to the grille : 6.54 mm (slot corner to the pocket)
    clearance to the edge   : 7.20 mm outboard
 
- SERVICE LID
-   plate                   : 151.4 x 3.0 x 116.4 mm
-   opening                 : 109.8 wide, Z 172.0..273.0, R12.0 corners
+ SERVICE LID  (drop-on housing - it stays on with no screws)
+   outside                 : 157.4 (W) x 119.2 (D) mm, 3.0 mm plate
+   skirts                  : 14.0 mm deep at the sides and back, 8.0 mm
+                             at the front (the bay roof is only 8.2 mm
+                             below the top), all 2.8 mm thick
+   fit                     : 0.20 mm slip + 0.35 mm bead = 0.15 mm press
+   located by              : skirt in X and Z, the top rim in Y - it
+                             cannot slide off in any direction, only lift
+   screws, still cut       : 6 x M3 O3.4 clearance at X=+/-70.0 Z=(185.0, 215.0, 245.0)
+
+   FAN CABLE  - can the lid catch it going on or off?
+   locating lip            : 1.5 mm deep, Z 172.5 .. 242.0
+   lip vs plenum interior  : lip bottoms out at y=101.3, which is 1.3 mm
+                             ABOVE the plenum ceiling at y=100.0, so it
+                             never enters the plenum at all
+   lip vs the fan          : stops 6.0 mm short of the fan at Z 248.0
+   headroom over the frame : 2.0 mm (frame top y=98.0, ceiling y=100.0)
+   skirt vs the case       : the skirt is outside the case, so it cannot
+                             reach any cable that is inside
+
+   service opening         : 109.8 wide, Z 172.0..273.0, R12.0 corners
    fan drop-in window      : Z 235.4 .. 248.0  (12.6 mm of slack, then push it back against the rear wall)
    roof left beside opening: 18.0 mm each side, plus 7.0 mm across
                              the front
-   6 x M3 lid screws       : X=+/-70.0  Z=(185.0, 215.0, 245.0)
-                             O4.2 insert bore / O3.4 clearance
 
  EDGE TREATMENT  (outside edges only, for handling and to stop chipping)
    body / strap fillet     : R1.4 on every outer edge
@@ -86,8 +102,8 @@
  VOLUME / MASS
    body   volume            :   523774.3 mm3  =  523.8 cm3
    body   mass @1.27 g/cm3  :      665 g  (PETG, 100% infill equiv)
-   lid    volume            :    74234.3 mm3  =   74.2 cm3
-   lid    mass @1.27 g/cm3  :       94 g  (PETG, 100% infill equiv)
+   lid    volume            :    87834.0 mm3  =   87.8 cm3
+   lid    mass @1.27 g/cm3  :      112 g  (PETG, 100% infill equiv)
    strap  volume            :     3822.2 mm3  =    3.8 cm3
    strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
 
@@ -98,8 +114,11 @@
    body closed (solid)     : True
    strap closed (solid)    : True
    body bbox               : 151.40 x 102.80 x 281.40
-   lid  bbox               : 151.40 x 5.00 x 116.40
-   body/lid interference    : 0.0000 mm3
+   lid  bbox               : 157.40 x 17.00 x 122.00
+   body/lid interference    : 283.5 mm3 - the skirt bead's press fit
+     expected ~231 mm3 for a 0.15 mm interference band -> OK
+     (both are separate prints, so this overlap is intentional - set
+      SKIRT_BEAD = SKIRT_CLEAR for a free slip fit instead)
    body/strap interference  : 0.0000 mm3
    build volume (Bambu H2S 340x320x340):
      body  fits            : True

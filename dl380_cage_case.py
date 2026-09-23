@@ -59,7 +59,28 @@ FIT_CLEAR     =   0.4    # mm  slide-in clearance, per side  (spec: +0.4/side)
 WALL          = 2.8      # mm  structural wall thickness
 FLOOR_T       = 4.0      # mm  base floor thickness (stiffer, carries the cage)
 LID_T         = 3.0      # mm  service lid plate thickness
-LID_LIP_T     = 2.0      # mm  lid locating lip depth (drops into the opening)
+LID_LIP_T     = 1.5      # mm  lid locating lip depth.  Deliberately shallow: the
+                         #     plenum's interior ceiling is only 1.3 mm below it,
+                         #     so the lip can never reach anything loose in there
+LID_LIP_GAP   = 6.0      # mm  the lid's lip stops this far short of the fan
+
+# ---- drop-on housing lid -----------------------------------------------------
+#  The lid is a skirted tray that slides straight down over the top of the case.
+#  The skirt locates it in X and in Z, and it rests on the top rim in Y, so it
+#  stays on with NO screws at all.  The six screw positions are still cut, for
+#  transport or if the case gets tipped.
+SKIRT_T       = 2.8      # mm  skirt wall thickness
+SKIRT_D       = 14.0     # mm  how far the side and rear skirts hang down
+SKIRT_FRONT_D = 8.0      # mm  the front skirt is shallower - any deeper and it
+                         #     would land on the drive bay's roof, 8.2 mm lower
+SKIRT_CLEAR   = 0.2      # mm  slip clearance between skirt and the case's faces
+SKIRT_BEAD    = 0.35     # mm  friction bead proud of the skirt's inner face.
+                         #     Anything over SKIRT_CLEAR is a press fit; set it
+                         #     equal to SKIRT_CLEAR for a free slip fit.
+SKIRT_BEAD_H  = 4.0      # mm  height of the bead band
+SKIRT_BEAD_UP = 10.0     # mm  the band sits this far above the skirt's bottom,
+                         #     which keeps it clear of the grille pocket and of
+                         #     the top pair of fan inserts
 STOP_RIB_W    = 4.0      # mm  width of the internal rear stop frame
 STOP_RIB_D    = 3.0      # mm  how far the stop frame sticks into the bay
 REAR_WALL_LAYERS = 3     # rear wall in wall-units -> 8.4 mm, enough for a
@@ -230,6 +251,14 @@ SVC_Z1 = Z_RIN - SVC_Z1_BACKOFF            # opening rear edge
 # back against the rear wall.  If FAN_LO > FAN_HI the fan cannot be fitted.
 FAN_DROP_LO = PSU_Z1 + WALL + 2.0          # clear of the cradle's rear wall
 FAN_DROP_HI = SVC_Z1 - FAN_INSET           # its thickness must clear the roof
+
+# ---- drop-on housing lid -----------------------------------------------------
+LID_Z0      = Z_BAY + SKIRT_CLEAR          # lid front edge, just behind the step
+LID_Z1      = Z_OUT + SKIRT_CLEAR + SKIRT_T
+LID_OX      = XW + SKIRT_CLEAR + SKIRT_T   # lid outer half width
+LID_LIP_END = FAN_Z0 - LID_LIP_GAP         # lip stops short of the fan
+LID_BEAD_LO = REAR_H - SKIRT_D + SKIRT_BEAD_UP
+LID_BEAD_Z1 = Z_OUT + SKIRT_CLEAR          # bead stops at the rear skirt
 
 
 # ==============================================================================
@@ -517,11 +546,37 @@ def build():
 
     body = _tidy(body)
 
-    # ============================================================== service lid
-    lid = fillet_all(box(OUT_W, LID_T, Z_OUT - Z_BAY, -XW, REAR_H, Z_BAY),
-                     FILLET_R_LID)
+    # ==================================================== drop-on housing lid ---
+    #  A skirted tray, not a flat plate.  It slides straight down over the top:
+    #  the skirt locates it in X and Z, the plate rests on the top rim in Y, and
+    #  a friction bead on the skirt makes it a light press fit.  No screws are
+    #  needed to keep it on; the six screw positions are still cut for transport.
+    lid = box(2 * LID_OX, LID_T, LID_Z1 - LID_Z0, -LID_OX, REAR_H, LID_Z0)
+    for sx in (1, -1):
+        x0 = XW + SKIRT_CLEAR if sx > 0 else -LID_OX
+        lid = lid.fuse(box(SKIRT_T, SKIRT_D + LID_T, LID_Z1 - LID_Z0,
+                           x0, REAR_H - SKIRT_D, LID_Z0))
+    lid = lid.fuse(box(2 * LID_OX, SKIRT_D + LID_T, SKIRT_T,
+                       -LID_OX, REAR_H - SKIRT_D, Z_OUT + SKIRT_CLEAR))
+    #  front skirt: shallower, because the drive bay's roof is 8.2 mm below the
+    #  top of the rear section and a full-depth skirt would land on it
+    lid = lid.fuse(box(2 * LID_OX, SKIRT_FRONT_D + LID_T, SKIRT_T,
+                       -LID_OX, REAR_H - SKIRT_FRONT_D, LID_Z0 - SKIRT_T))
+    #  round the outside of the tray before adding the small features, or the
+    #  0.35 mm bead would be swallowed by a 1.0 mm round
+    lid = _tidy(lid)
+    lid = fillet_all(lid, FILLET_R_LID)
+    #  friction bead, proud of the skirt's inner faces on three sides
+    for sx in (1, -1):
+        bx = (XW + SKIRT_CLEAR - SKIRT_BEAD) if sx > 0 else -(XW + SKIRT_CLEAR)
+        lid = lid.fuse(box(SKIRT_BEAD, SKIRT_BEAD_H, LID_BEAD_Z1 - LID_Z0,
+                           bx, LID_BEAD_LO, LID_Z0))
+    lid = lid.fuse(box(2 * (XW + SKIRT_CLEAR), SKIRT_BEAD_H, SKIRT_BEAD,
+                       -(XW + SKIRT_CLEAR), LID_BEAD_LO,
+                       LID_BEAD_Z1 - SKIRT_BEAD))
+    #  locating lip, stopping well short of the fan so the fan lead has room
     lid = lid.fuse(rounded_rect_prism(SVC_HALF - 0.5, REAR_H - LID_LIP_T,
-                                      REAR_H, SVC_Z0 + 0.5, SVC_Z1 - 0.5,
+                                      REAR_H, SVC_Z0 + 0.5, LID_LIP_END,
                                       SVC_R - 0.5))
     for sx in (-1, 1):
         for zz in LID_SCREW_Z:
@@ -677,10 +732,37 @@ def report(body, lid, strap, log):
     add("   clearance to the edge   : %.2f mm outboard"
         % (XW - abs(REAR_CABLE_SLOT_X) - REAR_CABLE_SLOT_W / 2.0))
     add("")
-    add(" SERVICE LID")
-    add("   plate                   : %.1f x %.1f x %.1f mm"
-        % (OUT_W, LID_T, Z_OUT - Z_BAY))
-    add("   opening                 : %.1f wide, Z %.1f..%.1f, R%.1f corners"
+    add(" SERVICE LID  (drop-on housing - it stays on with no screws)")
+    add("   outside                 : %.1f (W) x %.1f (D) mm, %.1f mm plate"
+        % (2 * LID_OX, LID_Z1 - LID_Z0, LID_T))
+    add("   skirts                  : %.1f mm deep at the sides and back, %.1f mm"
+        % (SKIRT_D, SKIRT_FRONT_D))
+    add("                             at the front (the bay roof is only %.1f mm"
+        % (REAR_H - BAY_H))
+    add("                             below the top), all %.1f mm thick" % SKIRT_T)
+    add("   fit                     : %.2f mm slip + %.2f mm bead = %.2f mm press"
+        % (SKIRT_CLEAR, SKIRT_BEAD, SKIRT_BEAD - SKIRT_CLEAR))
+    add("   located by              : skirt in X and Z, the top rim in Y - it")
+    add("                             cannot slide off in any direction, only lift")
+    add("   screws, still cut       : %d x M3 O%.1f clearance at X=+/-%.1f Z=%s"
+        % (2 * len(LID_SCREW_Z), LID_CLEAR_DIA, LID_SCREW_X, LID_SCREW_Z))
+    add("")
+    add("   FAN CABLE  - can the lid catch it going on or off?")
+    add("   locating lip            : %.1f mm deep, Z %.1f .. %.1f"
+        % (LID_LIP_T, SVC_Z0 + 0.5, LID_LIP_END))
+    add("   lip vs plenum interior  : lip bottoms out at y=%.1f, which is %.1f mm"
+        % (REAR_H - LID_LIP_T, (REAR_H - LID_LIP_T) - PLEN_Y1))
+    add("                             ABOVE the plenum ceiling at y=%.1f, so it"
+        % PLEN_Y1)
+    add("                             never enters the plenum at all")
+    add("   lip vs the fan          : stops %.1f mm short of the fan at Z %.1f"
+        % (FAN_Z0 - LID_LIP_END, FAN_Z0))
+    add("   headroom over the frame : %.1f mm (frame top y=%.1f, ceiling y=%.1f)"
+        % (PLEN_Y1 - (FAN_CY + FAN_SIZE / 2.0), FAN_CY + FAN_SIZE / 2.0, PLEN_Y1))
+    add("   skirt vs the case       : the skirt is outside the case, so it cannot")
+    add("                             reach any cable that is inside")
+    add("")
+    add("   service opening         : %.1f wide, Z %.1f..%.1f, R%.1f corners"
         % (2 * SVC_HALF, SVC_Z0, SVC_Z1, SVC_R))
     add("   fan drop-in window      : Z %.1f .. %.1f  (%s)"
         % (FAN_DROP_LO, FAN_DROP_HI,
@@ -690,10 +772,6 @@ def report(body, lid, strap, log):
     add("   roof left beside opening: %.1f mm each side, plus %.1f mm across"
         % (XI - SVC_HALF, SVC_Z0 - Z_BAY))
     add("                             the front")
-    add("   %d x M3 lid screws       : X=+/-%.1f  Z=%s"
-        % (2 * len(LID_SCREW_Z), LID_SCREW_X, LID_SCREW_Z))
-    add("                             O%.1f insert bore / O%.1f clearance"
-        % (LID_INSERT_DIA, LID_CLEAR_DIA))
     add("")
     add(" EDGE TREATMENT  (outside edges only, for handling and to stop chipping)")
     add("   body / strap fillet     : R%.1f on every outer edge" % FILLET_R)
@@ -731,7 +809,16 @@ def report(body, lid, strap, log):
     bb = lid.BoundBox
     add("   lid  bbox               : %.2f x %.2f x %.2f"
         % (bb.XLength, bb.YLength, bb.ZLength))
-    add("   body/lid interference    : %.4f mm3" % body.common(lid).Volume)
+    lid_inter = body.common(lid).Volume
+    bead_nom = (SKIRT_BEAD - SKIRT_CLEAR) * SKIRT_BEAD_H * (
+        2 * (LID_BEAD_Z1 - LID_Z0) + 2 * (XW + SKIRT_CLEAR))
+    add("   body/lid interference    : %.1f mm3 - the skirt bead's press fit"
+        % lid_inter)
+    add("     expected ~%.0f mm3 for a %.2f mm interference band -> %s"
+        % (bead_nom, SKIRT_BEAD - SKIRT_CLEAR,
+           "OK" if 0.5 * bead_nom < lid_inter < 1.4 * bead_nom else "*** CHECK ***"))
+    add("     (both are separate prints, so this overlap is intentional - set")
+    add("      SKIRT_BEAD = SKIRT_CLEAR for a free slip fit instead)")
     add("   body/strap interference  : %.4f mm3" % body.common(strap).Volume)
     add("   build volume (Bambu H2S 340x320x340):")
     add("     body  fits            : %s" % (bb_max(body) <= 340.0))
