@@ -3,11 +3,11 @@
 Parametric [FreeCAD](https://www.freecad.org/) Python model of an external desktop
 enclosure that turns a salvaged **HP ProLiant DL380 G6/G7 8-bay 2.5" SFF drive cage
 with backplane** (cage assy P/N 496074-001 and relatives) into a standalone,
-fan-cooled JBOD-style box.
+fan-cooled JBOD-style box with its own internal **PicoPSU**.
 
-Fitted to an **ARCTIC P9 PWM PST 92 mm** fan. Everything is generated from one
-script — change a number at the top, re-run, get a new STEP file. The case height is
-*derived from the fan*, so swapping fan size re-shapes the enclosure by itself.
+Everything — body, lid and PicoPSU strap — is generated from one script. Change a
+number at the top, re-run, get a new STEP file. The rear section height is derived
+from the fan, so swapping fan size re-shapes the enclosure by itself.
 
 ![front](out/body_front.png)
 ![cutaway](out/body_cut.png)
@@ -20,17 +20,17 @@ script — change a number at the top, re-run, get a new STEP file. The case hei
 | | |
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
-| Body solid | valid ✓ closed ✓ **151.40 × 94.60 × 238.40 mm** |
-| Lid solid | valid ✓ closed ✓ 151.40 × 5.00 × 73.40 mm |
-| Top profile | **flat** — rear section is the same 94.6 mm as the bay |
-| Body ↔ lid interference | 0.0000 mm³ |
-| Build volume (Bambu Lab H2S, 340×320×340) | body fits ✓ lid fits ✓ |
-| Lid insert bosses | 13.0 mm of solid material around every Ø4.2 bore ✓ |
-| Cable egress | slot verified open through the wall ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **18 probes, 0 failures** ✓ |
+| Body solid | valid ✓ closed ✓ **151.40 × 102.80 × 281.40 mm** |
+| Lid solid | valid ✓ closed ✓ 151.40 × 5.00 × 116.40 mm |
+| Strap solid | valid ✓ closed ✓ 50.20 × 4.00 × 20.00 mm |
+| Body ↔ lid / body ↔ strap interference | 0.0000 mm³ / 0.0000 mm³ |
+| PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR |
+| Build volume (Bambu Lab H2S, 340×320×340) | all three fit ✓ |
+| Body / strap STL watertight | 17 880 and 1 028 triangles, 0 non-manifold edges ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **33 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
-written by the build; `verify_step.py` re-reads the exported STEP, so its 18 probes
+written by the build; `verify_step.py` re-reads the exported STEP, so its 33 probes
 also prove the STEP round-trip lost nothing.
 
 ---
@@ -52,117 +52,163 @@ Nominal cage envelope used for the model: **145.0 × 87.0 × 165.0 mm (W × H ×
 ## Design
 
 ```
-      z=0                                                          z=238.4
-      |  <------------- 165.0 mm bay ------------->|<- 65 plenum ->|<-8.4->| y=94.6
-      +============================================+===============+=======+  FLAT
-      |  ^                                         |  airflow      | fan   |  TOP
-      |  |                                         |  transition   | wall  |
-      |  |  HP cage sleeve, front wide open         |  rect->circle |       |
-      |  |  145.8 x 87.8  (+0.4 mm/side)            |               |  O86  |
-      |  |                                         |  SFF-8087 +   |       |
-      |  |  ### internal rear stop frame ###        |  Wago 221 bay |       |
-      |  v                                         |               |       | y=0
-      +============================================+===============+=======+
-                                                     (rear face)   ^ fan mounts here
+ z=0                                                        z=281.4
+ | <---------- 165 bay ---------->|<-20->|<--- cradle --->|<-25 fan->|<-8.4->|
+ +================================+======+=================+==========+=======+ y=102.8
+ | ^                              | boot |  PicoPSU cradle |   fan    |grille | STEP
+ | |                              |      |  strap over it  |  INSIDE  | O90   | UP
+ | | HP cage sleeve, wide open    |      |                 |   92     | honey |
+ | | 145.8 x 87.8 (+0.4/side)     |      | [] |--board--|  |   frame  | comb  |
+ | |                              |      | [] |         |  |          |       |
+ | | ### rear stop frame ###       |      |    |         |  |  O86     |       |
+ | v                              |      |    |-cables->|  |  field   |       | y=0
+ +================================+======+=================+==========+=======+ y=94.6
+                                  <--------- 108 plenum ----------> (rear face)
+   [] = strap bosses          all of the cradle and fan sits INSIDE the case
 ```
 
 ### Sections
 
-**Bay (z 0 → 165)** — a plain sleeve, internal **145.8 × 87.8 mm**. The front is
-fully open so standard HP 2.5" SFF caddies and their latch/eject levers slide
-straight in and out. A **3 mm deep internal stop frame** around the rear of the
-bay seats the cage; the frame's inner aperture is 137.8 × 79.8 mm, so it stops the
-cage without choking the airflow path through the backplane.
+**Bay (z 0 → 165)** — a plain sleeve, internal **145.8 × 87.8 mm**, outer height
+94.6 mm. The front is fully open so standard HP 2.5" SFF caddies and their
+latch/eject levers slide straight in and out. A **3 mm deep internal stop frame**
+around the rear seats the cage; its inner aperture is 137.8 × 79.8 mm, so it stops
+the cage without choking the airflow path through the backplane.
 
-**Plenum (z 165 → 230)** — 65 mm of clear volume behind the backplane for the two
-SFF-8087 mini-SAS cable boots and three Wago 221 lever terminal blocks. The fan
-draws 1.44 W, which is nothing for a Wago 221, so it can be fed from the same
-terminals as the drives.
+**Plenum (z 165 → 273)** — 108 mm deep, laid out front to back:
 
-**Duct** — an internal **rect → circle transition**. A ruled loft between the
-145.8 × 87.8 sleeve rectangle and an Ø86 circle centred on the fan axis, built from
-two angle-matched 96-gon wires so the surface is twist-free. This is the "tapered
-bevel" of the brief: it squeezes the 12 801 mm² cage aperture down to the fan's
-~5 809 mm² swept disc over 65 mm instead of dumping a rectangular jet at a round fan.
+| Z | What |
+|---|---|
+| 165 → 185 | 20 mm of cable boot space behind the backplane |
+| 185 → 233.4 | the PicoPSU cradle |
+| 233.4 → 248 | cable routing |
+| 248 → 273 | the fan, against the inside of the rear wall |
 
-**Rear wall (z 230 → 238.4)** — **8.4 mm** thick (3 × wall). Deliberately thicker
-than the other walls so a standard 5.7 mm M3 heat-set insert seats fully with
-material behind it, and so a 30 mm fan screw has something to bite into. It carries
-the Ø86 aperture centred at Y = 47.3, four Ø4.2 holes on an 82.5 × 82.5 mm square
-pattern, and a 16 × 9 mm notch at X = +55 for the fan lead.
+**Fan — inside the case.** The ARCTIC P9 sits flat against the inside of the rear
+wall, 2 mm clear of the bore on every side, and exhausts straight through the
+grille. Nothing hangs off the back of the enclosure and the blades are protected.
 
-**Cable egress** — a 16 × 30 mm stadium (rounded-end) slot in the left wall at the
-rear of the plenum, Y 12 → 28 mm, for two external SAS cables plus one Molex DC
-harness. Rounded ends act as strain relief. Set `CABLE_SLOT_MIRROR = True` to cut
-the same slot in the right wall.
+**Honeycomb exhaust grille** — punched through a **3 mm membrane** at the bottom of
+a Ø90 × 5.4 mm counterbore in the outer face, not through the full 8.4 mm wall, so
+it costs little airflow and the wall stays stiff enough to carry the fan inserts.
+55 flat-top hexagonal cells, 9 mm across flats with 1.2 mm webs, **78 % open** across
+the field. The cell field is inset from the pocket wall so no cell can break out of
+it; the tightest edge margin, pocket to case edge, is **5.8 mm**.
 
-**Lid** — the body is a single cohesive print with a closed top over the bay; the
-plenum gets a separable **service lid** so you can get at the cabling after the
-cage is in. The lid is a 3 mm plate with a locating lip that drops into a 96 mm
-rounded opening, held by **6 × M3** screws into heat-set inserts (3 per side, Z =
-185 / 205 / 225 — all clear of the caddy path).
+**Rear wall (z 273 → 281.4)** — **8.4 mm** thick (3 × wall). Carries the grille, the
+four fan mounting holes, two cable slots and the DC jack.
+
+**Cable egress — out of the back.** Two 17 × 12 mm rounded slots at X = −60,
+Y = 33 and 50 take the two SFF-8087 → SFF-8088 leads. Separate slots so each cable
+keeps its own strain relief instead of two cables sawing against each other in one
+hole. 6.54 mm from the slot corners to the grille pocket, 7.20 mm outboard.
+
+**DC input jack** — Ø8 through, counterbored Ø16 × 5 mm on the outer face at
+(+60, 52). The counterbore matters: it leaves a **3.4 mm panel** for the jack's nut
+instead of the full 8.4 mm wall, which is thicker than most panel-mount 5.5 × 2.5 mm
+barrel jacks will clamp.
+
+**PicoPSU cradle** — see below.
+
+**Lid** — the body is one cohesive print with a closed top over the bay; the plenum
+gets a separable **service lid** so you can get at the cabling and the PSU after the
+cage is in. A 3 mm plate with a locating lip that drops into the 109.8 mm opening,
+held by **6 × M3** screws into heat-set inserts (X = ±70, Z = 185 / 215 / 245), each
+with 13 mm of material behind it.
+
+**Roof gussets** — because the plenum is a plain box, its roof would otherwise have
+bridged 145.8 mm in mid air. Two **18 mm 45° gussets** run the length of the roof/wall
+corners. They make the roof printable and give the lid screws their material.
 
 **Base** — four Ø12 × 2 mm recesses for rubber feet, in a 4 mm floor.
 
-### Why 92 mm, and why that gives a flat top
+### Why the rear section steps up 8.2 mm
 
-The original brief specified a **120 mm fan**. The problem: a 120 mm fan needs
-`105 mm` of mounting pattern plus hole radius plus edge material ≈ **123 mm** of
-rear wall, but the airflow it has to clear comes out of an aperture only
-**87.8 mm tall**. A 120 mm fan therefore *cannot* sit in a case the height of the
-cage — it forces a raised rear tower, which is what v1 of this model had
-(132 mm rear section, L-shaped side profile).
+A **92 mm fan frame is taller than the 87.8 mm cage bore**, so it cannot sit inside a
+case only as tall as the bay. The rear section therefore steps from 94.6 mm to
+102.8 mm — an 8.2 mm step, not the 37 mm tower an earlier revision had.
 
-Dropping to a **92 mm fan** removes the tower entirely: `82.5 + 4.2 + 2×3.5 =
-93.7 mm`, which fits inside the 94.6 mm bay height. So the case becomes a plain
-prism with a **flat top**, and the fan sits on the cage centreline (Y = 47.3)
-instead of 19 mm above it, which also makes the duct symmetric.
+This is derived, not hand-set:
 
-This is enforced in code, not by hand — `REAR_H` is computed as
-`max(BAY_H, FAN_APERTURE + 2*FAN_EDGE, 2*(FAN_OFF + FAN_HOLE/2 + FAN_EDGE))`.
-Set `FAN_APERTURE = 115.0` and `FAN_PATTERN = 105.0` and the rear section grows to
-122 mm on its own; the report tells you which profile you got.
+```python
+INT_H_PLEN = max(INT_H, FAN_SIZE + 2*FAN_INNER_CLEAR)
+REAR_H     = FLOOR_T + INT_H_PLEN + WALL     # 102.8 with a 92 mm fan
+```
+
+Give it a fan of **83.8 mm or less** and `REAR_H` collapses back to `BAY_H` and the
+top becomes a flat prism. `FAN_SIZE` and `FAN_INNER_CLEAR` are the only numbers you
+touch.
 
 ---
 
 ## Fitted fan — ARCTIC P9 PWM PST (ACFAN00298A)
 
-Figures below are from ARCTIC's own spec sheet (`Spec_Sheet_P9_PWM_PST_EN.pdf`),
-not from a reseller listing.
+Figures from ARCTIC's own spec sheet (`Spec_Sheet_P9_PWM_PST_EN.pdf`), not from a
+reseller listing.
 
 | | |
 |---|---|
 | Frame | 92 × 92 × 25 mm, 106 g |
-| Mounting hole pattern | **82.5 × 82.5 mm** — matches the model's `FAN_PATTERN` |
+| Mounting hole pattern | **82.5 × 82.5 mm** — matches `FAN_PATTERN` |
 | Speed | 200–3000 rpm, PWM controlled (0 rpm below 5 % duty) |
 | Airflow | 38.83 cfm / 65.97 m³/h |
-| Static pressure | 3.12 mmH₂O — a high-pressure fan, which is what a caddy-stacked backplane needs |
+| Static pressure | 3.12 mmH₂O — a high-pressure fan, which is what a caddy-stacked backplane wants |
 | Bearing | fluid dynamic |
 | Electrical | 12 V DC, 0.12 A = **1.44 W**, starts at 5 V |
 | Lead | 400 mm + 80 mm PST daisy-chain, 4-pin plug **and** 4-pin socket |
 | Ambient | 0–40 °C, 6 year warranty |
 
-**Fit against this enclosure**
+**Fit inside the enclosure**
 
 | | |
 |---|---|
-| Rear face | 151.4 × 94.6 mm |
-| Side margin | 29.7 mm each side |
-| Top/bottom margin | **1.3 mm** — the 92 mm frame is nearly the full case height |
-| Edge margin, aperture | 4.30 mm |
-| Edge margin, mounting holes | 3.95 mm |
-| Overall depth with fan fitted | **263.4 mm** (238.4 body + 25 fan) |
+| Bore it sits in | 145.8 × 96.0 × 108 mm |
+| Frame clearance | 2.0 mm on every side |
+| Fan position | Z 248 → 273, flat against the rear wall |
+| Grille field | Ø90 pocket, Ø~86 of actual honeycomb |
+| Mounting holes | Ø4.2 at (±41.25, 52 ± 41.25) |
 
-**Mounting** — the fan sits on the *outside* of the rear wall. There is no room for
-it inside: the plenum bore is 87.8 mm tall and the fan frame is 92 mm. Press four M3
-heat-set inserts into the Ø4.2 holes from the outside face — the 8.4 mm wall takes a
-standard 5.7 mm insert with material to spare — then run M3 × 30 mm screws through
-the fan's own (~4.5 mm) frame holes.
+**Mounting** — press four M3 heat-set inserts into the Ø4.2 holes from the
+**outside** face (the 8.4 mm wall takes a standard 5.7 mm insert with material to
+spare), then run M3 × 30 mm screws through the fan's own ~4.5 mm frame holes from
+inside the plenum. Point the fan so it exhausts outward and check the moulded
+airflow arrow.
 
-**Fan lead** — the 4-pin plug housing is roughly 11 × 7 mm, so the wall notch is
-**16 × 9 mm**, sized so the connector passes through intact and can be landed on the
-Wago terminals instead of being cut off. Point the fan's outboard face away from the
-case (exhaust) and check the moulded airflow arrow.
+**Fan lead** — the 4-pin plug never leaves the case now, so no wall notch is needed.
+
+---
+
+## PicoPSU cradle
+
+Sized from mini-box's own figures for the **picoPSU-120: 31 × 44 × 21 mm (1U)**,
+57 g with its harness, DC input a 5.5 × 2.5 × 10 mm barrel.
+
+The board sits on the plenum floor behind the backplane, and the whole point of the
+cradle is that it **cannot reach the backplane**:
+
+| | |
+|---|---|
+| Cradle bore | 32.6 × 45.6 mm (0.8 mm clearance per side) |
+| Cradle Z | 185 → 230.6 mm |
+| Mouth to backplane face | **20 mm** — board stops 21.6 mm short even fully forward |
+| Plinth | 3 mm, so the solder side never touches the floor |
+| Front lip | 6 mm tall (3 mm above the plinth) — stops it sliding forward |
+| Retaining strap | 50.2 × 4 × 20 mm, 2 × M3 into corner bosses, 0.4 mm over the board top |
+| Corner bosses | Ø4.2 heat-set inserts, 10 mm deep |
+
+The build runs a **phantom PicoPSU box** through the cradle and reports the
+interference. That check earned its place immediately — it caught the left strap
+boss being modelled 6 mm the wrong side of its wall, straight through the board's
+footprint (625 mm³ of interference) which nothing visual had flagged.
+
+**Two things to check on your own wiring**
+
+1. The cradle holds the *bare board*. If you mount the 24-pin ATX connector facing
+   up, it stands taller than the 21 mm board and the strap will be in the way. Either
+   fit the strap around it, or change `PSU_BORE_Z` to move the strap along the cradle.
+2. There is no motherboard here, so a PicoPSU will not start on its own — **PS_ON#
+   must be tied to ground** for it to run as a standalone 12 V → 5 V/3.3 V supply.
+   The fan's 1.44 W is nothing for the Wago 221 terminals, so it can share them.
 
 ---
 
@@ -170,22 +216,26 @@ case (exhaust) and check the moulded airflow arrow.
 
 | Item | Qty | Notes |
 |---|---|---|
-| Printed body | 1 | ≈ 673 cm³ / ≈ 855 g at 1.27 g/cm³ |
-| Printed service lid | 1 | ≈ 42 cm³ / ≈ 53 g |
-| **ARCTIC P9 PWM PST 92 mm** | 1 | rear-mounted, exhaust; 106 g |
-| M3 × 6 heat-set insert | **10** | 6 in the lid bosses, 4 in the rear wall for the fan |
-| M3 × 10–12 screw | 6 | lid |
+| Printed body | 1 | ≈ 528 cm³ / ≈ 671 g at 1.27 g/cm³ |
+| Printed service lid | 1 | ≈ 71 cm³ / ≈ 90 g |
+| Printed PSU strap | 1 | ≈ 3.9 cm³ / ≈ 5 g |
+| **ARCTIC P9 PWM PST 92 mm** | 1 | inside the plenum, exhaust; 106 g |
+| **PicoPSU-120** (or similar) | 1 | 31 × 44 × 21 mm; add a 12 V brick + panel DC jack |
+| Panel-mount 5.5 × 2.5 mm DC jack | 1 | Ø8 body, ≤ 3.4 mm panel |
+| M3 × 6 heat-set insert | **12** | 6 lid, 4 fan, 2 PSU strap |
+| M3 × 10–12 screw | 8 | 6 lid, 2 strap |
 | M3 × 30 screw | 4 | through the fan frame into the rear-wall inserts |
 | M3 screw + nut | 2–6 | cage anchoring (see caveats) |
 | Rubber feet Ø12 × 2 mm | 4 | |
-| SFF-8087 → SFF-8088 cables | 2 | exit through the side slot |
-| Molex / SATA power harness | 1 | same slot |
+| SFF-8087 → SFF-8088 cables | 2 | exit through the rear slots |
+| Wago 221 lever terminals | 3 | in the plenum |
 
 ### Print settings
 
 PETG or ASA suggested (the plenum sees warm server air). 0.2 mm layers, 3–4 walls,
-4–5 top/bottom layers. **No supports needed** — the part prints flat on its base
-with the front opening up; the duct is a shallow taper, not an overhang.
+4–5 top/bottom layers. **No supports needed** — the body prints flat on its base with
+the front opening up. The grille webs are 1.2 mm, i.e. three 0.4 mm lines; don't go
+below a 0.4 mm nozzle for those.
 
 ---
 
@@ -220,17 +270,23 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `CAGE_W` / `CAGE_H` / `CAGE_D` | 145.0 / 87.0 / 165.0 | HP cage envelope |
 | `FIT_CLEAR` | 0.4 | slide-in clearance, per side |
 | `WALL` / `FLOOR_T` | 2.8 / 4.0 | wall and floor thickness |
-| `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm for the fan inserts |
-| `PLENUM_D` | 65.0 | clear depth behind the backplane |
-| `FAN_MODEL` | ARCTIC P9 PWM PST | documentation only |
-| `FAN_SIZE` | 92.0 | nominal fan frame |
-| `FAN_APERTURE` / `FAN_PATTERN` | 86.0 / 82.5 | opening Ø and hole pattern |
-| `FAN_HOLE` | 4.2 | 4.2 for M3 inserts, 4.5 for M4 pass-through |
-| `FAN_EDGE` | 3.5 | min material between a hole and the case edge |
-| `FAN_CABLE_SLOT` | (55, 14, 16, 9, +1) | X, Y, W, H, side — sized for a 4-pin plug |
-| `CABLE_SLOT_C` / `CABLE_SLOT_SZ` | (20, 213) / (16, 30) | egress slot position and size |
+| `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm |
+| `GUSSET_H` | 18.0 | 45° roof gusset size (sets the service opening width) |
+| `PLENUM_D` | 108.0 | clear depth behind the backplane |
+| `FAN_SIZE` / `FAN_INNER_CLEAR` | 92.0 / 2.0 | frame size and bore clearance |
+| `FAN_APERTURE` / `FAN_PATTERN` / `FAN_HOLE` | 86.0 / 82.5 / 4.2 | grille field and mounting pattern |
+| `FAN_INSET` | 25.0 | fan depth against the rear wall |
+| `GRILLE_CELL` / `GRILLE_WEB` | 9.0 / 1.2 | honeycomb cell and web size |
+| `GRILLE_RIM` / `GRILLE_DEPTH` | 2.0 / 3.0 | solid rim, membrane thickness |
+| `PSU_W` / `PSU_L` / `PSU_H` | 31 / 44 / 21 | the board envelope |
+| `PSU_CLEAR` / `PSU_BOOT` / `PSU_PLINTH_T` | 0.8 / 20.0 / 3.0 | fit, backplane gap, plinth |
+| `PSU_WALL_H` / `PSU_FRONT_LIP` | 24.0 / 6.0 | cradle wall and lip heights |
+| `PSU_BORE_Z` | 192.0 | where the strap screws sit along the cradle |
+| `REAR_CABLE_SLOT_*` | X −60, Y 33/50, 17 × 12 | rear cable egress |
+| `DC_JACK_X` / `DC_JACK_Y` | 60.0 / 52.0 | DC jack position |
+| `DC_JACK_DIA` / `DC_JACK_PAD` / `DC_JACK_DEPTH` | 8.0 / 16.0 / 5.0 | jack hole and counterbore |
 | `CAGE_SCREW_Z` | 15…155 | candidate cage anchor positions |
-| `LID_SCREW_X` / `LID_SCREW_Z` | 68.0 / (185, 205, 225) | lid screw positions |
+| `LID_SCREW_X` / `LID_SCREW_Z` | 70.0 / (185, 215, 245) | lid screw positions |
 | `REAR_H` | *derived* | follows the fan automatically |
 
 ---
@@ -241,19 +297,18 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
    per side wall as a *menu*, not a measurement — the real cage's own holes were not
    measured. Check which position lines up with your cage and drop the rest from the
    list before you print. The rear stop frame holds the cage regardless.
-2. **Top/bottom fan clearance is only 1.3 mm.** The 92 mm frame is almost exactly the
-   case height, so the fan sits nearly flush with the top and bottom of the rear face.
-   Check the P9's frame edges and its corner anti-vibration pads for moulding flash
-   before tightening — if it fouls, shim it.
-3. **Fan edge margin is 3.95 mm** around the Ø4.2 mounting holes, because a 92 mm
-   pattern is very nearly the full 94.6 mm case height. That is fine for M3 in PETG,
-   but if you want more, go down to an 80 mm fan (`FAN_APERTURE = 76.0`,
-   `FAN_PATTERN = 71.5`) — nothing else needs changing.
-4. **Dimensions are from the brief, not from calipers.** If your cage measures
+2. **The PicoPSU cradle is sized for the bare picoPSU-120 (31 × 44 × 21 mm).** Check
+   your board before printing; other PicoPSU models differ, and `PSU_W/L/H` and
+   `PSU_BORE_Z` are the numbers to change.
+3. **The DC jack counterbore leaves a 3.4 mm panel.** Measure your jack's neck and
+   change `DC_JACK_PAD` / `DC_JACK_DEPTH` if it wants something different.
+4. **Rear section is 8.2 mm taller than the bay.** That is what an internal 92 mm fan
+   costs. Use an 83.8 mm-or-smaller fan and the top is flat again.
+5. **Dimensions are from the brief, not from calipers.** If your cage measures
    differently, change `CAGE_W` / `CAGE_H` / `CAGE_D` and rebuild.
-5. **Nothing here has been printed yet.** The geometry is verified as valid, closed,
-   non-interfering, and feature-by-feature against the exported STEP, but that is not
-   the same as a successful print.
+6. **Nothing here has been printed yet.** The geometry is verified as valid, closed,
+   non-interfering, phantom-fitted and feature-by-feature against the exported STEP,
+   but that is not the same as a successful print.
 
 ---
 
@@ -265,11 +320,11 @@ verify_step.py                re-probes the exported STEP; non-zero exit on fail
 render_stl.py                 standalone STL -> shaded PNG renderer
 docs/reference/               photos of the target hardware
 out/
-  dl380_cage_case.step        body + lid, high precision  <- deliverable
+  dl380_cage_case.step        body + lid + strap, high precision  <- deliverable
   dl380_cage_case_body.step   body only
   dl380_cage_case_lid.step    lid only
-  dl380_cage_case_body.stl    print mesh
-  dl380_cage_case_lid.stl     print mesh
+  dl380_cage_case_strap.step  PicoPSU strap only
+  dl380_cage_case_*.stl       print meshes
   dl380_cage_case_report.txt  derived dimensions + sanity checks
   *.png                       preview renders
 ```
