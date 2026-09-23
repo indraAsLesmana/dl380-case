@@ -21,6 +21,20 @@
    X : width,  centred on 0  (-OUT_W/2 .. +OUT_W/2)
    Y : height, 0 = outside of the base (part stands on Y=0)
    Z : depth,  0 = FRONT face (caddy insertion side), grows to the rear
+
+ Design note - why the top is flat
+   The rear section height is DERIVED from the fan, never hand-set.  REAR_H is
+   the *smallest* height that still gives FAN_EDGE of material between the fan
+   aperture / mounting holes and the outside edge.  If that comes out no taller
+   than the bay, the whole case is a plain prism with a flat top - which is the
+   case for the default 92 mm fan.
+
+   The original brief asked for a 120 mm fan.  A 120 mm fan needs 105 + 4.2 mm
+   of mounting pattern plus edge material = 123 mm of rear wall, but the cage
+   aperture its airflow has to come from is only 87.8 mm tall.  That forces a
+   tall rear tower (see git history / the v1 tag).  Dropping to 92 mm removes
+   the tower entirely; set FAN_* back to the 120 mm figures and REAR_H follows
+   automatically, and the report says so.
 ================================================================================
 """
 
@@ -52,15 +66,20 @@ STOP_RIB_D    = 3.0      # mm  how far the stop frame sticks into the bay
 
 # ---- wiring / airflow plenum -------------------------------------------------
 PLENUM_D      = 65.0     # mm  clear depth behind the backplane (spec: 65)
-REAR_H        = 132.0    # mm  OUTER height of the fan/plenum section
-REAR_WALL_T   = 5.6      # mm  rear wall thickness (2 x WALL, stiff, holds fan)
 
-# ---- 120 mm fan --------------------------------------------------------------
-FAN_APERTURE  = 115.0    # mm  Ø of the circular opening
-FAN_PATTERN   = 105.0    # mm  fan mounting hole square pattern
-FAN_HOLE      =   4.2    # mm  Ø  -> 4.2 for M3 heat-set insert, 4.5 for M4 pass
-FAN_DUCT_GAP  =  16.0    # mm  how far the tapered duct starts ahead of rear wall
-FAN_CABLE_SLOT= (12.0, 4.0)   # W x H fan-cable notch in the rear wall (centre, low)
+# ---- fan ---------------------------------------------------------------------
+#  92 mm fan  (default) : aperture 86.0, pattern 82.5  -> FLAT TOP, 94.6 mm
+# 120 mm fan  (original): aperture 115.0, pattern 105.0-> rear section becomes
+#                          123 mm tall.  Change the three FAN_* numbers and the
+#                          height follows; nothing else needs touching.
+FAN_SIZE      =  92.0    # mm  nominal fan frame size
+FAN_APERTURE  =  86.0    # mm  Ø of the circular opening (clears the blades)
+FAN_PATTERN   =  82.5    # mm  fan mounting hole square pattern
+FAN_HOLE      =   4.2    # mm  Ø -> 4.2 for M3 heat-set insert, 4.5 for M4 pass
+FAN_EDGE      =   3.5    # mm  min material between a hole / aperture and the edge
+FAN_DUCT_GAP  =  16.0    # mm  straight throat length at the rear wall
+#  fan cable notch in the rear wall: X, Y, W, H, side (+1 = right)
+FAN_CABLE_SLOT= (55.0, 14.0, 10.0, 5.0, 1)
 
 # ---- cable egress ------------------------------------------------------------
 CABLE_SLOT_C  = (20.0, 213.0)  # (Y centre, Z centre) on the LEFT (-X) wall
@@ -69,10 +88,10 @@ CABLE_SLOT_MIRROR = False      # True -> also cut the same slot in the right wal
 
 # ---- service opening + lid screws -------------------------------------------
 SVC_W         = 96.0     # mm  service opening width  (X)
-SVC_Z0, SVC_Z1= 172.0, 223.0   # mm  service opening extent in Z
+SVC_Z0, SVC_Z1= 174.0, 222.0   # mm  service opening extent in Z
 SVC_R         = 10.0     # mm  corner radius of the opening
-LID_SCREW_X   = 68.0     # mm  +/- X of the four lid screws
-LID_SCREW_Z   = (180.0, 215.0) # mm  Z of the four lid screws
+LID_SCREW_X   = 68.0     # mm  +/- X of the lid screws
+LID_SCREW_Z   = (185.0, 205.0, 225.0)   # mm  Z of the lid screws (both sides)
 LID_INSERT_D  = 10.0     # mm  depth of the heat-set insert bore from the top face
 LID_INSERT_DIA= 4.2      # mm  bore for M3 heat-set insert
 LID_CLEAR_DIA = 3.4      # mm  M3 clearance hole through the lid
@@ -107,6 +126,7 @@ INT_H   = CAGE_H + 2 * FIT_CLEAR           # internal height of the bay sleeve
 OUT_W   = INT_W + 2 * WALL                 # outside width
 BAY_H   = INT_H + FLOOR_T + WALL           # outside height of the bay section
 
+REAR_WALL_T = 2 * WALL                     # rear wall thickness (stiff, holds fan)
 Z_BAY   = CAGE_D                           # front face of the plenum
 Z_RIN   = CAGE_D + PLENUM_D                # inner face of the rear wall
 Z_OUT   = Z_RIN + REAR_WALL_T              # very back of the enclosure
@@ -114,14 +134,20 @@ Z_OUT   = Z_RIN + REAR_WALL_T              # very back of the enclosure
 BAY_Y0  = FLOOR_T                          # inside floor
 BAY_Y1  = FLOOR_T + INT_H                  # inside ceiling of the bay
 BAY_YC  = (BAY_Y0 + BAY_Y1) / 2.0          # bay vertical centre
-PLEN_Y1 = REAR_H - WALL                    # inside ceiling of the plenum
-FAN_CY  = REAR_H / 2.0                     # fan axis height
-
-XW      = OUT_W / 2.0                      # outer half width
-XI      = INT_W / 2.0                      # inner half width
 
 FAN_R   = FAN_APERTURE / 2.0
 FAN_OFF = FAN_PATTERN / 2.0                # +/- offset of the 4 fan holes
+
+# Rear section height: only as tall as the fan forces it to be.
+REAR_H  = max(BAY_H,                                       # never shorter
+              FAN_APERTURE + 2 * FAN_EDGE,                 # material round vent
+              2 * (FAN_OFF + FAN_HOLE / 2.0 + FAN_EDGE))   # material round holes
+PLEN_Y1 = REAR_H - WALL                    # inside ceiling of the plenum
+FAN_CY  = REAR_H / 2.0                     # fan axis height (centred)
+FLAT_TOP = abs(REAR_H - BAY_H) < 1e-9
+
+XW      = OUT_W / 2.0                      # outer half width
+XI      = INT_W / 2.0                      # inner half width
 
 
 # ==============================================================================
@@ -186,11 +212,11 @@ def stadium(center_y, center_z, height_y, length_z, span_x0, span_x1, r):
     return s
 
 
-def rounded_rect_prism(half_w, y0, y1, z0, z1, r):
+def rounded_rect_prism(half_w, y0, y1, z0, z1, r, x_centre=0.0):
     """Rounded rectangle in the XZ plane, extruded along Y."""
     W, D = 2 * half_w, z1 - z0
-    s = box(W, y1 - y0, D, -half_w, y0, z0)
-    for xx in (-half_w + r, half_w - r):
+    s = box(W, y1 - y0, D, x_centre - half_w, y0, z0)
+    for xx in (x_centre - half_w + r, x_centre + half_w - r):
         for zz in (z0 + r, z1 - r):
             s = s.fuse(cyl_y(r, y1 - y0, xx, zz, y0))
     return s
@@ -223,18 +249,25 @@ def build():
     bay_void = box(INT_W, INT_H, Z_BAY + 1.0, -XI, BAY_Y0, -1.0)
 
     # ------------------------------------------- airflow transition (duct) ---
-    #  rectangle 145.8 x 87.8  ->  circle Ø115, both as matched n-gons so the
+    #  rectangle 145.8 x 87.8  ->  circle Ø86, both as matched n-gons so the
     #  ruled loft cannot twist.  This is the "tapered bevel" of the spec.
     w_rect = polygon_wire(rect_points(XI, INT_H / 2.0, BAY_YC, DUCT_SEG), Z_BAY)
-    w_circ = polygon_wire(circle_points(FAN_R, FAN_CY, DUCT_SEG), Z_RIN - FAN_DUCT_GAP)
+    w_circ = polygon_wire(circle_points(FAN_R, FAN_CY, DUCT_SEG),
+                          Z_RIN - FAN_DUCT_GAP)
     duct = Part.makeLoft([w_rect, w_circ], solid=True, ruled=False)
-    duct = duct.fuse(cyl_z(FAN_R, FAN_DUCT_GAP + 1.0, 0.0, FAN_CY, Z_RIN - FAN_DUCT_GAP))
+    duct = duct.fuse(cyl_z(FAN_R, FAN_DUCT_GAP + 1.0, 0.0, FAN_CY,
+                           Z_RIN - FAN_DUCT_GAP))
     log.append(("airflow duct volume", duct.Volume))
 
-    # plenum upper cavity -> room for SFF-8087 boots, Wago 221 blocks, cables
-    top_cav = box(2 * (XI - 14.9), PLEN_Y1 - BAY_Y1, PLENUM_D,
-                  -(XI - 14.9), BAY_Y1, Z_BAY)
-    plenum_void = duct.fuse(top_cav)
+    # Upper plenum cavity - only exists when a big fan pushes the rear section
+    # above the bay height.  Zero height (and therefore absent) on a flat top:
+    # there the duct's own converging ceiling IS the plenum, and the service
+    # opening is simply cut through the 3 mm lid-side ceiling above it.
+    plenum_void = duct
+    if PLEN_Y1 > BAY_Y1 + 0.01:
+        plenum_void = plenum_void.fuse(
+            box(2 * (XI - 14.9), PLEN_Y1 - BAY_Y1, PLENUM_D,
+                -(XI - 14.9), BAY_Y1, Z_BAY))
 
     body = outer.cut(bay_void.fuse(plenum_void))
 
@@ -249,25 +282,22 @@ def build():
     # ------------------------------------------------------------------ cuts ---
     cuts = []
 
-    # --- 120 mm fan: aperture, 4 mounting holes, optional cable notch ---------
+    # --- fan: aperture, 4 mounting holes, cable notch ------------------------
     cuts.append(cyl_z(FAN_R, REAR_WALL_T + 2.0, 0.0, FAN_CY, Z_RIN - 1.0))
     for sx in (-1, 1):
         for sy in (-1, 1):
             cuts.append(cyl_z(FAN_HOLE / 2.0, REAR_WALL_T + 2.0,
                               sx * FAN_OFF, FAN_CY + sy * FAN_OFF, Z_RIN - 1.0))
-    fc_w, fc_h = FAN_CABLE_SLOT
-    cuts.append(rounded_rect_prism(fc_w / 2.0, 2.0, 2.0 + fc_h,
-                                   Z_RIN - 0.5, Z_OUT + 0.5, fc_h / 2.0 - 0.01))
-
-    # --- tapered duct: final straight throat into the rear wall --------------
-    #     (the loft already ends at the rear wall face, this just guarantees a
-    #      clean cylindrical land for the fan to sit against)
+    fx, fy, fw, fh, fside = FAN_CABLE_SLOT
+    cuts.append(rounded_rect_prism(fw / 2.0, fy - fh / 2.0, fy + fh / 2.0,
+                                   Z_RIN - 0.5, Z_OUT + 0.5, fh / 2.0 - 0.01,
+                                   x_centre=fside * fx))
 
     # --- top service opening -------------------------------------------------
     cuts.append(rounded_rect_prism(SVC_W / 2.0, PLEN_Y1 - 6.0, REAR_H + 2.0,
                                    SVC_Z0, SVC_Z1, SVC_R))
 
-    # --- lid heat-set insert bores (4x, from the top face downwards) ---------
+    # --- lid heat-set insert bores (from the top face downwards) -------------
     for sx in (-1, 1):
         for zz in LID_SCREW_Z:
             cuts.append(cyl_y(LID_INSERT_DIA / 2.0, LID_INSERT_D,
@@ -297,7 +327,8 @@ def build():
 
     # --- caddy entry lead-in flare ------------------------------------------
     w_in = polygon_wire(rect_points(XI, INT_H / 2.0, BAY_YC, DUCT_SEG), LEAD_DEPTH)
-    w_out = polygon_wire(rect_points(XI + LEAD_IN / 2.0, INT_H / 2.0 + LEAD_IN / 2.0,
+    w_out = polygon_wire(rect_points(XI + LEAD_IN / 2.0,
+                                     INT_H / 2.0 + LEAD_IN / 2.0,
                                      BAY_YC, DUCT_SEG), 0.0)
     cuts.append(Part.makeLoft([w_in, w_out], solid=True, ruled=True))
 
@@ -337,7 +368,7 @@ def material_depth(shape, x, z, y_top=None, probe_r=0.6, max_d=40.0, step=0.25):
     return d
 
 
-def ring_depths(shape, cx, cz, radius=3.4, n=8, **kw):
+def ring_depths(shape, cx, cz, radius=3.4, n=6, **kw):
     """Material depth sampled on a circle around a bore -> min wall thickness."""
     out = []
     for i in range(n):
@@ -367,19 +398,29 @@ def report(body, lid, log):
         % (OUT_W, BAY_H, Z_BAY))
     add("   fan/plenum section      : %.1f (W) x %.1f (H) x %.1f (D) mm"
         % (OUT_W, REAR_H, Z_OUT - Z_BAY))
+    add("   top profile             : %s"
+        % ("FLAT - rear section is the same height as the bay"
+           if FLAT_TOP else
+           "STEPPED - rear section is %.1f mm taller than the bay"
+           % (REAR_H - BAY_H)))
     add("   wall / floor / rear wall: %.1f / %.1f / %.1f mm"
         % (WALL, FLOOR_T, REAR_WALL_T))
     add("   plenum clear depth      : %.1f mm" % PLENUM_D)
     add("")
-    add(" 120 mm FAN")
+    add(" FAN  (%.0f mm class)" % FAN_SIZE)
     add("   aperture                : O%.1f at (0, %.1f) in the rear wall"
         % (FAN_APERTURE, FAN_CY))
     add("   hole pattern            : %.1f x %.1f square, O%.1f"
         % (FAN_PATTERN, FAN_PATTERN, FAN_HOLE))
     add("   hole centres (X,Y)      : (+/-%.1f, %.1f)  (+/-%.1f, %.1f)"
         % (FAN_OFF, FAN_CY - FAN_OFF, FAN_OFF, FAN_CY + FAN_OFF))
-    add("   cable notch             : %.1f x %.1f mm, low centre"
-        % FAN_CABLE_SLOT)
+    add("   edge margin, aperture   : %.2f mm  (top and bottom)"
+        % (REAR_H / 2.0 - FAN_R))
+    add("   edge margin, holes      : %.2f mm  (top and bottom)"
+        % (REAR_H / 2.0 - (FAN_OFF + FAN_HOLE / 2.0)))
+    add("   cable notch             : %.1f x %.1f mm at X=%+.1f Y=%.1f"
+        % (FAN_CABLE_SLOT[2], FAN_CABLE_SLOT[3],
+           FAN_CABLE_SLOT[4] * FAN_CABLE_SLOT[0], FAN_CABLE_SLOT[1]))
     add("")
     add(" CABLE EGRESS (left wall)")
     add("   stadium slot            : %.1f (Y) x %.1f (Z) mm at Y=%.1f Z=%.1f"
@@ -391,16 +432,18 @@ def report(body, lid, log):
         % (OUT_W, LID_T, Z_OUT - Z_BAY))
     add("   opening                 : %.1f wide, Z %.1f..%.1f, R%.1f corners"
         % (SVC_W, SVC_Z0, SVC_Z1, SVC_R))
-    add("   4x M3 lid screws        : X=+/-%.1f  Z=%s  (O%.1f insert / O%.1f clear)"
-        % (LID_SCREW_X, LID_SCREW_Z, LID_INSERT_DIA, LID_CLEAR_DIA))
+    add("   %d x M3 lid screws       : X=+/-%.1f  Z=%s"
+        % (2 * len(LID_SCREW_Z), LID_SCREW_X, LID_SCREW_Z))
+    add("                             O%.1f insert bore / O%.1f clearance"
+        % (LID_INSERT_DIA, LID_CLEAR_DIA))
     add("")
     add(" VOLUME / MASS")
-    for name, shp, dens in (("body", body, 1.27), ("lid", lid, 1.27)):
+    for name, shp in (("body", body), ("lid", lid)):
         v = shp.Volume
         add("   %-6s volume            : %10.1f mm3  = %6.1f cm3"
             % (name, v, v / 1000.0))
         add("   %-6s mass @1.27 g/cm3  : %8.0f g  (PETG, 100%% infill equiv)"
-            % (name, v / 1000.0 * dens))
+            % (name, v / 1000.0 * 1.27))
     add("")
     add(" SANITY CHECKS")
     add("   body valid              : %s" % body.isValid())
@@ -414,19 +457,19 @@ def report(body, lid, log):
         % (bb.XLength, bb.YLength, bb.ZLength))
     add("   body/lid interference    : %.4f mm3" % body.common(lid).Volume)
     add("   build volume (Bambu H2S 340x320x340):")
-    add("     body  fits            : %s"
-        % (bb_max(body) <= 340.0))
+    add("     body  fits            : %s" % (bb_max(body) <= 340.0))
     add("     lid   fits            : %s"
-        % (max(lid.BoundBox.XLength, lid.BoundBox.YLength, lid.BoundBox.ZLength) <= 340.0))
+        % (max(lid.BoundBox.XLength, lid.BoundBox.YLength,
+               lid.BoundBox.ZLength) <= 340.0))
     add("   lid-screw insert bores - material around the O%.1f bore:"
         % LID_INSERT_DIA)
     for sx in (-1, 1):
         for zz in LID_SCREW_Z:
             ds = ring_depths(body, sx * LID_SCREW_X, zz, radius=3.4, n=6,
                              y_top=REAR_H, max_d=LID_INSERT_D + 3.0)
-            ok = "OK" if min(ds) >= LID_INSERT_D else "TOO SHALLOW"
             add("     X=%+7.1f Z=%6.1f : min %.1f mm / max %.1f mm  -> %s"
-                % (sx * LID_SCREW_X, zz, min(ds), max(ds), ok))
+                % (sx * LID_SCREW_X, zz, min(ds), max(ds),
+                   "OK" if min(ds) >= LID_INSERT_D else "TOO SHALLOW"))
     add("   cable egress slot through the left wall:")
     cy, cz = CABLE_SLOT_C
     sh, sz = CABLE_SLOT_SZ
@@ -443,10 +486,20 @@ def report(body, lid, log):
             % (zz, REAR_H - d))
     add("")
     add(" NOTES")
-    add("   * The 120 mm fan will NOT fit across an 87.8 mm tall cage aperture, so")
-    add("     the rear section is taller (%.1f mm outside, %.1f mm inside) than the"
-        % (REAR_H, PLEN_Y1))
-    add("     bay (%.1f mm) - the extra height is the airflow plenum." % BAY_H)
+    if FLAT_TOP:
+        add("   * Flat top: the %.0f mm fan fits the %.1f mm bay height with"
+            % (FAN_SIZE, BAY_H))
+        add("     %.2f mm of material around the mounting holes."
+            % (REAR_H / 2.0 - (FAN_OFF + FAN_HOLE / 2.0)))
+        add("   * If you go back to a 120 mm fan set FAN_APERTURE=115.0 and")
+        add("     FAN_PATTERN=105.0; REAR_H then becomes %.1f mm by itself and"
+            % max(BAY_H, 115.0 + 2 * FAN_EDGE, 2 * (52.5 + 2.1 + 3.5)))
+        add("     the top steps up to a fan tower again.")
+    else:
+        add("   * The fan does not fit the %.1f mm bay height, so the rear"
+            % BAY_H)
+        add("     section is %.1f mm tall - the extra height is airflow plenum."
+            % REAR_H)
     add("   * Cage side-screw Z positions are a starting suggestion: drill/print")
     add("     only the pair that lines up with your cage's own holes.")
     add("   * Rear stop frame inner aperture: %.1f x %.1f mm"
