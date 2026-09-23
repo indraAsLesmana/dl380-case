@@ -1,0 +1,67 @@
+==============================================================================
+ DL380 G6/G7 8x2.5" SFF drive-cage desktop enclosure - build report
+==============================================================================
+
+ TARGET HARDWARE
+   cage outer              : 145.0 x 87.0 x 165.0 mm (W x H x D)
+   sleeve bore             : 145.8 x 87.8 mm  (0.4 mm/side clearance)
+
+ ENCLOSURE  (body)
+   outside W x H x D       : 151.4 x 132.0 x 235.6 mm
+   bay section             : 151.4 (W) x 94.6 (H) x 165.0 (D) mm
+   fan/plenum section      : 151.4 (W) x 132.0 (H) x 70.6 (D) mm
+   wall / floor / rear wall: 2.8 / 4.0 / 5.6 mm
+   plenum clear depth      : 65.0 mm
+
+ 120 mm FAN
+   aperture                : O115.0 at (0, 66.0) in the rear wall
+   hole pattern            : 105.0 x 105.0 square, O4.2
+   hole centres (X,Y)      : (+/-52.5, 13.5)  (+/-52.5, 118.5)
+   cable notch             : 12.0 x 4.0 mm, low centre
+
+ CABLE EGRESS (left wall)
+   stadium slot            : 16.0 (Y) x 30.0 (Z) mm at Y=20.0 Z=213.0
+   mirrored to right wall  : no
+
+ SERVICE LID
+   plate                   : 151.4 x 3.0 x 70.6 mm
+   opening                 : 96.0 wide, Z 172.0..223.0, R10.0 corners
+   4x M3 lid screws        : X=+/-68.0  Z=(180.0, 215.0)  (O4.2 insert / O3.4 clear)
+
+ VOLUME / MASS
+   body   volume            :   662275.3 mm3  =  662.3 cm3
+   body   mass @1.27 g/cm3  :      841 g  (PETG, 100% infill equiv)
+   lid    volume            :    41457.6 mm3  =   41.5 cm3
+   lid    mass @1.27 g/cm3  :       53 g  (PETG, 100% infill equiv)
+
+ SANITY CHECKS
+   body valid              : True
+   lid valid               : True
+   body closed (solid)     : True
+   body bbox               : 151.40 x 132.00 x 235.60
+   lid  bbox               : 151.40 x 5.00 x 70.60
+   body/lid interference    : 0.0000 mm3
+   build volume (Bambu H2S 340x320x340):
+     body  fits            : True
+     lid   fits            : True
+   lid-screw insert bores - material around the O4.2 bore:
+     X=  -68.0 Z= 180.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  -68.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  +68.0 Z= 180.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  +68.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK
+   cable egress slot through the left wall:
+     Y= 14.0 Z= 213.0 : 0% inside solid  -> CLEAR
+     Y= 20.0 Z= 213.0 : 0% inside solid  -> CLEAR
+     Y= 26.0 Z= 213.0 : 0% inside solid  -> CLEAR
+     Z= 198.0 : solid wall from the top face down to Y=22.0
+     Z= 213.0 : solid wall from the top face down to Y=28.0
+     Z= 228.0 : solid wall from the top face down to Y=22.0
+
+ NOTES
+   * The 120 mm fan will NOT fit across an 87.8 mm tall cage aperture, so
+     the rear section is taller (132.0 mm outside, 129.2 mm inside) than the
+     bay (94.6 mm) - the extra height is the airflow plenum.
+   * Cage side-screw Z positions are a starting suggestion: drill/print
+     only the pair that lines up with your cage's own holes.
+   * Rear stop frame inner aperture: 137.8 x 79.8 mm
+==============================================================================
