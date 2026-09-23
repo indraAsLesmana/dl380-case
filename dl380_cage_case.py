@@ -63,6 +63,9 @@ LID_T         = 3.0      # mm  service lid plate thickness
 LID_LIP_T     = 2.0      # mm  lid locating lip depth (drops into the opening)
 STOP_RIB_W    = 4.0      # mm  width of the internal rear stop frame
 STOP_RIB_D    = 3.0      # mm  how far the stop frame sticks into the bay
+REAR_WALL_LAYERS = 3     # rear wall in wall-units -> 8.4 mm, deep enough that a
+                         # standard 5.7 mm M3 heat-set insert seats fully and
+                         # still has material behind it
 
 # ---- wiring / airflow plenum -------------------------------------------------
 PLENUM_D      = 65.0     # mm  clear depth behind the backplane (spec: 65)
@@ -72,14 +75,18 @@ PLENUM_D      = 65.0     # mm  clear depth behind the backplane (spec: 65)
 # 120 mm fan  (original): aperture 115.0, pattern 105.0-> rear section becomes
 #                          123 mm tall.  Change the three FAN_* numbers and the
 #                          height follows; nothing else needs touching.
+FAN_MODEL     = "ARCTIC P9 PWM PST  (ACFAN00298A)"
 FAN_SIZE      =  92.0    # mm  nominal fan frame size
 FAN_APERTURE  =  86.0    # mm  Ø of the circular opening (clears the blades)
-FAN_PATTERN   =  82.5    # mm  fan mounting hole square pattern
+FAN_PATTERN   =  82.5    # mm  fan mounting hole square pattern (ARCTIC drawing)
 FAN_HOLE      =   4.2    # mm  Ø -> 4.2 for M3 heat-set insert, 4.5 for M4 pass
 FAN_EDGE      =   3.5    # mm  min material between a hole / aperture and the edge
 FAN_DUCT_GAP  =  16.0    # mm  straight throat length at the rear wall
 #  fan cable notch in the rear wall: X, Y, W, H, side (+1 = right)
-FAN_CABLE_SLOT= (55.0, 14.0, 10.0, 5.0, 1)
+#  sized to pass a standard 4-pin fan plug (housing is ~11 x 7 mm) from outside
+#  in to the Wago terminals, so the ARCTIC's 400 mm + 80 mm PST lead can be
+#  routed without cutting the connector off.
+FAN_CABLE_SLOT= (55.0, 14.0, 16.0, 9.0, 1)
 
 # ---- cable egress ------------------------------------------------------------
 CABLE_SLOT_C  = (20.0, 213.0)  # (Y centre, Z centre) on the LEFT (-X) wall
@@ -126,7 +133,7 @@ INT_H   = CAGE_H + 2 * FIT_CLEAR           # internal height of the bay sleeve
 OUT_W   = INT_W + 2 * WALL                 # outside width
 BAY_H   = INT_H + FLOOR_T + WALL           # outside height of the bay section
 
-REAR_WALL_T = 2 * WALL                     # rear wall thickness (stiff, holds fan)
+REAR_WALL_T = REAR_WALL_LAYERS * WALL      # rear wall thickness (stiff, holds fan)
 Z_BAY   = CAGE_D                           # front face of the plenum
 Z_RIN   = CAGE_D + PLENUM_D                # inner face of the rear wall
 Z_OUT   = Z_RIN + REAR_WALL_T              # very back of the enclosure
@@ -407,7 +414,13 @@ def report(body, lid, log):
         % (WALL, FLOOR_T, REAR_WALL_T))
     add("   plenum clear depth      : %.1f mm" % PLENUM_D)
     add("")
-    add(" FAN  (%.0f mm class)" % FAN_SIZE)
+    add(" FAN  -  %s" % FAN_MODEL)
+    add("   nominal size            : %.0f x %.0f x 25 mm, 106 g" % (FAN_SIZE, FAN_SIZE))
+    add("   P9 PWM PST rating       : 200-3000 rpm PWM (0 rpm below 5%),")
+    add("                             38.83 cfm | 65.97 m3/h, 3.12 mmH2O static,")
+    add("                             0.12 A @ 12 V = 1.44 W, fluid dynamic bearing")
+    add("   supplied lead           : 400 mm + 80 mm PST daisy-chain, 4-pin")
+    add("                             plug + 4-pin socket")
     add("   aperture                : O%.1f at (0, %.1f) in the rear wall"
         % (FAN_APERTURE, FAN_CY))
     add("   hole pattern            : %.1f x %.1f square, O%.1f"
@@ -418,9 +431,20 @@ def report(body, lid, log):
         % (REAR_H / 2.0 - FAN_R))
     add("   edge margin, holes      : %.2f mm  (top and bottom)"
         % (REAR_H / 2.0 - (FAN_OFF + FAN_HOLE / 2.0)))
+    add("   frame fit on rear face  : %.1f wide x %.1f tall -> %.1f mm side"
+        % (OUT_W, REAR_H, (OUT_W - FAN_SIZE) / 2.0))
+    add("                             margin, %.1f mm top/bottom"
+        % ((REAR_H - FAN_SIZE) / 2.0))
     add("   cable notch             : %.1f x %.1f mm at X=%+.1f Y=%.1f"
         % (FAN_CABLE_SLOT[2], FAN_CABLE_SLOT[3],
            FAN_CABLE_SLOT[4] * FAN_CABLE_SLOT[0], FAN_CABLE_SLOT[1]))
+    add("   mounting                : fan outside the %.1f mm rear wall;"
+        % REAR_WALL_T)
+    add("                             4x M3 heat-set insert pressed in from the")
+    add("                             outside face, M3 x 30 screws through the")
+    add("                             fan frame (~4.5 mm holes)")
+    add("   overall depth w/ fan    : %.1f mm (%.1f body + 25 fan)"
+        % (Z_OUT + 25.0, Z_OUT))
     add("")
     add(" CABLE EGRESS (left wall)")
     add("   stadium slot            : %.1f (Y) x %.1f (Z) mm at Y=%.1f Z=%.1f"

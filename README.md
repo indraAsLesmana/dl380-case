@@ -5,9 +5,9 @@ enclosure that turns a salvaged **HP ProLiant DL380 G6/G7 8-bay 2.5" SFF drive c
 with backplane** (cage assy P/N 496074-001 and relatives) into a standalone,
 fan-cooled JBOD-style box.
 
-Everything is generated from one script — change a number at the top, re-run,
-get a new STEP file. The case height is *derived from the fan*, so swapping fan
-size re-shapes the enclosure by itself.
+Fitted to an **ARCTIC P9 PWM PST 92 mm** fan. Everything is generated from one
+script — change a number at the top, re-run, get a new STEP file. The case height is
+*derived from the fan*, so swapping fan size re-shapes the enclosure by itself.
 
 ![front](out/body_front.png)
 ![cutaway](out/body_cut.png)
@@ -20,15 +20,18 @@ size re-shapes the enclosure by itself.
 | | |
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
-| Body solid | valid ✓ closed ✓ **151.40 × 94.60 × 235.60 mm** |
-| Lid solid | valid ✓ closed ✓ 151.40 × 5.00 × 70.60 mm |
+| Body solid | valid ✓ closed ✓ **151.40 × 94.60 × 238.40 mm** |
+| Lid solid | valid ✓ closed ✓ 151.40 × 5.00 × 73.40 mm |
 | Top profile | **flat** — rear section is the same 94.6 mm as the bay |
 | Body ↔ lid interference | 0.0000 mm³ |
 | Build volume (Bambu Lab H2S, 340×320×340) | body fits ✓ lid fits ✓ |
 | Lid insert bosses | 13.0 mm of solid material around every Ø4.2 bore ✓ |
 | Cable egress | slot verified open through the wall ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **18 probes, 0 failures** ✓ |
 
-Full generated report: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt)
+Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
+written by the build; `verify_step.py` re-reads the exported STEP, so its 18 probes
+also prove the STEP round-trip lost nothing.
 
 ---
 
@@ -49,18 +52,18 @@ Nominal cage envelope used for the model: **145.0 × 87.0 × 165.0 mm (W × H ×
 ## Design
 
 ```
-      z=0                                                          z=235.6
-      |  <------------- 165.0 mm bay ------------->|<- 65 plenum ->|<- wall
-      +============================================+===============+   y=94.6
-      |  ^                                         |  airflow      |    FLAT
-      |  |                                         |  transition   |    TOP
-      |  |  HP cage sleeve, front wide open         |  rect->circle |
-      |  |  145.8 x 87.8  (+0.4 mm/side)            |               |
-      |  |                                         |  SFF-8087 +   |
-      |  |  ### internal rear stop frame ###        |  Wago 221 bay |
-      |  v                                         |               |   y=0
-      +============================================+=== O86 fan ===+
-                                                      (rear face)
+      z=0                                                          z=238.4
+      |  <------------- 165.0 mm bay ------------->|<- 65 plenum ->|<-8.4->| y=94.6
+      +============================================+===============+=======+  FLAT
+      |  ^                                         |  airflow      | fan   |  TOP
+      |  |                                         |  transition   | wall  |
+      |  |  HP cage sleeve, front wide open         |  rect->circle |       |
+      |  |  145.8 x 87.8  (+0.4 mm/side)            |               |  O86  |
+      |  |                                         |  SFF-8087 +   |       |
+      |  |  ### internal rear stop frame ###        |  Wago 221 bay |       |
+      |  v                                         |               |       | y=0
+      +============================================+===============+=======+
+                                                     (rear face)   ^ fan mounts here
 ```
 
 ### Sections
@@ -72,21 +75,21 @@ bay seats the cage; the frame's inner aperture is 137.8 × 79.8 mm, so it stops 
 cage without choking the airflow path through the backplane.
 
 **Plenum (z 165 → 230)** — 65 mm of clear volume behind the backplane for the two
-SFF-8087 mini-SAS cable boots and three Wago 221 lever terminal blocks. On a flat
-top the plenum is simply the full-height cavity behind the cage, and the service
-opening drops straight into it.
+SFF-8087 mini-SAS cable boots and three Wago 221 lever terminal blocks. The fan
+draws 1.44 W, which is nothing for a Wago 221, so it can be fed from the same
+terminals as the drives.
 
 **Duct** — an internal **rect → circle transition**. A ruled loft between the
 145.8 × 87.8 sleeve rectangle and an Ø86 circle centred on the fan axis, built from
 two angle-matched 96-gon wires so the surface is twist-free. This is the "tapered
 bevel" of the brief: it squeezes the 12 801 mm² cage aperture down to the fan's
-5 809 mm² swept disc over 65 mm instead of dumping a rectangular jet at a round fan.
+~5 809 mm² swept disc over 65 mm instead of dumping a rectangular jet at a round fan.
 
-**Rear wall (z 230 → 235.6)** — 5.6 mm thick: Ø86 aperture centred at Y = 47.3,
-four Ø4.2 holes on an 82.5 × 82.5 mm square pattern for M3 heat-set inserts (or
-Ø4.5 for M4 pass-through — change `FAN_HOLE`), and a 10 × 5 mm notch at X = +55 for
-the fan's own cable. Edge margin is 4.30 mm around the aperture and 3.95 mm around
-the mounting holes.
+**Rear wall (z 230 → 238.4)** — **8.4 mm** thick (3 × wall). Deliberately thicker
+than the other walls so a standard 5.7 mm M3 heat-set insert seats fully with
+material behind it, and so a 30 mm fan screw has something to bite into. It carries
+the Ø86 aperture centred at Y = 47.3, four Ø4.2 holes on an 82.5 × 82.5 mm square
+pattern, and a 16 × 9 mm notch at X = +55 for the fan lead.
 
 **Cable egress** — a 16 × 30 mm stadium (rounded-end) slot in the left wall at the
 rear of the plenum, Y 12 → 28 mm, for two external SAS cables plus one Molex DC
@@ -122,15 +125,57 @@ Set `FAN_APERTURE = 115.0` and `FAN_PATTERN = 105.0` and the rear section grows 
 
 ---
 
+## Fitted fan — ARCTIC P9 PWM PST (ACFAN00298A)
+
+Figures below are from ARCTIC's own spec sheet (`Spec_Sheet_P9_PWM_PST_EN.pdf`),
+not from a reseller listing.
+
+| | |
+|---|---|
+| Frame | 92 × 92 × 25 mm, 106 g |
+| Mounting hole pattern | **82.5 × 82.5 mm** — matches the model's `FAN_PATTERN` |
+| Speed | 200–3000 rpm, PWM controlled (0 rpm below 5 % duty) |
+| Airflow | 38.83 cfm / 65.97 m³/h |
+| Static pressure | 3.12 mmH₂O — a high-pressure fan, which is what a caddy-stacked backplane needs |
+| Bearing | fluid dynamic |
+| Electrical | 12 V DC, 0.12 A = **1.44 W**, starts at 5 V |
+| Lead | 400 mm + 80 mm PST daisy-chain, 4-pin plug **and** 4-pin socket |
+| Ambient | 0–40 °C, 6 year warranty |
+
+**Fit against this enclosure**
+
+| | |
+|---|---|
+| Rear face | 151.4 × 94.6 mm |
+| Side margin | 29.7 mm each side |
+| Top/bottom margin | **1.3 mm** — the 92 mm frame is nearly the full case height |
+| Edge margin, aperture | 4.30 mm |
+| Edge margin, mounting holes | 3.95 mm |
+| Overall depth with fan fitted | **263.4 mm** (238.4 body + 25 fan) |
+
+**Mounting** — the fan sits on the *outside* of the rear wall. There is no room for
+it inside: the plenum bore is 87.8 mm tall and the fan frame is 92 mm. Press four M3
+heat-set inserts into the Ø4.2 holes from the outside face — the 8.4 mm wall takes a
+standard 5.7 mm insert with material to spare — then run M3 × 30 mm screws through
+the fan's own (~4.5 mm) frame holes.
+
+**Fan lead** — the 4-pin plug housing is roughly 11 × 7 mm, so the wall notch is
+**16 × 9 mm**, sized so the connector passes through intact and can be landed on the
+Wago terminals instead of being cut off. Point the fan's outboard face away from the
+case (exhaust) and check the moulded airflow arrow.
+
+---
+
 ## BOM
 
 | Item | Qty | Notes |
 |---|---|---|
-| Printed body | 1 | ≈ 650 cm³ / ≈ 826 g at 1.27 g/cm³ |
-| Printed service lid | 1 | ≈ 41 cm³ / ≈ 52 g |
-| 92 × 92 × 25 mm fan | 1 | rear-mounted, exhaust |
-| M3 × 6 heat-set insert | 6 | into the lid bosses |
+| Printed body | 1 | ≈ 673 cm³ / ≈ 855 g at 1.27 g/cm³ |
+| Printed service lid | 1 | ≈ 42 cm³ / ≈ 53 g |
+| **ARCTIC P9 PWM PST 92 mm** | 1 | rear-mounted, exhaust; 106 g |
+| M3 × 6 heat-set insert | **10** | 6 in the lid bosses, 4 in the rear wall for the fan |
 | M3 × 10–12 screw | 6 | lid |
+| M3 × 30 screw | 4 | through the fan frame into the rear-wall inserts |
 | M3 screw + nut | 2–6 | cage anchoring (see caveats) |
 | Rubber feet Ø12 × 2 mm | 4 | |
 | SFF-8087 → SFF-8088 cables | 2 | exit through the side slot |
@@ -144,22 +189,25 @@ with the front opening up; the duct is a shallow taper, not an overhang.
 
 ---
 
-## Rebuilding
+## Rebuilding and verifying
 
 ```bash
 # generate STEP + STL + report into ./out
 freecadcmd dl380_cage_case.py
 
+# re-probe the exported STEP: every opening open, every wall solid
+freecadcmd verify_step.py
+
 # optional: dependency-free preview renders (SVG -> PNG via rsvg-convert)
 python3 render_stl.py out/dl380_cage_case_body.stl out/body.png
 ```
 
-Tested with FreeCAD 1.1.3 (`freecadcmd`). The script also runs from the FreeCAD GUI
+Tested with FreeCAD 1.1.3 (`freecadcmd`). The scripts also run from the FreeCAD GUI
 Python console via `exec(open("dl380_cage_case.py").read())`.
 
-`render_stl.py` is a self-contained painter's-algorithm shaded renderer — it only
-needs `rsvg-convert` (or any SVG rasteriser) and no Python packages at all. It draws
-a front, rear, side, top and half-section cutaway view.
+`render_stl.py` is a self-contained painter's-algorithm shaded renderer — it needs
+only `rsvg-convert` (or any SVG rasteriser) and no Python packages at all. It draws
+front, rear, side, top and half-section cutaway views.
 
 ---
 
@@ -172,11 +220,14 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `CAGE_W` / `CAGE_H` / `CAGE_D` | 145.0 / 87.0 / 165.0 | HP cage envelope |
 | `FIT_CLEAR` | 0.4 | slide-in clearance, per side |
 | `WALL` / `FLOOR_T` | 2.8 / 4.0 | wall and floor thickness |
+| `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm for the fan inserts |
 | `PLENUM_D` | 65.0 | clear depth behind the backplane |
-| `FAN_SIZE` | 92.0 | nominal fan frame (documentation only) |
+| `FAN_MODEL` | ARCTIC P9 PWM PST | documentation only |
+| `FAN_SIZE` | 92.0 | nominal fan frame |
 | `FAN_APERTURE` / `FAN_PATTERN` | 86.0 / 82.5 | opening Ø and hole pattern |
 | `FAN_HOLE` | 4.2 | 4.2 for M3 inserts, 4.5 for M4 pass-through |
 | `FAN_EDGE` | 3.5 | min material between a hole and the case edge |
+| `FAN_CABLE_SLOT` | (55, 14, 16, 9, +1) | X, Y, W, H, side — sized for a 4-pin plug |
 | `CABLE_SLOT_C` / `CABLE_SLOT_SZ` | (20, 213) / (16, 30) | egress slot position and size |
 | `CAGE_SCREW_Z` | 15…155 | candidate cage anchor positions |
 | `LID_SCREW_X` / `LID_SCREW_Z` | 68.0 / (185, 205, 225) | lid screw positions |
@@ -190,14 +241,19 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
    per side wall as a *menu*, not a measurement — the real cage's own holes were not
    measured. Check which position lines up with your cage and drop the rest from the
    list before you print. The rear stop frame holds the cage regardless.
-2. **Fan edge margin is 3.95 mm** around the Ø4.2 mounting holes, because a 92 mm
-   fan pattern is very nearly the full 94.6 mm case height. That is fine for M3 in
-   PETG, but if you want more, go down to an 80 mm fan
-   (`FAN_APERTURE = 76.0`, `FAN_PATTERN = 71.5`) — nothing else needs changing.
-3. **Dimensions are from the brief, not from calipers.** If your cage measures
+2. **Top/bottom fan clearance is only 1.3 mm.** The 92 mm frame is almost exactly the
+   case height, so the fan sits nearly flush with the top and bottom of the rear face.
+   Check the P9's frame edges and its corner anti-vibration pads for moulding flash
+   before tightening — if it fouls, shim it.
+3. **Fan edge margin is 3.95 mm** around the Ø4.2 mounting holes, because a 92 mm
+   pattern is very nearly the full 94.6 mm case height. That is fine for M3 in PETG,
+   but if you want more, go down to an 80 mm fan (`FAN_APERTURE = 76.0`,
+   `FAN_PATTERN = 71.5`) — nothing else needs changing.
+4. **Dimensions are from the brief, not from calipers.** If your cage measures
    differently, change `CAGE_W` / `CAGE_H` / `CAGE_D` and rebuild.
-4. Nothing here has been printed yet. The geometry is verified as valid, closed and
-   non-interfering, but that is not the same as a successful print.
+5. **Nothing here has been printed yet.** The geometry is verified as valid, closed,
+   non-interfering, and feature-by-feature against the exported STEP, but that is not
+   the same as a successful print.
 
 ---
 
@@ -205,6 +261,7 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 
 ```
 dl380_cage_case.py            parametric model -> STEP/STL (the thing to edit)
+verify_step.py                re-probes the exported STEP; non-zero exit on failure
 render_stl.py                 standalone STL -> shaded PNG renderer
 docs/reference/               photos of the target hardware
 out/
