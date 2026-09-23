@@ -145,9 +145,6 @@ def main():
         svg = "%s_%s.svg" % (base, name)
         render(tris, svg, az, el, section=sec)
         outs.append(svg)
-    subprocess.run(["rsvg-convert", "-w", "1000"] + outs[:1] +
-                   ["-o", png], check=True)
-    # individual files
     for svg in outs:
         subprocess.run(["rsvg-convert", "-w", "1000", svg,
                         "-o", svg[:-4] + ".png"], check=True)
