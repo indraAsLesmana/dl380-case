@@ -20,14 +20,34 @@
    P9 PWM PST rating       : 200-3000 rpm PWM (0 rpm below 5%),
                              38.83 cfm | 65.97 m3/h, 3.12 mmH2O static,
                              0.12 A @ 12 V = 1.44 W, fluid dynamic bearing
-   position                : INSIDE, against the rear wall, Z 248.0..273.0
-   bore it sits in         : 145.8 (W) x 96.0 (H) x 108.0 (D) mm
-   frame clearance         : 2.0 mm on every side of the frame
+   position                : in a slot against the rear wall, Z 248.0..273.0,
+                             seated on the plenum floor
+   fan axis                : (0, 50.0) - the frame sits ON the floor at
+                             y=4.0, so the axis is 2.0 mm below the
+                             centre of the plenum bore
    hole pattern            : 82.5 x 82.5 square, O4.2
-   hole centres (X,Y)      : (+/-41.2, 10.8)  (+/-41.2, 93.2)
-   mounting                : M3 heat-set inserts pressed into the rear
-                             wall from OUTSIDE, M3 x 30 screws through
-                             the fan frame from inside the plenum
+   hole centres (X,Y)      : (+/-41.2, 8.8)  (+/-41.2, 91.2)
+
+ FAN HOUSING  - it slides in from the top and sets tight with no screws
+   how it goes in          : straight DOWN into the slot at Z 248.0..273.0
+   seat                    : the plenum floor.  This sets the height, so
+                             the screw holes line up if you ever use them
+   sides (X)               : two guide rails 42.0 mm up from the floor,
+                             0.20 mm clearance per side, 1.8 mm lead-in
+   behind (Z+)             : the rear wall / grille face
+   forward (Z-)            : two front corner tabs, 16.0 mm tall - the fan
+                             cannot tip forward past them
+   up (Y+)                 : two fins on the lid's underside reach down to
+                             y=97.0, 1.0 mm above the frame's top edge
+   => restrained on four sides by the case and on the fifth by the lid
+
+   On the rails: they are a SNUG fit, not a press fit, and that is
+   deliberate.  A rigid slot narrower than the fan frame cannot be
+   inserted into at all - the fan jams at the top - so an interference
+   fit is geometrically impossible here.  0.2 mm per side is what stops
+   it rattling.  Tune it with FAN_GUIDE_CLEAR, and set FAN_LID_GAP to
+   change how much the fan can lift.  The 4 x O4.2 screw holes are still
+   there if you would rather bolt it.
 
  HONEYCOMB EXHAUST GRILLE  (recessed into the outer face)
    pocket                  : O90.0, 5.4 mm deep
@@ -35,7 +55,7 @@
    cell / web              : 9.0 mm across flats / 1.2 mm walls
    cells                   : 55
    open fraction of field  : 78%
-   tightest edge margin    : 5.80 mm (pocket to the top edge)
+   tightest edge margin    : 7.80 mm (pocket to the top edge)
 
  PicoPSU CRADLE  (plenum floor, 20.0 mm behind the backplane)
    board                   : 31.0 (W) x 44.0 (L) x 21.0 (H) mm
@@ -61,7 +81,7 @@
    2 slots                : 17.0 (X) x 12.0 (Y) mm, rounded corners
    centres                 : X=-60.0   Y = 33.0, 50.0
    fitted SFF-8088 lead    : ~12.5 x 8 mm, so 4.5 x 4.0 mm of slack
-   clearance to the grille : 6.54 mm (slot corner to the pocket)
+   clearance to the grille : 6.50 mm (slot corner to the pocket)
    clearance to the edge   : 7.20 mm outboard
 
  SERVICE LID  (drop-on housing - it stays on with no screws)
@@ -80,12 +100,14 @@
                              ABOVE the plenum ceiling at y=100.0, so it
                              never enters the plenum at all
    lip vs the fan          : stops 6.0 mm short of the fan at Z 248.0
-   headroom over the frame : 2.0 mm (frame top y=98.0, ceiling y=100.0)
+   headroom over the frame : 4.0 mm (frame top y=96.0, ceiling y=100.0)
    skirt vs the case       : the skirt is outside the case, so it cannot
                              reach any cable that is inside
 
    service opening         : 109.8 wide, Z 172.0..273.0, R12.0 corners
-   fan drop-in window      : Z 235.4 .. 248.0  (12.6 mm of slack, then push it back against the rear wall)
+   entry for the fan       : Z 248.0..273.0, straight down into the housing.
+                             The front tabs and rails make that the only
+                             way in, so there is nothing to slide or align
    roof left beside opening: 18.0 mm each side, plus 7.0 mm across
                              the front
 
@@ -100,10 +122,10 @@
                              front wall, so one had to give
 
  VOLUME / MASS
-   body   volume            :   523774.3 mm3  =  523.8 cm3
-   body   mass @1.27 g/cm3  :      665 g  (PETG, 100% infill equiv)
-   lid    volume            :    87834.0 mm3  =   87.8 cm3
-   lid    mass @1.27 g/cm3  :      112 g  (PETG, 100% infill equiv)
+   body   volume            :   530281.3 mm3  =  530.3 cm3
+   body   mass @1.27 g/cm3  :      673 g  (PETG, 100% infill equiv)
+   lid    volume            :    88693.6 mm3  =   88.7 cm3
+   lid    mass @1.27 g/cm3  :      113 g  (PETG, 100% infill equiv)
    strap  volume            :     3822.2 mm3  =    3.8 cm3
    strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
 

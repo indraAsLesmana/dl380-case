@@ -104,6 +104,22 @@ FAN_PATTERN   =  82.5    # mm  fan mounting hole square pattern (ARCTIC drawing)
 FAN_HOLE      =   4.2    # mm  Ø -> 4.2 for M3 heat-set insert, 4.5 for M4 pass
 FAN_INSET     =  25.0    # mm  fan depth; it hugs the inside of the rear wall
 
+# ---- fan housing -------------------------------------------------------------
+#  The fan slides straight DOWN into a slot from the top and seats on the plenum
+#  floor.  It is held by geometry on four sides and by the lid on the fifth, so
+#  it sets tight with no screws at all.
+#
+#  Note there is deliberately NO interference on the guides.  A rigid rail
+#  cannot give a press fit: a slot narrower than the fan frame simply cannot be
+#  inserted into, so the only workable snug fit is a small positive clearance.
+FAN_GUIDE_CLEAR = 0.2    # mm  clearance per side between fan frame and rail
+FAN_GUIDE_T     = 3.0    # mm  rail thickness
+FAN_GUIDE_H     = 42.0   # mm  rail height above the plenum floor
+FAN_GUIDE_CHAM  = 1.8    # mm  lead-in chamfer at the top of each rail
+FAN_TAB_H       = 16.0   # mm  front corner tab height
+FAN_TAB_Z       = 3.0    # mm  front corner tab depth
+FAN_LID_GAP     = 1.0    # mm  gap between the fan's top edge and the lid fin
+
 # ---- honeycomb exhaust grille ------------------------------------------------
 GRILLE_CELL   =   9.0    # mm  honeycomb cell size, across flats
 GRILLE_WEB    =   1.2    # mm  material between cells (3 lines @ 0.4 mm nozzle)
@@ -220,8 +236,19 @@ PLEN_Y1 = REAR_H - WALL                    # inside ceiling of the plenum
 
 FAN_R   = FAN_APERTURE / 2.0
 FAN_OFF = FAN_PATTERN / 2.0                # +/- offset of the 4 fan holes
-FAN_CY  = (BAY_Y0 + PLEN_Y1) / 2.0         # fan axis, centred in the plenum bore
 FAN_Z0  = Z_RIN - FAN_INSET                # front face of the fan
+
+# ---- fan housing -------------------------------------------------------------
+#  The fan SEATS ON THE PLENUM FLOOR, so its axis drops to FLOOR_T + FAN_SIZE/2
+#  and everything keyed off it - the grille, the mounting holes - follows.
+FAN_CY      = FLOOR_T + FAN_SIZE / 2.0     # fan axis, with the fan on the floor
+FAN_HALF    = FAN_SIZE / 2.0
+FAN_TOP     = FLOOR_T + FAN_SIZE           # top edge of the fan frame
+GUIDE_X     = FAN_HALF + FAN_GUIDE_CLEAR   # rail inner face
+GUIDE_XO    = GUIDE_X + FAN_GUIDE_T        # rail outer face
+FAN_TAB_Z1  = FAN_Z0 - FAN_GUIDE_CLEAR     # front tab, rear face
+FAN_TAB_Z0  = FAN_TAB_Z1 - FAN_TAB_Z       # front tab, front face
+LID_FIN_Y0  = FAN_TOP + FAN_LID_GAP        # bottom of the lid's retainer fin
 
 # honeycomb geometry: R sizes a perfect tiling, Rp the shrunken cells we cut
 GRILLE_R        = (GRILLE_CELL + GRILLE_WEB) / math.sqrt(3.0)
@@ -451,6 +478,24 @@ def build():
     for side in (1, -1):
         body = body.fuse(gusset(XI, PLEN_Y1, GUSSET_H, Z_BAY, Z_RIN, side))
 
+    # ------------------------------------------------ fan housing in plenum ---
+    #  A slot the fan slides straight down into from the top.  It seats on the
+    #  plenum floor and is guided in X by two rails; the rear wall is behind it
+    #  and two front corner tabs stop it tipping forward.  The lid reaches down
+    #  to its top edge, which is what stops it lifting.  No screws needed.
+    for sx in (1, -1):
+        p = [(sx * GUIDE_X, FLOOR_T),
+             (sx * GUIDE_XO, FLOOR_T),
+             (sx * GUIDE_XO, FLOOR_T + FAN_GUIDE_H),
+             (sx * (GUIDE_X + FAN_GUIDE_CHAM), FLOOR_T + FAN_GUIDE_H),
+             (sx * GUIDE_X, FLOOR_T + FAN_GUIDE_H - FAN_GUIDE_CHAM)]
+        if sx < 0:
+            p.reverse()
+        body = body.fuse(prism(p, FAN_Z0, FAN_INSET))
+        tx = GUIDE_X if sx > 0 else -GUIDE_XO
+        body = body.fuse(box(FAN_GUIDE_T, FAN_TAB_H, FAN_TAB_Z,
+                             tx, FLOOR_T, FAN_TAB_Z0))
+
     # ----------------------------------------------- PicoPSU cradle in plenum ---
     #  plinth the board stands on
     body = body.fuse(box(2 * PSU_XH, PSU_PLINTH_T, 2 * PSU_ZH,
@@ -578,6 +623,13 @@ def build():
     lid = lid.fuse(rounded_rect_prism(SVC_HALF - 0.5, REAR_H - LID_LIP_T,
                                       REAR_H, SVC_Z0 + 0.5, LID_LIP_END,
                                       SVC_R - 0.5))
+    #  retainer fins, reaching down beside the fan's top edge.  These are what
+    #  stop the fan lifting out of its housing, so the lid is the fan's fifth
+    #  restraint and no screws are needed for it either.
+    for sx in (1, -1):
+        fx = GUIDE_X if sx > 0 else -GUIDE_XO
+        lid = lid.fuse(box(FAN_GUIDE_T, REAR_H - LID_FIN_Y0, FAN_INSET - 0.3,
+                           fx, LID_FIN_Y0, FAN_Z0))
     for sx in (-1, 1):
         for zz in LID_SCREW_Z:
             lid = lid.cut(cyl_y(LID_CLEAR_DIA / 2.0, LID_T + LID_LIP_T + 2.0,
@@ -660,19 +712,46 @@ def report(body, lid, strap, log):
     add("   P9 PWM PST rating       : 200-3000 rpm PWM (0 rpm below 5%),")
     add("                             38.83 cfm | 65.97 m3/h, 3.12 mmH2O static,")
     add("                             0.12 A @ 12 V = 1.44 W, fluid dynamic bearing")
-    add("   position                : INSIDE, against the rear wall, Z %.1f..%.1f"
+    add("   position                : in a slot against the rear wall, Z %.1f..%.1f,"
         % (FAN_Z0, Z_RIN))
-    add("   bore it sits in         : %.1f (W) x %.1f (H) x %.1f (D) mm"
-        % (INT_W, PLEN_Y1 - BAY_Y0, PLENUM_D))
-    add("   frame clearance         : %.1f mm on every side of the frame"
-        % FAN_INNER_CLEAR)
+    add("                             seated on the plenum floor")
+    add("   fan axis                : (0, %.1f) - the frame sits ON the floor at"
+        % FAN_CY)
+    add("                             y=%.1f, so the axis is %.1f mm below the"
+        % (FLOOR_T, (PLEN_Y1 + BAY_Y0) / 2.0 - FAN_CY))
+    add("                             centre of the plenum bore")
     add("   hole pattern            : %.1f x %.1f square, O%.1f"
         % (FAN_PATTERN, FAN_PATTERN, FAN_HOLE))
     add("   hole centres (X,Y)      : (+/-%.1f, %.1f)  (+/-%.1f, %.1f)"
         % (FAN_OFF, FAN_CY - FAN_OFF, FAN_OFF, FAN_CY + FAN_OFF))
-    add("   mounting                : M3 heat-set inserts pressed into the rear")
-    add("                             wall from OUTSIDE, M3 x 30 screws through")
-    add("                             the fan frame from inside the plenum")
+    add("")
+    add(" FAN HOUSING  - it slides in from the top and sets tight with no screws")
+    add("   how it goes in          : straight DOWN into the slot at Z %.1f..%.1f"
+        % (FAN_Z0, Z_RIN))
+    add("   seat                    : the plenum floor.  This sets the height, so")
+    add("                             the screw holes line up if you ever use them")
+    add("   sides (X)               : two guide rails %.1f mm up from the floor,"
+        % FAN_GUIDE_H)
+    add("                             %.2f mm clearance per side, %.1f mm lead-in"
+        % (FAN_GUIDE_CLEAR, FAN_GUIDE_CHAM))
+    add("   behind (Z+)             : the rear wall / grille face")
+    add("   forward (Z-)            : two front corner tabs, %.1f mm tall - the fan"
+        % FAN_TAB_H)
+    add("                             cannot tip forward past them")
+    add("   up (Y+)                 : two fins on the lid's underside reach down to")
+    add("                             y=%.1f, %.1f mm above the frame's top edge"
+        % (LID_FIN_Y0, FAN_LID_GAP))
+    add("   => restrained on four sides by the case and on the fifth by the lid")
+    add("")
+    add("   On the rails: they are a SNUG fit, not a press fit, and that is")
+    add("   deliberate.  A rigid slot narrower than the fan frame cannot be")
+    add("   inserted into at all - the fan jams at the top - so an interference")
+    add("   fit is geometrically impossible here.  %.1f mm per side is what stops"
+        % FAN_GUIDE_CLEAR)
+    add("   it rattling.  Tune it with FAN_GUIDE_CLEAR, and set FAN_LID_GAP to")
+    add("   change how much the fan can lift.  The 4 x O%.1f screw holes are still"
+        % FAN_HOLE)
+    add("   there if you would rather bolt it.")
     add("")
     add(" HONEYCOMB EXHAUST GRILLE  (recessed into the outer face)")
     add("   pocket                  : O%.1f, %.1f mm deep"
@@ -758,17 +837,16 @@ def report(body, lid, strap, log):
     add("   lip vs the fan          : stops %.1f mm short of the fan at Z %.1f"
         % (FAN_Z0 - LID_LIP_END, FAN_Z0))
     add("   headroom over the frame : %.1f mm (frame top y=%.1f, ceiling y=%.1f)"
-        % (PLEN_Y1 - (FAN_CY + FAN_SIZE / 2.0), FAN_CY + FAN_SIZE / 2.0, PLEN_Y1))
+        % (PLEN_Y1 - FAN_TOP, FAN_TOP, PLEN_Y1))
     add("   skirt vs the case       : the skirt is outside the case, so it cannot")
     add("                             reach any cable that is inside")
     add("")
     add("   service opening         : %.1f wide, Z %.1f..%.1f, R%.1f corners"
         % (2 * SVC_HALF, SVC_Z0, SVC_Z1, SVC_R))
-    add("   fan drop-in window      : Z %.1f .. %.1f  (%s)"
-        % (FAN_DROP_LO, FAN_DROP_HI,
-           "%.1f mm of slack, then push it back against the rear wall"
-           % (FAN_DROP_HI - FAN_DROP_LO) if FAN_DROP_HI >= FAN_DROP_LO
-           else "*** FAN CANNOT BE FITTED ***"))
+    add("   entry for the fan       : Z %.1f..%.1f, straight down into the housing."
+        % (FAN_Z0, Z_RIN))
+    add("                             The front tabs and rails make that the only")
+    add("                             way in, so there is nothing to slide or align")
     add("   roof left beside opening: %.1f mm each side, plus %.1f mm across"
         % (XI - SVC_HALF, SVC_Z0 - Z_BAY))
     add("                             the front")

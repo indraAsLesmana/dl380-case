@@ -38,7 +38,15 @@ REAR_H = FLOOR_T + INT_H_PLEN + WALL                      # 102.8
 PLEN_Y1 = REAR_H - WALL                                   # 100.0
 FAN_R = FAN_APERTURE / 2.0                                # 43.0
 FAN_OFF = FAN_PATTERN / 2.0                               # 41.25
-FAN_CY = (FLOOR_T + PLEN_Y1) / 2.0                        # 52.0
+FAN_TOP = FLOOR_T + FAN_SIZE                              # 96.0
+FAN_CY = FLOOR_T + FAN_SIZE / 2.0                         # 50.0 - seats on floor
+
+# fan housing
+FAN_GUIDE_CLEAR, FAN_GUIDE_T, FAN_GUIDE_H = 0.2, 3.0, 42.0
+FAN_LID_GAP = 1.0
+GUIDE_X = FAN_SIZE / 2.0 + FAN_GUIDE_CLEAR                # 46.2 rail inner face
+GUIDE_XC = GUIDE_X + FAN_GUIDE_T / 2.0                    # rail mid-thickness
+LID_FIN_Y0 = FAN_TOP + FAN_LID_GAP                        # 97.0 fin bottom
 
 XW = (INT_W + 2 * WALL) / 2.0                             # 75.7
 XI = INT_W / 2.0                                          # 72.9
@@ -104,6 +112,11 @@ CASES = [
     ("fan hole  bottom-left",     (-FAN_OFF, FAN_CY - FAN_OFF, ZW), "void"),
     ("plenum  fan bay",           (0.0, FAN_CY, 230.0),             "void"),
     ("plenum  clear volume",      (0.0, 60.0, 220.0),               "void"),
+    ("fan housing, rail right",   (GUIDE_XC, 20.0, FAN_Z0 + 12.0),  "solid"),
+    ("fan housing, rail left",    (-GUIDE_XC, 20.0, FAN_Z0 + 12.0), "solid"),
+    ("fan housing, front tab",    (GUIDE_XC, 10.0, FAN_Z0 - 1.5),   "solid"),
+    ("fan housing, slot is clear", (0.0, FAN_CY, FAN_Z0 + 12.0),    "void"),
+    ("in front of the housing",   (0.0, FAN_CY, FAN_Z0 - 10.0),     "void"),
     ("cradle interior",           (0.0, FLOOR_T + 11.0, 200.0),     "void"),
     ("cradle interior  corner",   (13.0, PSU_TOP - 2.0, PSU_Z1 - 2.0), "void"),
     ("cradle plinth",             (0.0, FLOOR_T + 1.5, 200.0),      "solid"),
@@ -164,6 +177,9 @@ LID_CASES = [
                                                                      "void", 0.5),
     ("open over the fan",         (0.0, REAR_H - LID_LIP_T / 2.0, FAN_Z0 + 10.0),
                                                                      "void", 0.5),
+    ("fan retainer fin",          (GUIDE_XC, LID_FIN_Y0 + 2.0, FAN_Z0 + 12.0),
+                                                                     "solid"),
+    ("clearance under the fin",   (GUIDE_XC, FAN_TOP - 1.0, FAN_Z0 + 12.0), "void"),
     ("lid screw hole",            (LID_SCREW_X, REAR_H + LID_T / 2.0, LID_SCREW_Z),
                                                                      "void"),
 ]
