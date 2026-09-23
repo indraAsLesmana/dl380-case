@@ -7,12 +7,12 @@
    sleeve bore             : 145.8 x 87.8 mm  (0.4 mm/side clearance)
 
  ENCLOSURE  (body)
-   outside W x H x D       : 151.4 x 102.8 x 273.4 mm
+   outside W x H x D       : 151.4 x 102.8 x 281.4 mm
    bay section             : 151.4 (W) x 94.6 (H) x 165.0 (D) mm
-   fan/plenum section      : 151.4 (W) x 102.8 (H) x 108.4 (D) mm
+   fan/plenum section      : 151.4 (W) x 102.8 (H) x 116.4 (D) mm
    top profile             : STEPPED - rear section is 8.2 mm taller than the bay (fan is inside)
    wall / floor / rear wall: 2.8 / 4.0 / 8.4 mm
-   plenum clear depth      : 100.0 mm
+   plenum clear depth      : 108.0 mm
    roof gussets            : 18.0 mm tall at 45 deg, carrying the lid screws
 
  FAN  -  ARCTIC P9 PWM PST  (ACFAN00298A)
@@ -20,8 +20,8 @@
    P9 PWM PST rating       : 200-3000 rpm PWM (0 rpm below 5%),
                              38.83 cfm | 65.97 m3/h, 3.12 mmH2O static,
                              0.12 A @ 12 V = 1.44 W, fluid dynamic bearing
-   position                : INSIDE, against the rear wall, Z 240.0..265.0
-   bore it sits in         : 145.8 (W) x 96.0 (H) x 100.0 (D) mm
+   position                : INSIDE, against the rear wall, Z 248.0..273.0
+   bore it sits in         : 145.8 (W) x 96.0 (H) x 108.0 (D) mm
    frame clearance         : 2.0 mm on every side of the frame
    hole pattern            : 82.5 x 82.5 square, O4.2
    hole centres (X,Y)      : (+/-41.2, 10.8)  (+/-41.2, 93.2)
@@ -37,6 +37,26 @@
    open fraction of field  : 78%
    tightest edge margin    : 5.80 mm (pocket to the top edge)
 
+ PicoPSU CRADLE  (plenum floor, 20.0 mm behind the backplane)
+   board                   : 31.0 (W) x 44.0 (L) x 21.0 (H) mm
+   cradle inner            : 32.6 x 45.6 mm, 0.8 mm clearance per side
+   cradle Z                : 185.0 .. 230.6  (mouth to rear wall)
+   backplane clearance     : 20.0 mm from the cradle mouth to the
+                             backplane face - the board cannot reach it
+   plinth                  : 3.0 mm, board sits clear of the floor
+   front lip               : 6.0 mm tall (3.0 mm above the plinth),
+                             stops the board sliding forward
+   retaining strap         : 50.2 x 4.0 x 20.0 mm, 2 x M3 into corner
+                             bosses with O4.2 heat-set inserts,
+                             0.4 mm gap over the board top
+
+ DC INPUT JACK  (rear wall)
+   centre                  : (+60.0, 52.0)
+   panel counterbore       : O16.0 x 5.0 mm deep, leaving a 3.4 mm
+                             thick panel for the jack nut
+   jack hole               : O8.0 through
+   edge margin             : 7.70 mm outboard
+
  CABLE EGRESS  (rear wall, beside the grille)
    2 slots                : 17.0 (X) x 12.0 (Y) mm, rounded corners
    centres                 : X=-60.0   Y = 33.0, 50.0
@@ -45,27 +65,36 @@
    clearance to the edge   : 7.20 mm outboard
 
  SERVICE LID
-   plate                   : 151.4 x 3.0 x 108.4 mm
+   plate                   : 151.4 x 3.0 x 116.4 mm
    opening                 : 109.8 wide, Z 172.0..258.0, R12.0 corners
    6 x M3 lid screws       : X=+/-70.0  Z=(185.0, 215.0, 245.0)
                              O4.2 insert bore / O3.4 clearance
 
  VOLUME / MASS
-   body   volume            :   497354.8 mm3  =  497.4 cm3
-   body   mass @1.27 g/cm3  :      632 g  (PETG, 100% infill equiv)
-   lid    volume            :    67567.9 mm3  =   67.6 cm3
-   lid    mass @1.27 g/cm3  :       86 g  (PETG, 100% infill equiv)
+   body   volume            :   528927.6 mm3  =  528.9 cm3
+   body   mass @1.27 g/cm3  :      672 g  (PETG, 100% infill equiv)
+   lid    volume            :    71201.5 mm3  =   71.2 cm3
+   lid    mass @1.27 g/cm3  :       90 g  (PETG, 100% infill equiv)
+   strap  volume            :     3943.4 mm3  =    3.9 cm3
+   strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
 
  SANITY CHECKS
    body valid              : True
    lid valid               : True
+   strap valid             : True
    body closed (solid)     : True
-   body bbox               : 151.40 x 102.80 x 273.40
-   lid  bbox               : 151.40 x 5.00 x 108.40
+   strap closed (solid)    : True
+   body bbox               : 151.40 x 102.80 x 281.40
+   lid  bbox               : 151.40 x 5.00 x 116.40
    body/lid interference    : 0.0000 mm3
+   body/strap interference  : 0.0000 mm3
    build volume (Bambu H2S 340x320x340):
      body  fits            : True
      lid   fits            : True
+     strap fits            : True
+   PicoPSU phantom fit (board pushed to the rear of the cradle):
+     board/body interference: 0.0000 mm3  -> CLEAR
+     board front to backplane: 21.60 mm in the rearmost position
    lid-screw insert bores - material around the O4.2 bore:
      X=  -70.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
      X=  -70.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK

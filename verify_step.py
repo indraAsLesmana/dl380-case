@@ -30,7 +30,7 @@ STEP = _arg if _arg.lower().endswith((".step", ".stp")) else _DEFAULT
 # ---- geometry constants, mirrored from dl380_cage_case.py -------------------
 INT_H, INT_W = 87.8, 145.8
 FLOOR_T, WALL = 4.0, 2.8
-CAGE_D, PLENUM_D, REAR_WALL_T = 165.0, 100.0, 8.4
+CAGE_D, PLENUM_D, REAR_WALL_T = 165.0, 108.0, 8.4
 
 FAN_SIZE, FAN_APERTURE, FAN_PATTERN, FAN_INNER_CLEAR = 92.0, 86.0, 82.5, 2.0
 INT_H_PLEN = max(INT_H, FAN_SIZE + 2 * FAN_INNER_CLEAR)
@@ -43,7 +43,8 @@ FAN_CY = (FLOOR_T + PLEN_Y1) / 2.0                        # 52.0
 XW = (INT_W + 2 * WALL) / 2.0                             # 75.7
 XI = INT_W / 2.0                                          # 72.9
 Z_BAY = CAGE_D                                            # 165.0
-Z_RIN = CAGE_D + PLENUM_D                                 # 265.0
+Z_RIN = CAGE_D + PLENUM_D                                 # 273.0
+Z_OUT = Z_RIN + REAR_WALL_T                               # 281.4
 ZW = Z_RIN + REAR_WALL_T / 2.0                            # mid rear-wall
 
 GRILLE_CELL, GRILLE_WEB, GRILLE_RIM = 9.0, 1.2, 2.0
@@ -53,6 +54,24 @@ SVC_HALF = XI - GUSSET_H                                  # 54.9
 LID_SCREW_X, LID_SCREW_Z = 70.0, 185.0
 REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y = -60.0, (33.0, 50.0)
 REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H = 17.0, 12.0
+
+# PicoPSU cradle
+PSU_W, PSU_L, PSU_H = 31.0, 44.0, 21.0
+PSU_CLEAR, PSU_BOOT, PSU_PLINTH_T = 0.8, 20.0, 3.0
+PSU_WALL_H, PSU_FRONT_LIP = 24.0, 6.0
+PSU_BOSS_W, PSU_BOSS_L = 6.0, 14.0
+PSU_XH = (PSU_W + 2 * PSU_CLEAR) / 2.0                    # 16.3
+PSU_ZH = (PSU_L + 2 * PSU_CLEAR) / 2.0                    # 22.8
+PSU_Z0 = Z_BAY + PSU_BOOT                                 # 185.0
+PSU_Z1 = PSU_Z0 + 2 * PSU_ZH                              # 230.6
+PSU_TRAY_OH = PSU_XH + WALL                               # 19.1
+PSU_TOP = FLOOR_T + PSU_PLINTH_T + PSU_H + 0.4            # 28.4
+PSU_BOSS_X = PSU_XH + (WALL + PSU_BOSS_W) / 2.0           # 20.7
+PSU_BORE_Z = PSU_Z0 + PSU_BOSS_L / 2.0                    # 192.0
+
+# DC input jack
+DC_JACK_X, DC_JACK_Y = 60.0, 52.0
+DC_JACK_DIA, DC_JACK_PAD, DC_JACK_DEPTH = 8.0, 16.0, 5.0
 
 # the first honeycomb cell sits on the fan axis; the next column is offset
 _GR = (GRILLE_CELL + GRILLE_WEB) / math.sqrt(3.0)
@@ -68,8 +87,23 @@ CASES = [
     ("fan hole  bottom-right",    (FAN_OFF, FAN_CY - FAN_OFF, ZW),  "void"),
     ("fan hole  top-left",        (-FAN_OFF, FAN_CY + FAN_OFF, ZW), "void"),
     ("fan hole  bottom-left",     (-FAN_OFF, FAN_CY - FAN_OFF, ZW), "void"),
-    ("plenum  fan bay",           (0.0, FAN_CY, 200.0),             "void"),
-    ("plenum  clear volume",      (0.0, 30.0, 200.0),               "void"),
+    ("plenum  fan bay",           (0.0, FAN_CY, 230.0),             "void"),
+    ("plenum  clear volume",      (0.0, 60.0, 220.0),               "void"),
+    ("cradle interior",           (0.0, FLOOR_T + 11.0, 200.0),     "void"),
+    ("cradle interior  corner",   (13.0, PSU_TOP - 2.0, PSU_Z1 - 2.0), "void"),
+    ("cradle plinth",             (0.0, FLOOR_T + 1.5, 200.0),      "solid"),
+    ("cradle side wall",          (PSU_XH + WALL / 2.0, 15.0, 200.0), "solid"),
+    ("cradle rear wall",          (0.0, 15.0, PSU_Z1 + WALL / 2.0), "solid"),
+    ("cradle front lip",          (0.0, FLOOR_T + 1.0, PSU_Z0 - WALL / 2.0),
+                                                                     "solid"),
+    ("strap boss insert bore",    (PSU_BOSS_X, PSU_TOP - 4.0, PSU_BORE_Z),
+                                                                     "void"),
+    ("strap boss material",       (PSU_BOSS_X, FLOOR_T + 2.0, PSU_BORE_Z),
+                                                                     "solid"),
+    ("DC jack hole",              (DC_JACK_X, DC_JACK_Y, ZW),       "void"),
+    ("DC jack counterbore",       (DC_JACK_X, DC_JACK_Y, Z_OUT - DC_JACK_DEPTH / 2.0),
+                                                                     "void"),
+    ("rear wall beside jack",     (GRILLE_POCKET_R + 3.0, FAN_CY, ZW), "solid"),
     ("roof material  (gusset)",   (71.5, PLEN_Y1 + 1.5, 200.0),     "solid"),
     ("top service opening",       (0.0, REAR_H - 1.0, 215.0),       "void"),
     ("lid insert bore",           (LID_SCREW_X, REAR_H - 4.6, LID_SCREW_Z), "void"),

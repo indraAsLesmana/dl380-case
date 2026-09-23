@@ -68,7 +68,9 @@ GUSSET_H      = 18.0     # mm  45 deg gussets under the plenum roof.  They carry
                          # the lid screws and stop the roof bridging in mid air
 
 # ---- wiring / airflow plenum -------------------------------------------------
-PLENUM_D      = 100.0    # mm  clear depth behind the backplane
+PLENUM_D      = 108.0    # mm  clear depth behind the backplane.  Holds, front to
+                         #     back: 20 mm of cable boot space, a 55 mm PicoPSU
+                         #     cradle and the 25 mm fan against the rear wall.
 
 # ---- fan ---------------------------------------------------------------------
 #  92 mm (default): frame 92 -> rear section becomes 102.8 mm tall
@@ -95,6 +97,35 @@ REAR_CABLE_SLOT_X = -60.0          # mm  slot centre X
 REAR_CABLE_SLOT_Y = (33.0, 50.0)   # mm  slot centre heights
 REAR_CABLE_SLOT_W =  17.0          # mm  slot width in X
 REAR_CABLE_SLOT_H =  12.0          # mm  slot height in Y
+
+# ---- PicoPSU cradle ----------------------------------------------------------
+#  mini-box picoPSU-120 measured 31 x 44 x 21 mm (1U), 57 g with its harness.
+#  It sits in a cradle on the plenum floor 20 mm behind the backplane so it can
+#  never be pushed back onto the backplane PCB, and a strap over the top stops
+#  it lifting out.
+PSU_W, PSU_L, PSU_H = 31.0, 44.0, 21.0   # mm  board envelope
+PSU_CLEAR     =   0.8    # mm  clearance per side in the cradle
+PSU_BOOT      =  20.0    # mm  gap between the backplane and the cradle mouth
+PSU_PLINTH_T  =   3.0    # mm  the board sits on this, off the floor
+PSU_WALL_H    =  24.0    # mm  cradle wall height above the floor
+PSU_FRONT_LIP =   6.0    # mm  front wall height; the 3 mm above the plinth is
+                         #     what stops the board sliding forward
+PSU_STRAP_H   =   4.0    # mm  retaining strap thickness
+PSU_STRAP_L   =  20.0    # mm  retaining strap length in Z
+PSU_BOSS_W    =   6.0    # mm  boss sticking sideways past each cradle wall
+PSU_BOSS_L    =  14.0    # mm  boss length in Z
+PSU_INSERT_D  =  10.0    # mm  M3 heat-set insert depth into the boss
+PSU_SCREW_DIA =   3.4    # mm  M3 clearance through the strap
+
+# ---- DC input jack (rear wall) ----------------------------------------------
+#  For a panel-mount 5.5 x 2.5 mm barrel jack, matching the picoPSU-120's DC
+#  input.  The outer face is counterbored so the jack sees a 3.4 mm panel
+#  rather than the full 8.4 mm wall, which is thicker than most jacks accept.
+DC_JACK_X     =  60.0    # mm  centre X (right of the grille; cables exit left)
+DC_JACK_Y     =  52.0    # mm  centre Y
+DC_JACK_DIA   =   8.0    # mm  jack body hole
+DC_JACK_PAD   =  16.0    # mm  counterbore diameter in the outer face
+DC_JACK_DEPTH =   5.0    # mm  counterbore depth
 
 # ---- service opening + lid screws -------------------------------------------
 SVC_Z0, SVC_Z1= 172.0, 258.0   # mm  service opening extent in Z
@@ -164,6 +195,17 @@ GRILLE_POCKET_R = FAN_R + GRILLE_RIM       # recess radius in the outer face
 XW       = OUT_W / 2.0                     # outer half width
 XI       = INT_W / 2.0                     # inner half width
 SVC_HALF = XI - GUSSET_H                   # service opening half width
+
+# ---- PicoPSU cradle placement ------------------------------------------------
+PSU_XH      = (PSU_W + 2 * PSU_CLEAR) / 2.0    # cradle inner half width  16.3
+PSU_ZH      = (PSU_L + 2 * PSU_CLEAR) / 2.0    # cradle inner half length 22.8
+PSU_Z0      = Z_BAY + PSU_BOOT                 # cradle mouth            185.0
+PSU_Z1      = PSU_Z0 + 2 * PSU_ZH              # cradle inner rear       230.6
+PSU_TRAY_OH = PSU_XH + WALL                    # cradle outer half width  19.1
+PSU_TOP     = FLOOR_T + PSU_PLINTH_T + PSU_H + 0.4   # board top + clearance 28.4
+PSU_BOSS_X  = PSU_XH + (WALL + PSU_BOSS_W) / 2.0     # insert centre        20.7
+PSU_BORE_Z  = PSU_Z0 + PSU_BOSS_L / 2.0 + 0.0        # strap screw Z        192.0
+PSU_STRAP_X = PSU_TRAY_OH + PSU_BOSS_W               # strap half width     25.1
 
 
 # ==============================================================================
@@ -323,8 +365,40 @@ def build():
     for side in (1, -1):
         body = body.fuse(gusset(XI, PLEN_Y1, GUSSET_H, Z_BAY, Z_RIN, side))
 
+    # ----------------------------------------------- PicoPSU cradle in plenum ---
+    #  plinth the board stands on
+    body = body.fuse(box(2 * PSU_XH, PSU_PLINTH_T, 2 * PSU_ZH,
+                         -PSU_XH, FLOOR_T, PSU_Z0))
+    #  side walls
+    for sx in (1, -1):
+        x0 = PSU_XH if sx > 0 else -PSU_TRAY_OH
+        body = body.fuse(box(WALL, PSU_WALL_H, 2 * PSU_ZH, x0, FLOOR_T, PSU_Z0))
+    #  rear wall and the low lip across the mouth, which is what stops the
+    #  board sliding forward onto the backplane
+    body = body.fuse(box(2 * PSU_TRAY_OH, PSU_WALL_H, WALL,
+                         -PSU_TRAY_OH, FLOOR_T, PSU_Z1))
+    body = body.fuse(box(2 * PSU_TRAY_OH, PSU_FRONT_LIP, WALL,
+                         -PSU_TRAY_OH, FLOOR_T, PSU_Z0 - WALL))
+    #  corner bosses that take the retaining-strap inserts
+    for sx in (1, -1):
+        bx = PSU_TRAY_OH if sx > 0 else -(PSU_TRAY_OH + PSU_BOSS_W)
+        body = body.fuse(box(PSU_BOSS_W, PSU_TOP - FLOOR_T, PSU_BOSS_L,
+                             bx, FLOOR_T, PSU_BORE_Z - PSU_BOSS_L / 2.0))
+
     # ------------------------------------------------------------------ cuts ---
     cuts = []
+
+    # --- retaining-strap inserts in the two corner bosses --------------------
+    for sx in (1, -1):
+        cuts.append(cyl_y(LID_INSERT_DIA / 2.0, PSU_INSERT_D,
+                          sx * PSU_BOSS_X, PSU_BORE_Z,
+                          PSU_TOP - PSU_INSERT_D))
+
+    # --- DC input jack in the rear wall --------------------------------------
+    cuts.append(cyl_z(DC_JACK_DIA / 2.0, REAR_WALL_T + 2.0,
+                      DC_JACK_X, DC_JACK_Y, Z_RIN - 1.0))
+    cuts.append(cyl_z(DC_JACK_PAD / 2.0, DC_JACK_DEPTH + 1.0,
+                      DC_JACK_X, DC_JACK_Y, Z_OUT - DC_JACK_DEPTH))
 
     # --- fan mounting holes (screws come from inside the plenum) -------------
     for sx in (-1, 1):
@@ -397,7 +471,15 @@ def build():
                                 sx * LID_SCREW_X, zz, REAR_H - LID_LIP_T - 1.0))
     lid = _tidy(lid)
 
-    return body, lid, log
+    # ============================================== PicoPSU retaining strap ---
+    strap = box(2 * PSU_STRAP_X, PSU_STRAP_H, PSU_STRAP_L,
+                -PSU_STRAP_X, PSU_TOP, PSU_BORE_Z - PSU_STRAP_L / 2.0)
+    for sx in (1, -1):
+        strap = strap.cut(cyl_y(PSU_SCREW_DIA / 2.0, PSU_STRAP_H + 2.0,
+                                sx * PSU_BOSS_X, PSU_BORE_Z, PSU_TOP - 1.0))
+    strap = _tidy(strap)
+
+    return body, lid, strap, log
 
 
 # ==============================================================================
@@ -427,7 +509,7 @@ def ring_depths(shape, cx, cz, radius=3.4, n=6, **kw):
     return out
 
 
-def report(body, lid, log):
+def report(body, lid, strap, log):
     L = []
     add = L.append
     add("=" * 78)
@@ -489,6 +571,38 @@ def report(body, lid, log):
     add("   tightest edge margin    : %.2f mm (pocket to the top edge)"
         % (REAR_H - FAN_CY - GRILLE_POCKET_R))
     add("")
+    add(" PicoPSU CRADLE  (plenum floor, %.1f mm behind the backplane)"
+        % PSU_BOOT)
+    add("   board                   : %.1f (W) x %.1f (L) x %.1f (H) mm"
+        % (PSU_W, PSU_L, PSU_H))
+    add("   cradle inner            : %.1f x %.1f mm, %.1f mm clearance per side"
+        % (2 * PSU_XH, 2 * PSU_ZH, PSU_CLEAR))
+    add("   cradle Z                : %.1f .. %.1f  (mouth to rear wall)"
+        % (PSU_Z0, PSU_Z1))
+    add("   backplane clearance     : %.1f mm from the cradle mouth to the"
+        % PSU_BOOT)
+    add("                             backplane face - the board cannot reach it")
+    add("   plinth                  : %.1f mm, board sits clear of the floor"
+        % PSU_PLINTH_T)
+    add("   front lip               : %.1f mm tall (%.1f mm above the plinth),"
+        % (PSU_FRONT_LIP, PSU_FRONT_LIP - PSU_PLINTH_T))
+    add("                             stops the board sliding forward")
+    add("   retaining strap         : %.1f x %.1f x %.1f mm, 2 x M3 into corner"
+        % (2 * PSU_STRAP_X, PSU_STRAP_H, PSU_STRAP_L))
+    add("                             bosses with O%.1f heat-set inserts,"
+        % LID_INSERT_DIA)
+    add("                             %.1f mm gap over the board top"
+        % (PSU_TOP - FLOOR_T - PSU_PLINTH_T - PSU_H))
+    add("")
+    add(" DC INPUT JACK  (rear wall)")
+    add("   centre                  : (%+.1f, %.1f)" % (DC_JACK_X, DC_JACK_Y))
+    add("   panel counterbore       : O%.1f x %.1f mm deep, leaving a %.1f mm"
+        % (DC_JACK_PAD, DC_JACK_DEPTH, REAR_WALL_T - DC_JACK_DEPTH))
+    add("                             thick panel for the jack nut")
+    add("   jack hole               : O%.1f through" % DC_JACK_DIA)
+    add("   edge margin             : %.2f mm outboard"
+        % (XW - DC_JACK_X - DC_JACK_PAD / 2.0))
+    add("")
     add(" CABLE EGRESS  (rear wall, beside the grille)")
     add("   %d slots                : %.1f (X) x %.1f (Y) mm, rounded corners"
         % (len(REAR_CABLE_SLOT_Y), REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H))
@@ -515,7 +629,7 @@ def report(body, lid, log):
         % (LID_INSERT_DIA, LID_CLEAR_DIA))
     add("")
     add(" VOLUME / MASS")
-    for name, shp in (("body", body), ("lid", lid)):
+    for name, shp in (("body", body), ("lid", lid), ("strap", strap)):
         v = shp.Volume
         add("   %-6s volume            : %10.1f mm3  = %6.1f cm3"
             % (name, v, v / 1000.0))
@@ -525,7 +639,9 @@ def report(body, lid, log):
     add(" SANITY CHECKS")
     add("   body valid              : %s" % body.isValid())
     add("   lid valid               : %s" % lid.isValid())
+    add("   strap valid             : %s" % strap.isValid())
     add("   body closed (solid)     : %s" % body.isClosed())
+    add("   strap closed (solid)    : %s" % strap.isClosed())
     bb = body.BoundBox
     add("   body bbox               : %.2f x %.2f x %.2f"
         % (bb.XLength, bb.YLength, bb.ZLength))
@@ -533,11 +649,23 @@ def report(body, lid, log):
     add("   lid  bbox               : %.2f x %.2f x %.2f"
         % (bb.XLength, bb.YLength, bb.ZLength))
     add("   body/lid interference    : %.4f mm3" % body.common(lid).Volume)
+    add("   body/strap interference  : %.4f mm3" % body.common(strap).Volume)
     add("   build volume (Bambu H2S 340x320x340):")
     add("     body  fits            : %s" % (bb_max(body) <= 340.0))
     add("     lid   fits            : %s"
         % (max(lid.BoundBox.XLength, lid.BoundBox.YLength,
                lid.BoundBox.ZLength) <= 340.0))
+    add("     strap fits            : %s"
+        % (max(strap.BoundBox.XLength, strap.BoundBox.YLength,
+               strap.BoundBox.ZLength) <= 340.0))
+    add("   PicoPSU phantom fit (board pushed to the rear of the cradle):")
+    psu = box(PSU_W, PSU_H, PSU_L, -PSU_W / 2.0,
+              FLOOR_T + PSU_PLINTH_T, PSU_Z1 - PSU_L)
+    inter = body.common(psu).Volume
+    add("     board/body interference: %.4f mm3  -> %s"
+        % (inter, "CLEAR" if inter < 1e-6 else "FOULING"))
+    add("     board front to backplane: %.2f mm in the rearmost position"
+        % ((PSU_Z1 - PSU_L) - Z_BAY))
     add("   lid-screw insert bores - material around the O%.1f bore:"
         % LID_INSERT_DIA)
     for sx in (-1, 1):
@@ -591,13 +719,14 @@ def bb_max(shape):
 # 6. EXPORT
 # ==============================================================================
 
-def export(body, lid, log):
+def export(body, lid, strap, log):
     os.makedirs(OUT_DIR, exist_ok=True)
 
     doc = App.newDocument("dl380_cage_case")
-    ob, ol = doc.addObject("Part::Feature", "Case_Body"), \
-             doc.addObject("Part::Feature", "Service_Lid")
-    ob.Shape, ol.Shape = body, lid
+    ob = doc.addObject("Part::Feature", "Case_Body")
+    ol = doc.addObject("Part::Feature", "Service_Lid")
+    os_ = doc.addObject("Part::Feature", "PicoPSU_Strap")
+    ob.Shape, ol.Shape, os_.Shape = body, lid, strap
     doc.recompute()
 
     import Import
@@ -605,20 +734,20 @@ def export(body, lid, log):
 
     paths = []
     p_all = os.path.join(OUT_DIR, BASENAME + ".step")
-    Import.export([ob, ol], p_all)
+    Import.export([ob, ol, os_], p_all)
     paths.append(p_all)
 
-    for name, shape in (("body", body), ("lid", lid)):
+    for name, shape in (("body", body), ("lid", lid), ("strap", strap)):
         p = os.path.join(OUT_DIR, "%s_%s.step" % (BASENAME, name))
         shape.exportStep(p)
         paths.append(p)
 
-    for name, obj in (("body", ob), ("lid", ol)):
+    for name, obj in (("body", ob), ("lid", ol), ("strap", os_)):
         p = os.path.join(OUT_DIR, "%s_%s.stl" % (BASENAME, name))
         Mesh.export([obj], p)
         paths.append(p)
 
-    txt = report(body, lid, log)
+    txt = report(body, lid, strap, log)
     p = os.path.join(OUT_DIR, "%s_report.txt" % BASENAME)
     with open(p, "w") as f:
         f.write(txt)
@@ -632,8 +761,8 @@ def export(body, lid, log):
 # ==============================================================================
 
 def main():
-    body, lid, log = build()
-    paths, txt = export(body, lid, log)
+    body, lid, strap, log = build()
+    paths, txt = export(body, lid, strap, log)
     print(txt)
     print("FILES:")
     for p in paths:
