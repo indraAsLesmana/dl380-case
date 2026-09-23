@@ -88,6 +88,9 @@ grille membrane are designed to print unsupported.
 
 Check these before you go further:
 
+- **every outer edge is rounded** — R1.4 on the body, R1.0 on the lid, R1.4 on the
+  strap. Run a finger round it; if something feels sharp, it's a print defect, not
+  the design
 - the four Ø4.2 fan insert holes in the **outside** of the rear wall are clear
 - the honeycomb grille is open. The webs are 1.2 mm — **three 0.4 mm lines** — so
   don't use a nozzle bigger than 0.4 mm, and don't jab them with a scraper
@@ -129,7 +132,14 @@ up flush with the case's front face.
 
 **If it fights you**: don't force it. Find the tight corner, lift it out, look for
 print elephant-footing or blobs on the inside of the sleeve, scrape them off, and
-try again. The mouth has a 1.6 mm lead-in flare to help you start it square.
+try again.
+
+**One thing to expect**: the mouth's lead-in flare is only **0.8 mm** (0.4 mm per
+side) — half what it would be without the rounded outer corners, because the round
+and the flare both come out of the same 2.8 mm front wall. So the mouth is closer to
+a straight-edged hole than a funnel, and the cage has to go in **square** rather than
+being guided in by the taper. Start it gently and correct the angle rather than
+pushing; once it's started it slides freely.
 
 Pull it back out for now — you want the box empty for the inserts.
 
@@ -345,7 +355,8 @@ dab of cyanoacrylate if they're loose.
 
 | Symptom | Cause |
 |---|---|
-| Cage won't start into the mouth | printing blobs or elephant-footing inside the sleeve; scrape and retry. Don't force it — 0.4 mm/side is not a clearance you can bully |
+| Cage won't start into the mouth | the lead-in is only 0.8 mm and printing blobs or elephant-footing make it worse; scrape the sleeve and start it squarer. Don't force it — 0.4 mm/side is not a clearance you can bully |
+| Something on the outside feels sharp | a print defect, not the design — every outer edge is R1.4 / R1.0. Deburr it |
 | Cage stops short of the front face | something in the bay behind it, or it's wedged; lift out and look |
 | Fan won't drop into the plenum | you're forward of Z 248 and standing it on the PSU cradle — move it back to the Z 235–248 band |
 | Fan won't sit flat on the rear wall | its cable is trapped behind it, or a cable is in the way along the side |

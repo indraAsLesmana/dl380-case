@@ -29,11 +29,12 @@ the drive cage goes in and the order the internals have to be fitted.
 | Body ↔ lid / body ↔ strap interference | 0.0000 mm³ / 0.0000 mm³ |
 | PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR |
 | Build volume (Bambu Lab H2S, 340×320×340) | all three fit ✓ |
-| Body / strap STL watertight | 17 880 and 1 028 triangles, 0 non-manifold edges ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **33 probes, 0 failures** ✓ |
+| Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
+| All three STL watertight | 34 032 / 12 516 / 10 468 triangles, 0 non-manifold edges ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **35 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
-written by the build; `verify_step.py` re-reads the exported STEP, so its 33 probes
+written by the build; `verify_step.py` re-reads the exported STEP, so its 35 probes
 also prove the STEP round-trip lost nothing.
 
 ---
@@ -124,6 +125,24 @@ bridged 145.8 mm in mid air. Two **18 mm 45° gussets** run the length of the ro
 corners. They make the roof printable and give the lid screws their material.
 
 **Base** — four Ø12 × 2 mm recesses for rubber feet, in a 4 mm floor.
+
+**Edge treatment** — every outer edge is rounded: **R1.4** on the body and the PSU
+strap, **R1.0** on the lid. Nothing on the outside is a sharp edge.
+
+The rounds are applied to the **bare shell**, before anything is cut into it.
+Filleting the finished body would also try to round the 1.2 mm honeycomb webs and
+every internal corner, which OCC will not survive; and the coplanar faces have to be
+merged first, or the seams between the two shell boxes get filleted into grooves.
+
+R1.4 is close to the ceiling here: every outer edge sits on either a 2.8 mm wall or
+a 3 mm lid plate, and the round has to leave a printable rim behind it.
+
+**The cost, stated plainly**: the outer corner round and the cage lead-in flare both
+remove material from the same 2.8 mm front wall, and at the mouth corner they add
+up. Keeping the original 1.6 mm flare would have left **0.5 mm** there, so the flare
+is reduced to 0.8 mm, which leaves exactly **1.00 mm**. So the cage's lead-in is
+half what it was — see [INSTALL.md](INSTALL.md) step 2 for what that means in
+practice.
 
 ### Why the rear section steps up 8.2 mm
 
@@ -219,9 +238,9 @@ footprint (625 mm³ of interference) which nothing visual had flagged.
 
 | Item | Qty | Notes |
 |---|---|---|
-| Printed body | 1 | ≈ 528 cm³ / ≈ 671 g at 1.27 g/cm³ |
-| Printed service lid | 1 | ≈ 71 cm³ / ≈ 90 g |
-| Printed PSU strap | 1 | ≈ 3.9 cm³ / ≈ 5 g |
+| Printed body | 1 | ≈ 524 cm³ / ≈ 665 g at 1.27 g/cm³ |
+| Printed service lid | 1 | ≈ 74 cm³ / ≈ 94 g |
+| Printed PSU strap | 1 | ≈ 3.8 cm³ / ≈ 5 g |
 | **ARCTIC P9 PWM PST 92 mm** | 1 | inside the plenum, exhaust; 106 g |
 | **PicoPSU-120** (or similar) | 1 | 31 × 44 × 21 mm; add a 12 V brick + panel DC jack |
 | Panel-mount 5.5 × 2.5 mm DC jack | 1 | Ø8 body, ≤ 3.4 mm panel |
@@ -273,6 +292,8 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `CAGE_W` / `CAGE_H` / `CAGE_D` | 145.0 / 87.0 / 165.0 | HP cage envelope |
 | `FIT_CLEAR` | 0.4 | slide-in clearance, per side |
 | `WALL` / `FLOOR_T` | 2.8 / 4.0 | wall and floor thickness |
+| `FILLET_R` / `FILLET_R_LID` | 1.4 / 1.0 | outer edge rounds, body+strap / lid |
+| `LEAD_IN` / `LEAD_DEPTH` | 0.8 / 4.0 | cage lead-in flare — capped by the rounds |
 | `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm |
 | `GUSSET_H` | 18.0 | 45° roof gusset size (sets the service opening width) |
 | `PLENUM_D` | 108.0 | clear depth behind the backplane |
