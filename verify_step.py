@@ -49,6 +49,7 @@ ZW = Z_RIN + REAR_WALL_T / 2.0                            # mid rear-wall
 
 GRILLE_CELL, GRILLE_WEB, GRILLE_RIM = 9.0, 1.2, 2.0
 GRILLE_POCKET_R = FAN_R + GRILLE_RIM                      # 45.0
+FILLET_R = 1.4
 GUSSET_H = 18.0
 SVC_HALF = XI - GUSSET_H                                  # 54.9
 LID_SCREW_X, LID_SCREW_Z = 70.0, 185.0
@@ -121,6 +122,12 @@ CASES = [
     ("rear stop frame rib",       (0.0, FLOOR_T + 2.0, Z_BAY - 1.5), "solid"),
     ("floor material",            (0.0, 2.0, 100.0),                 "solid"),
     ("rubber foot recess",        (61.0, 1.0, 14.0),                 "void"),
+    # edge rounding: a point 0.35 mm in from the sharp corner along the diagonal
+    # is removed by a R1.4 round, and would be solid without one
+    ("fillets  corner removed",   (XW - 0.35 / math.sqrt(2.0),
+                                   FAN_CY, Z_OUT - 0.35 / math.sqrt(2.0)),
+                                                                     "void", 0.15),
+    ("fillets  wall kept",        (XW - 1.7, FAN_CY, Z_OUT - 2.4),   "solid"),
 ]
 
 
@@ -147,8 +154,10 @@ def main():
     print("  " + "-" * 62)
 
     failures = 0
-    for name, (x, y, z), want in CASES:
-        s = Part.makeSphere(1.0, Vector(x, y, z))
+    for case in CASES:
+        name, (x, y, z), want = case[0], case[1], case[2]
+        probe_r = case[3] if len(case) > 3 else 1.0
+        s = Part.makeSphere(probe_r, Vector(x, y, z))
         frac = s.common(body).Volume / s.Volume
         ok = frac < 0.05 if want == "void" else frac > 0.95
         failures += 0 if ok else 1

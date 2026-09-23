@@ -151,8 +151,20 @@ FOOT_X        = 61.0     # mm  +/- X of the foot centres
 FOOT_Z        = (14.0, 260.0)
 
 # ---- entry lead-in -----------------------------------------------------------
-LEAD_IN       = 1.6      # mm  flare added to the aperture at the mouth
+#  Deliberately small: the lead-in and the outer corner rounds both take material
+#  off the same 2.8 mm front wall.  Wall left at the mouth corner is
+#  WALL - FILLET_R - LEAD_IN/2 = 1.00 mm.
+LEAD_IN       = 0.8      # mm  total flare added to the aperture at the mouth
 LEAD_DEPTH    = 4.0      # mm  how deep that flare goes
+
+# ---- edge rounding -----------------------------------------------------------
+#  Rounded on the OUTSIDE only, for handling comfort and to stop the edges
+#  chipping.  Applied to the bare shell before anything is cut out of it;
+#  filleting the finished body would also try to round the honeycomb webs and
+#  every internal corner, which OCC will not survive.
+FILLET_R      = 1.4      # mm  body outer edges and the PSU strap
+FILLET_R_LID  = 1.0      # mm  lid plate - it is only 3 mm thick, and a 1.4 round
+                         #     would leave 0.2 mm at the rim
 
 # ---- faceting ----------------------------------------------------------------
 DUCT_SEG      = 96       # polygon segments used for the entry lead-in flare
@@ -348,16 +360,49 @@ def _tidy(shape):
     return shape
 
 
+def fillet_all(shape, r):
+    """Round every edge of a simple solid.
+
+    Only safe on a shape with no internal detail - run it on the bare shell
+    before cutting anything into it.  Coplanar faces must already have been
+    merged by _tidy(), otherwise the seams between them become grooves.
+    Steps down the radius if OCC refuses one.
+    """
+    if r <= 0.0:
+        return shape
+    last = None
+    for attempt in (r, r * 0.75, r * 0.5, r * 0.35):
+        try:
+            out = shape.makeFillet(attempt, shape.Edges)
+            if out.isValid() and out.Volume > 0.0:
+                if abs(attempt - r) > 1e-9:
+                    print("  (fillet: %.2f mm refused, used %.2f mm)"
+                          % (r, attempt))
+                return out
+        except Exception as exc:
+            last = exc
+    print("  (fillet: every radius refused, edges left sharp: %s)" % last)
+    return shape
+
+
 # ==============================================================================
 # 4. BUILD
 # ==============================================================================
 
 def build():
-    log = []
+    log = {}
 
     # ---------------------------------------------------------------- shell ---
     outer = box(OUT_W, BAY_H, Z_BAY, -XW, 0.0, 0.0)
     outer = outer.fuse(box(OUT_W, REAR_H, Z_OUT - Z_BAY, -XW, 0.0, Z_BAY))
+    #  Round every outer edge here, while the shell is still just two boxes.
+    #  _tidy() first, or the coplanar seams between the two boxes' faces would
+    #  get filleted into grooves.
+    outer = _tidy(outer)
+    v_shell = outer.Volume
+    outer = fillet_all(outer, FILLET_R)
+    log["shell_volume_bare"] = v_shell
+    log["shell_volume_filleted"] = outer.Volume
 
     # ---------------------------------------------------------------- voids ---
     bay_void = box(INT_W, INT_H, Z_BAY + 1.0, -XI, BAY_Y0, -1.0)
@@ -427,7 +472,7 @@ def build():
     cells = honeycomb_openings(0.0, FAN_CY, GRILLE_OPEN_R,
                                Z_RIN - 1.0, REAR_WALL_T + 2.0,
                                GRILLE_CELL, GRILLE_WEB)
-    log.append(("honeycomb cells", len(cells)))
+    log["honeycomb_cells"] = len(cells)
     cuts.extend(cells)
 
     # --- top service opening -------------------------------------------------
@@ -473,7 +518,8 @@ def build():
     body = _tidy(body)
 
     # ============================================================== service lid
-    lid = box(OUT_W, LID_T, Z_OUT - Z_BAY, -XW, REAR_H, Z_BAY)
+    lid = fillet_all(box(OUT_W, LID_T, Z_OUT - Z_BAY, -XW, REAR_H, Z_BAY),
+                     FILLET_R_LID)
     lid = lid.fuse(rounded_rect_prism(SVC_HALF - 0.5, REAR_H - LID_LIP_T,
                                       REAR_H, SVC_Z0 + 0.5, SVC_Z1 - 0.5,
                                       SVC_R - 0.5))
@@ -484,8 +530,9 @@ def build():
     lid = _tidy(lid)
 
     # ============================================== PicoPSU retaining strap ---
-    strap = box(2 * PSU_STRAP_X, PSU_STRAP_H, PSU_STRAP_L,
-                -PSU_STRAP_X, PSU_TOP, PSU_BORE_Z - PSU_STRAP_L / 2.0)
+    strap = fillet_all(box(2 * PSU_STRAP_X, PSU_STRAP_H, PSU_STRAP_L,
+                           -PSU_STRAP_X, PSU_TOP,
+                           PSU_BORE_Z - PSU_STRAP_L / 2.0), FILLET_R)
     for sx in (1, -1):
         strap = strap.cut(cyl_y(PSU_SCREW_DIA / 2.0, PSU_STRAP_H + 2.0,
                                 sx * PSU_BOSS_X, PSU_BORE_Z, PSU_TOP - 1.0))
@@ -578,7 +625,7 @@ def report(body, lid, strap, log):
     add("   membrane                : %.1f mm thick" % GRILLE_DEPTH)
     add("   cell / web              : %.1f mm across flats / %.1f mm walls"
         % (GRILLE_CELL, GRILLE_WEB))
-    add("   cells                   : %d" % log[0][1])
+    add("   cells                   : %d" % log["honeycomb_cells"])
     add("   open fraction of field  : %.0f%%" % (((GRILLE_RP / GRILLE_R) ** 2) * 100.0))
     add("   tightest edge margin    : %.2f mm (pocket to the top edge)"
         % (REAR_H - FAN_CY - GRILLE_POCKET_R))
@@ -647,6 +694,22 @@ def report(body, lid, strap, log):
         % (2 * len(LID_SCREW_Z), LID_SCREW_X, LID_SCREW_Z))
     add("                             O%.1f insert bore / O%.1f clearance"
         % (LID_INSERT_DIA, LID_CLEAR_DIA))
+    add("")
+    add(" EDGE TREATMENT  (outside edges only, for handling and to stop chipping)")
+    add("   body / strap fillet     : R%.1f on every outer edge" % FILLET_R)
+    add("   lid fillet              : R%.1f (its plate is only %.1f mm thick)"
+        % (FILLET_R_LID, LID_T))
+    add("   filleted                : %s"
+        % ("yes" if log["shell_volume_filleted"]
+           < log["shell_volume_bare"] - 1.0 else "NO - check the build log"))
+    add("   material the rounds took : %.0f mm3 off the bare shell"
+        % (log["shell_volume_bare"] - log["shell_volume_filleted"]))
+    add("   wall at the mouth corner : %.2f mm  (%.1f wall - R%.1f - %.1f lead-in)"
+        % (WALL - FILLET_R - LEAD_IN / 2.0, WALL, FILLET_R, LEAD_IN / 2.0))
+    add("   lead-in flare           : %.1f mm total, down from 1.6 mm - the round"
+        % LEAD_IN)
+    add("                             and the flare both cut the same 2.8 mm")
+    add("                             front wall, so one had to give")
     add("")
     add(" VOLUME / MASS")
     for name, shp in (("body", body), ("lid", lid), ("strap", strap)):

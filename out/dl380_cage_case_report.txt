@@ -73,12 +73,22 @@
    6 x M3 lid screws       : X=+/-70.0  Z=(185.0, 215.0, 245.0)
                              O4.2 insert bore / O3.4 clearance
 
+ EDGE TREATMENT  (outside edges only, for handling and to stop chipping)
+   body / strap fillet     : R1.4 on every outer edge
+   lid fillet              : R1.0 (its plate is only 3.0 mm thick)
+   filleted                : yes
+   material the rounds took : 896 mm3 off the bare shell
+   wall at the mouth corner : 1.00 mm  (2.8 wall - R1.4 - 0.4 lead-in)
+   lead-in flare           : 0.8 mm total, down from 1.6 mm - the round
+                             and the flare both cut the same 2.8 mm
+                             front wall, so one had to give
+
  VOLUME / MASS
-   body   volume            :   524316.0 mm3  =  524.3 cm3
-   body   mass @1.27 g/cm3  :      666 g  (PETG, 100% infill equiv)
-   lid    volume            :    74465.5 mm3  =   74.5 cm3
-   lid    mass @1.27 g/cm3  :       95 g  (PETG, 100% infill equiv)
-   strap  volume            :     3943.4 mm3  =    3.9 cm3
+   body   volume            :   523774.3 mm3  =  523.8 cm3
+   body   mass @1.27 g/cm3  :      665 g  (PETG, 100% infill equiv)
+   lid    volume            :    74234.3 mm3  =   74.2 cm3
+   lid    mass @1.27 g/cm3  :       94 g  (PETG, 100% infill equiv)
+   strap  volume            :     3822.2 mm3  =    3.8 cm3
    strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
 
  SANITY CHECKS
