@@ -171,40 +171,48 @@ Three things worth knowing:
 
 ## Step 4 — the fan (do this before the cage)
 
-The fan is the deepest thing in the case: it ends up hard against the **inside** of
-the rear wall at Z 248–273, so it goes in first while the plenum is empty.
+The fan is the deepest thing in the case. It has **its own housing**: it slides
+straight down into a slot and seats on the plenum floor, and **no screws are needed**.
 
 **Where it lands**
 
 | | |
 |---|---|
-| Position | Z 248 → 273, flat against the rear wall |
-| Frame | X ±46, Y 6 → 98 (2 mm clear of the bore on every side) |
-| Screws | 4 × M3 × 30 through the frame, from inside, into the outside-face inserts |
+| Slot | Z 248 → 273, straight down from above |
+| Seat | the plenum floor — the frame's bottom edge rests on it |
+| Frame | X ±46, guided by two rails with 0.2 mm clearance per side |
+| Up | two fins on the lid later come down to 1 mm above its top edge |
 
-**How to get it in.** The service opening in the top runs Z 172 → 273, and the PSU
-cradle occupies Z 182 → 233 on the floor. That leaves a drop-in window of
-**Z 235.4 → 248** — 12.6 mm of slack, and the report prints this number so you can
-check it for yourself.
+**How to get it in.** The service opening in the top runs Z 172 → 273. Lower the
+frame flat (hub up) into the **rear end** of that opening, over Z 248–273, and let
+it drop.
 
-1. Hold the fan flat (frame horizontal, hub up) over the **rear end** of the
-   opening, somewhere in Z 235–248. Anywhere in that band works.
-2. Lower it straight down until it rests on the floor of the plenum.
-3. **Slide it back** the last 12.6 mm until its frame touches the inside of the
-   rear wall.
+1. Line the frame up over the **rear end** of the opening. The two guide rails below
+   have a 1.8 mm chamfer at their tops to help you find the slot.
+2. Lower it straight down. It slides between the rails and lands on the plenum
+   floor.
+3. It is seated when the frame's bottom edge is flat on the floor and its rear face
+   is against the inside of the rear wall. There is 0.2 mm of play, so it feels snug
+   rather than loose.
 4. Check the airflow arrow points **out of the back** — this fan exhausts. Also
-   check its cable is trailing out of the front of the fan, toward the cradle end,
-   not pinched behind it.
+   check its lead trails out of the front of the frame, not trapped behind it.
 5. **Route the lead now, while there is room.** Run it forward along one side of
    the plenum, tucked down low against the floor, and leave it long enough to reach
-   the Wagos. The lid cannot trap it (its internal lip stops 6 mm short of the fan
-   and never enters the plenum), but a lead lying loose near the top opening is the
-   one thing you would have to fish out later.
-6. Start all four M3 × 30 screws by hand, then nip them up. The inserts are in
-   PETG: **snug, not tight.**
+   the Wagos. The lid cannot trap it, but a lead left looped up near the opening is
+   the one thing you would have to fish out later.
+6. That is it — no screws. Close the lid at step 11: its two underside fins come
+   down to just above the fan's top edge, and that is what stops the fan lifting
+   out. With the lid on, the case holds the fan on **four** sides and the lid holds
+   it on the **fifth**.
 
-If it will not drop in, you are too far forward and standing it on the PSU cradle.
-Move it back.
+**If you would rather bolt it**, the four M3 positions are still cut. Press heat-set
+inserts into the rear wall from **outside** and run M3 × 30 screws through the frame
+from inside the plenum. Nothing about the housing interferes with that.
+
+**If it will not go down**: check you are over the *rear end* of the opening and not
+the middle. The two front corner tabs — 16 mm tall, just in front of the slot — will
+stop the frame if you are forward of them. The fit is 0.2 mm per side, so if your
+printer runs tight that is the number to change.
 
 ---
 
@@ -341,6 +349,11 @@ shipping or if the case gets tipped.
 
 To get back in, just lift it off. No tools.
 
+**The lid is also the fan's fifth restraint.** Its two underside fins come down to
+1 mm above the fan's top edge — that is why the fan needs no screws. So fit the lid
+before you tip or carry the case: with the lid off, the fan is held only by gravity
+and the housing's snug fit.
+
 **If it will not go on**: take a scraper to the friction bead — the narrow band
 about 10 mm up the inside of the skirt — or rebuild with `SKIRT_BEAD = SKIRT_CLEAR`
 for a free slip fit. If it drops on too easily, raise `SKIRT_BEAD`. That one number
@@ -381,8 +394,10 @@ dab of cyanoacrylate if they're loose.
 | Cage won't start into the mouth | the lead-in is only 0.8 mm and printing blobs or elephant-footing make it worse; scrape the sleeve and start it squarer. Don't force it — 0.4 mm/side is not a clearance you can bully |
 | Something on the outside feels sharp | a print defect, not the design — every outer edge is R1.4 / R1.0. Deburr it |
 | Cage stops short of the front face | something in the bay behind it, or it's wedged; lift out and look |
-| Fan won't drop into the plenum | you're forward of Z 248 and standing it on the PSU cradle — move it back to the Z 235–248 band |
-| Fan won't sit flat on the rear wall | its cable is trapped behind it, or a cable is in the way along the side |
+| Fan won't drop into the plenum | you're forward of the housing — the two front corner tabs at Z 244.7–247.7 will stop the frame. Lower it over Z 248–273 |
+| Fan fits but rattles | the housing fit is 0.2 mm per side; lower `FAN_GUIDE_CLEAR` and rebuild |
+| Fan won't go into the housing | raise `FAN_GUIDE_CLEAR`, or scrape the two rails |
+| Fan lifts when I turn the case over | the lid is what holds it down — its two fins sit 1 mm above the frame. With the lid off, the fan is only held by gravity. Reduce `FAN_LID_GAP` if you want it clamped tighter |
 | PicoPSU won't start | PS_ON# isn't grounded (step 9) |
 | Strap won't sit down | the 24-pin ATX connector is standing up under it — move the strap along the cradle |
 | DC jack won't clamp | your jack's neck is shorter than 3.4 mm; reduce `DC_JACK_DEPTH` and rebuild |

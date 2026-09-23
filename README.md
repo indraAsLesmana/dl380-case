@@ -32,12 +32,13 @@ the drive cage goes in and the order the internals have to be fitted.
 | PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR |
 | Build volume (Bambu Lab H2S, 340×320×340) | all three fit ✓ |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
-| All three STL watertight | 34 032 / 31 844 / 10 468 triangles, 0 non-manifold edges ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **46 probes, 0 failures** ✓ |
+| **Fan housing** | **slides in from the top and needs no screws** — held 4 sides by the case, 5th by the lid |
+| All three STL watertight | 34 092 / 31 876 / 10 468 triangles, 0 non-manifold edges ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **53 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
 written by the build; `verify_step.py` re-reads the exported STEP and probes the
-body and the lid separately, so its 46 probes also prove the STEP round-trip lost
+body and the lid separately, so its 53 probes also prove the STEP round-trip lost
 nothing.
 
 ---
@@ -91,9 +92,34 @@ the cage without choking the airflow path through the backplane.
 | 233.4 → 248 | cable routing |
 | 248 → 273 | the fan, against the inside of the rear wall |
 
-**Fan — inside the case.** The ARCTIC P9 sits flat against the inside of the rear
-wall, 2 mm clear of the bore on every side, and exhausts straight through the
-grille. Nothing hangs off the back of the enclosure and the blades are protected.
+**Fan — its own housing, and it needs no screws.** The ARCTIC P9 **slides straight
+down into a slot** from the top and seats on the plenum floor, exhausting straight
+through the grille. Nothing hangs off the back of the enclosure and the blades are
+protected.
+
+| | |
+|---|---|
+| Slot | Z 248 → 273, straight down from above |
+| Seat | the plenum floor — this sets the height, so the screw holes still line up |
+| Sides | two guide rails, 42 mm up from the floor, 0.2 mm clearance per side, 1.8 mm lead-in chamfer at the top |
+| Behind | the rear wall / grille face |
+| Forward | two 16 mm front corner tabs — it cannot tip out |
+| Up | **two fins on the lid's underside** reach down to 1 mm above the frame's top edge |
+
+That last row is what makes "no screws" honest: the case holds the fan on four sides
+and **the lid holds it on the fifth**. There is nothing to line up and nothing to
+drop. The four M3 positions are still cut if you would rather bolt it.
+
+**One thing the rails are not.** They are a *snug* fit, not a press fit — and a press
+fit is geometrically impossible here. A rigid slot narrower than the fan frame cannot
+be inserted into: the fan just jams at the top. Both cases checked before building
+it: at 0.00 mm clearance the fan touches and grips nothing, and at −0.15 mm it cannot
+go in at all. So the clearance is what stops it rattling, and it is the tabs plus the
+lid fins that hold it. Tune with `FAN_GUIDE_CLEAR` and `FAN_LID_GAP`.
+
+Because the fan seats on the floor, its axis sits at **y = 50** rather than the
+plenum's centre at 52, and the grille pocket and all four mounting holes moved down
+2 mm with it.
 
 **Honeycomb exhaust grille** — punched through a **3 mm membrane** at the bottom of
 a Ø90 × 5.4 mm counterbore in the outer face, not through the full 8.4 mm wall, so
@@ -216,15 +242,17 @@ reseller listing.
 | Frame clearance | 2.0 mm on every side |
 | Fan position | Z 248 → 273, flat against the rear wall |
 | Grille field | Ø90 pocket, Ø~86 of actual honeycomb |
-| Mounting holes | Ø4.2 at (±41.25, 52 ± 41.25) |
+| Mounting holes | Ø4.2 at (±41.25, 50 ± 41.25) — optional, the housing holds it |
+| Housing | slot at Z 248→273, 0.2 mm per side, lid fins 1 mm above the frame top |
 
-**Mounting** — press four M3 heat-set inserts into the Ø4.2 holes from the
-**outside** face (the 8.4 mm wall takes a standard 5.7 mm insert with material to
-spare), then run M3 × 30 mm screws through the fan's own ~4.5 mm frame holes from
+**Mounting** — with the housing, mounting is just "lower it in". The four M3 × 30
+positions are still cut into the rear wall (heat-set inserts pressed in from the
+**outside** face) if you would rather bolt it, in which case the screws go in from
 inside the plenum. Point the fan so it exhausts outward and check the moulded
 airflow arrow.
 
 **Fan lead** — the 4-pin plug never leaves the case now, so no wall notch is needed.
+Route the lead forward along the plenum and tuck it down before the lid goes on.
 
 ---
 
@@ -331,6 +359,10 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `FAN_SIZE` / `FAN_INNER_CLEAR` | 92.0 / 2.0 | frame size and bore clearance |
 | `FAN_APERTURE` / `FAN_PATTERN` / `FAN_HOLE` | 86.0 / 82.5 / 4.2 | grille field and mounting pattern |
 | `FAN_INSET` | 25.0 | fan depth against the rear wall |
+| `FAN_GUIDE_CLEAR` | 0.2 | clearance per side in the fan housing — the fit to tune |
+| `FAN_GUIDE_T` / `FAN_GUIDE_H` / `FAN_GUIDE_CHAM` | 3.0 / 42.0 / 1.8 | rail thickness, height, lead-in |
+| `FAN_TAB_H` / `FAN_TAB_Z` | 16.0 / 3.0 | front corner tabs that stop the fan tipping |
+| `FAN_LID_GAP` | 1.0 | how far the lid's fin sits above the fan — how much it can lift |
 | `GRILLE_CELL` / `GRILLE_WEB` | 9.0 / 1.2 | honeycomb cell and web size |
 | `GRILLE_RIM` / `GRILLE_DEPTH` | 2.0 / 3.0 | solid rim, membrane thickness |
 | `PSU_W` / `PSU_L` / `PSU_H` | 31 / 44 / 21 | the board envelope |
