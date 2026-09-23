@@ -13,6 +13,9 @@ from the fan, so swapping fan size re-shapes the enclosure by itself.
 ![cutaway](out/body_cut.png)
 ![rear](out/body_rear.png)
 
+**Building it? → [INSTALL.md](INSTALL.md)** — step-by-step assembly, including how
+the drive cage goes in and the order the internals have to be fitted.
+
 ---
 
 ## Status
