@@ -128,12 +128,12 @@ DC_JACK_PAD   =  16.0    # mm  counterbore diameter in the outer face
 DC_JACK_DEPTH =   5.0    # mm  counterbore depth
 
 # ---- service opening + lid screws -------------------------------------------
-SVC_Z0, SVC_Z1= 172.0, 270.0   # mm  service opening extent in Z.  The rear end
-                         #     is set by the fan: the opening has to be at least
-                         #     as long as the fan frame (92 mm) or the fan cannot
-                         #     be lowered in flat and has to be inserted at 45 deg
-                         #     and rotated - see INSTALL.md step 4.
-SVC_R         = 12.0     # mm  corner radius of the opening
+SVC_Z0        = 172.0    # mm  front edge of the service opening
+SVC_Z1_BACKOFF=   0.0    # mm  how far short of the rear wall the opening stops.
+                         #     Keep it <= FAN_INSET - 2 or the fan can no longer
+                         #     be lowered into place behind the PSU cradle; the
+                         #     report prints the resulting drop-in window.
+SVC_R         =  12.0    # mm  corner radius of the opening
 LID_SCREW_X   = 70.0     # mm  +/- X of the lid screws
 LID_SCREW_Z   = (185.0, 215.0, 245.0)   # mm  Z of the lid screws (both sides)
 LID_INSERT_D  = 10.0     # mm  depth of the heat-set insert bore from the top face
@@ -210,6 +210,14 @@ PSU_TOP     = FLOOR_T + PSU_PLINTH_T + PSU_H + 0.4   # board top + clearance 28.
 PSU_BOSS_X  = PSU_XH + (WALL + PSU_BOSS_W) / 2.0     # insert centre        20.7
 PSU_BORE_Z  = PSU_Z0 + PSU_BOSS_L / 2.0 + 0.0        # strap screw Z        192.0
 PSU_STRAP_X = PSU_TRAY_OH + PSU_BOSS_W               # strap half width     25.1
+
+# ---- service opening, derived from the rear wall -----------------------------
+SVC_Z1 = Z_RIN - SVC_Z1_BACKOFF            # opening rear edge
+# The fan is inserted through this opening and can only descend BEHIND the
+# cradle, so these two numbers bound where it can drop in before being pushed
+# back against the rear wall.  If FAN_LO > FAN_HI the fan cannot be fitted.
+FAN_DROP_LO = PSU_Z1 + WALL + 2.0          # clear of the cradle's rear wall
+FAN_DROP_HI = SVC_Z1 - FAN_INSET           # its thickness must clear the roof
 
 
 # ==============================================================================
@@ -627,9 +635,14 @@ def report(body, lid, strap, log):
         % (OUT_W, LID_T, Z_OUT - Z_BAY))
     add("   opening                 : %.1f wide, Z %.1f..%.1f, R%.1f corners"
         % (2 * SVC_HALF, SVC_Z0, SVC_Z1, SVC_R))
-    add("   opening size            : %.1f x %.1f mm - must stay >= the %.0f mm"
-        % (2 * SVC_HALF, SVC_Z1 - SVC_Z0, FAN_SIZE))
-    add("                             fan frame so the fan drops in flat")
+    add("   fan drop-in window      : Z %.1f .. %.1f  (%s)"
+        % (FAN_DROP_LO, FAN_DROP_HI,
+           "%.1f mm of slack, then push it back against the rear wall"
+           % (FAN_DROP_HI - FAN_DROP_LO) if FAN_DROP_HI >= FAN_DROP_LO
+           else "*** FAN CANNOT BE FITTED ***"))
+    add("   roof left beside opening: %.1f mm each side, plus %.1f mm across"
+        % (XI - SVC_HALF, SVC_Z0 - Z_BAY))
+    add("                             the front")
     add("   %d x M3 lid screws       : X=+/-%.1f  Z=%s"
         % (2 * len(LID_SCREW_Z), LID_SCREW_X, LID_SCREW_Z))
     add("                             O%.1f insert bore / O%.1f clearance"

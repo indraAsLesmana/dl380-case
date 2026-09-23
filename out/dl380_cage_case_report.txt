@@ -66,17 +66,18 @@
 
  SERVICE LID
    plate                   : 151.4 x 3.0 x 116.4 mm
-   opening                 : 109.8 wide, Z 172.0..270.0, R12.0 corners
-   opening size            : 109.8 x 98.0 mm - must stay >= the 92 mm
-                             fan frame so the fan drops in flat
+   opening                 : 109.8 wide, Z 172.0..273.0, R12.0 corners
+   fan drop-in window      : Z 235.4 .. 248.0  (12.6 mm of slack, then push it back against the rear wall)
+   roof left beside opening: 18.0 mm each side, plus 7.0 mm across
+                             the front
    6 x M3 lid screws       : X=+/-70.0  Z=(185.0, 215.0, 245.0)
                              O4.2 insert bore / O3.4 clearance
 
  VOLUME / MASS
-   body   volume            :   525238.3 mm3  =  525.2 cm3
-   body   mass @1.27 g/cm3  :      667 g  (PETG, 100% infill equiv)
-   lid    volume            :    73812.7 mm3  =   73.8 cm3
-   lid    mass @1.27 g/cm3  :       94 g  (PETG, 100% infill equiv)
+   body   volume            :   524316.0 mm3  =  524.3 cm3
+   body   mass @1.27 g/cm3  :      666 g  (PETG, 100% infill equiv)
+   lid    volume            :    74465.5 mm3  =   74.5 cm3
+   lid    mass @1.27 g/cm3  :       95 g  (PETG, 100% infill equiv)
    strap  volume            :     3943.4 mm3  =    3.9 cm3
    strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
 
