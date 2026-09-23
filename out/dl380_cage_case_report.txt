@@ -7,81 +7,86 @@
    sleeve bore             : 145.8 x 87.8 mm  (0.4 mm/side clearance)
 
  ENCLOSURE  (body)
-   outside W x H x D       : 151.4 x 94.6 x 238.4 mm
+   outside W x H x D       : 151.4 x 102.8 x 273.4 mm
    bay section             : 151.4 (W) x 94.6 (H) x 165.0 (D) mm
-   fan/plenum section      : 151.4 (W) x 94.6 (H) x 73.4 (D) mm
-   top profile             : FLAT - rear section is the same height as the bay
+   fan/plenum section      : 151.4 (W) x 102.8 (H) x 108.4 (D) mm
+   top profile             : STEPPED - rear section is 8.2 mm taller than the bay (fan is inside)
    wall / floor / rear wall: 2.8 / 4.0 / 8.4 mm
-   plenum clear depth      : 65.0 mm
+   plenum clear depth      : 100.0 mm
+   roof gussets            : 18.0 mm tall at 45 deg, carrying the lid screws
 
  FAN  -  ARCTIC P9 PWM PST  (ACFAN00298A)
    nominal size            : 92 x 92 x 25 mm, 106 g
    P9 PWM PST rating       : 200-3000 rpm PWM (0 rpm below 5%),
                              38.83 cfm | 65.97 m3/h, 3.12 mmH2O static,
                              0.12 A @ 12 V = 1.44 W, fluid dynamic bearing
-   supplied lead           : 400 mm + 80 mm PST daisy-chain, 4-pin
-                             plug + 4-pin socket
-   aperture                : O86.0 at (0, 47.3) in the rear wall
+   position                : INSIDE, against the rear wall, Z 240.0..265.0
+   bore it sits in         : 145.8 (W) x 96.0 (H) x 100.0 (D) mm
+   frame clearance         : 2.0 mm on every side of the frame
    hole pattern            : 82.5 x 82.5 square, O4.2
-   hole centres (X,Y)      : (+/-41.2, 6.0)  (+/-41.2, 88.5)
-   edge margin, aperture   : 4.30 mm  (top and bottom)
-   edge margin, holes      : 3.95 mm  (top and bottom)
-   frame fit on rear face  : 151.4 wide x 94.6 tall -> 29.7 mm side
-                             margin, 1.3 mm top/bottom
-   cable notch             : 16.0 x 9.0 mm at X=+55.0 Y=14.0
-   mounting                : fan outside the 8.4 mm rear wall;
-                             4x M3 heat-set insert pressed in from the
-                             outside face, M3 x 30 screws through the
-                             fan frame (~4.5 mm holes)
-   overall depth w/ fan    : 263.4 mm (238.4 body + 25 fan)
+   hole centres (X,Y)      : (+/-41.2, 10.8)  (+/-41.2, 93.2)
+   mounting                : M3 heat-set inserts pressed into the rear
+                             wall from OUTSIDE, M3 x 30 screws through
+                             the fan frame from inside the plenum
+
+ HONEYCOMB EXHAUST GRILLE  (recessed into the outer face)
+   pocket                  : O90.0, 5.4 mm deep
+   membrane                : 3.0 mm thick
+   cell / web              : 9.0 mm across flats / 1.2 mm walls
+   cells                   : 55
+   open fraction of field  : 78%
+   tightest edge margin    : 5.80 mm (pocket to the top edge)
 
  CABLE EGRESS (left wall)
    stadium slot            : 16.0 (Y) x 30.0 (Z) mm at Y=20.0 Z=213.0
    mirrored to right wall  : no
 
  SERVICE LID
-   plate                   : 151.4 x 3.0 x 73.4 mm
-   opening                 : 96.0 wide, Z 174.0..222.0, R10.0 corners
-   6 x M3 lid screws       : X=+/-68.0  Z=(185.0, 205.0, 225.0)
+   plate                   : 151.4 x 3.0 x 108.4 mm
+   opening                 : 109.8 wide, Z 172.0..258.0, R12.0 corners
+   6 x M3 lid screws       : X=+/-70.0  Z=(185.0, 215.0, 245.0)
                              O4.2 insert bore / O3.4 clearance
 
  VOLUME / MASS
-   body   volume            :   673031.6 mm3  =  673.0 cm3
-   body   mass @1.27 g/cm3  :      855 g  (PETG, 100% infill equiv)
-   lid    volume            :    42104.9 mm3  =   42.1 cm3
-   lid    mass @1.27 g/cm3  :       53 g  (PETG, 100% infill equiv)
+   body   volume            :   499591.9 mm3  =  499.6 cm3
+   body   mass @1.27 g/cm3  :      634 g  (PETG, 100% infill equiv)
+   lid    volume            :    67567.9 mm3  =   67.6 cm3
+   lid    mass @1.27 g/cm3  :       86 g  (PETG, 100% infill equiv)
 
  SANITY CHECKS
    body valid              : True
    lid valid               : True
    body closed (solid)     : True
-   body bbox               : 151.40 x 94.60 x 238.40
-   lid  bbox               : 151.40 x 5.00 x 73.40
+   body bbox               : 151.40 x 102.80 x 273.40
+   lid  bbox               : 151.40 x 5.00 x 108.40
    body/lid interference    : 0.0000 mm3
    build volume (Bambu H2S 340x320x340):
      body  fits            : True
      lid   fits            : True
    lid-screw insert bores - material around the O4.2 bore:
-     X=  -68.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  -68.0 Z= 205.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  -68.0 Z= 225.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  +68.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  +68.0 Z= 205.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  +68.0 Z= 225.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  -70.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  -70.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  -70.0 Z= 245.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  +70.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  +70.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK
+     X=  +70.0 Z= 245.0 : min 13.0 mm / max 13.0 mm  -> OK
    cable egress slot through the left wall:
      Y= 14.0 Z= 213.0 : 0% inside solid  -> CLEAR
      Y= 20.0 Z= 213.0 : 0% inside solid  -> CLEAR
      Y= 26.0 Z= 213.0 : 0% inside solid  -> CLEAR
-     Z= 198.0 : solid wall from the top face down to Y=21.6
-     Z= 213.0 : solid wall from the top face down to Y=28.6
-     Z= 228.0 : solid wall from the top face down to Y=21.6
+     Z= 198.0 : solid wall from the top face down to Y=21.8
+     Z= 213.0 : solid wall from the top face down to Y=27.8
+     Z= 228.0 : solid wall from the top face down to Y=21.8
 
  NOTES
-   * Flat top: the 92 mm fan fits the 94.6 mm bay height with
-     3.95 mm of material around the mounting holes.
-   * If you go back to a 120 mm fan set FAN_APERTURE=115.0 and
-     FAN_PATTERN=105.0; REAR_H then becomes 122.0 mm by itself and
-     the top steps up to a fan tower again.
+   * The 92 mm fan frame is taller than the 87.8 mm bay bore, so the
+     rear section steps up 8.2 mm to hold it inside.
+     The largest fan that would keep the top flat is 83.8 mm.
+   * Air path: open front -> caddies -> plenum -> fan -> honeycomb grille.
+     No tapered duct any more: with the fan inside the plenum there is
+     nothing to funnel into, and the volume is needed for cabling.
+   * The grille is punched through a 3.0 mm membrane, not the full 8.4 mm
+     wall, so it costs little airflow and still looks clean.
    * Cage side-screw Z positions are a starting suggestion: drill/print
      only the pair that lines up with your cage's own holes.
    * Rear stop frame inner aperture: 137.8 x 79.8 mm

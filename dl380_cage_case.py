@@ -22,19 +22,18 @@
    Y : height, 0 = outside of the base (part stands on Y=0)
    Z : depth,  0 = FRONT face (caddy insertion side), grows to the rear
 
- Design note - why the top is flat
-   The rear section height is DERIVED from the fan, never hand-set.  REAR_H is
-   the *smallest* height that still gives FAN_EDGE of material between the fan
-   aperture / mounting holes and the outside edge.  If that comes out no taller
-   than the bay, the whole case is a plain prism with a flat top - which is the
-   case for the default 92 mm fan.
-
-   The original brief asked for a 120 mm fan.  A 120 mm fan needs 105 + 4.2 mm
-   of mounting pattern plus edge material = 123 mm of rear wall, but the cage
-   aperture its airflow has to come from is only 87.8 mm tall.  That forces a
-   tall rear tower (see git history / the v1 tag).  Dropping to 92 mm removes
-   the tower entirely; set FAN_* back to the 120 mm figures and REAR_H follows
-   automatically, and the report says so.
+ Design notes
+   * The fan lives INSIDE the rear section and exhausts through a printed
+     honeycomb grille recessed into the outer face of the rear wall.  Nothing
+     hangs off the back.
+   * The rear section therefore has to be tall enough to swallow the fan frame,
+     which is taller than the cage.  REAR_H is DERIVED, never hand-set: give it
+     a fan small enough to fit the bay height and it comes out equal to BAY_H
+     and the top is a flat prism again.
+   * Air path is: open front -> through the caddies -> plenum -> fan -> grille.
+     There is deliberately no tapered duct any more.  With the fan inside the
+     plenum there is nothing to funnel into, and the volume is needed for the
+     PicoPSU and the cabling.
 ================================================================================
 """
 
@@ -63,42 +62,42 @@ LID_T         = 3.0      # mm  service lid plate thickness
 LID_LIP_T     = 2.0      # mm  lid locating lip depth (drops into the opening)
 STOP_RIB_W    = 4.0      # mm  width of the internal rear stop frame
 STOP_RIB_D    = 3.0      # mm  how far the stop frame sticks into the bay
-REAR_WALL_LAYERS = 3     # rear wall in wall-units -> 8.4 mm, deep enough that a
-                         # standard 5.7 mm M3 heat-set insert seats fully and
-                         # still has material behind it
+REAR_WALL_LAYERS = 3     # rear wall in wall-units -> 8.4 mm, enough for a
+                         # standard 5.7 mm M3 heat-set insert to seat fully
+GUSSET_H      = 18.0     # mm  45 deg gussets under the plenum roof.  They carry
+                         # the lid screws and stop the roof bridging in mid air
 
 # ---- wiring / airflow plenum -------------------------------------------------
-PLENUM_D      = 65.0     # mm  clear depth behind the backplane (spec: 65)
+PLENUM_D      = 100.0    # mm  clear depth behind the backplane
 
 # ---- fan ---------------------------------------------------------------------
-#  92 mm fan  (default) : aperture 86.0, pattern 82.5  -> FLAT TOP, 94.6 mm
-# 120 mm fan  (original): aperture 115.0, pattern 105.0-> rear section becomes
-#                          123 mm tall.  Change the three FAN_* numbers and the
-#                          height follows; nothing else needs touching.
+#  92 mm (default): frame 92 -> rear section becomes 102.8 mm tall
+#  80 mm          : frame 80 -> fits the bay, REAR_H collapses to 94.6, flat top
 FAN_MODEL     = "ARCTIC P9 PWM PST  (ACFAN00298A)"
 FAN_SIZE      =  92.0    # mm  nominal fan frame size
-FAN_APERTURE  =  86.0    # mm  Ø of the circular opening (clears the blades)
+FAN_INNER_CLEAR = 2.0    # mm  clearance between the fan frame and the bore
+FAN_APERTURE  =  86.0    # mm  Ø of the grille field (clears the blades)
 FAN_PATTERN   =  82.5    # mm  fan mounting hole square pattern (ARCTIC drawing)
 FAN_HOLE      =   4.2    # mm  Ø -> 4.2 for M3 heat-set insert, 4.5 for M4 pass
-FAN_EDGE      =   3.5    # mm  min material between a hole / aperture and the edge
-FAN_DUCT_GAP  =  16.0    # mm  straight throat length at the rear wall
-#  fan cable notch in the rear wall: X, Y, W, H, side (+1 = right)
-#  sized to pass a standard 4-pin fan plug (housing is ~11 x 7 mm) from outside
-#  in to the Wago terminals, so the ARCTIC's 400 mm + 80 mm PST lead can be
-#  routed without cutting the connector off.
-FAN_CABLE_SLOT= (55.0, 14.0, 16.0, 9.0, 1)
+FAN_INSET     =  25.0    # mm  fan depth; it hugs the inside of the rear wall
+
+# ---- honeycomb exhaust grille ------------------------------------------------
+GRILLE_CELL   =   9.0    # mm  honeycomb cell size, across flats
+GRILLE_WEB    =   1.2    # mm  material between cells (3 lines @ 0.4 mm nozzle)
+GRILLE_RIM    =   2.0    # mm  solid ring between the cells and the pocket wall
+GRILLE_DEPTH  =   3.0    # mm  membrane thickness the cells are punched through
 
 # ---- cable egress ------------------------------------------------------------
+#  Still on the side wall in this revision; the rear-wall version comes next.
 CABLE_SLOT_C  = (20.0, 213.0)  # (Y centre, Z centre) on the LEFT (-X) wall
 CABLE_SLOT_SZ = (16.0, 30.0)   # (height in Y, length in Z)   >= 14 x 28 per spec
 CABLE_SLOT_MIRROR = False      # True -> also cut the same slot in the right wall
 
 # ---- service opening + lid screws -------------------------------------------
-SVC_W         = 96.0     # mm  service opening width  (X)
-SVC_Z0, SVC_Z1= 174.0, 222.0   # mm  service opening extent in Z
-SVC_R         = 10.0     # mm  corner radius of the opening
-LID_SCREW_X   = 68.0     # mm  +/- X of the lid screws
-LID_SCREW_Z   = (185.0, 205.0, 225.0)   # mm  Z of the lid screws (both sides)
+SVC_Z0, SVC_Z1= 172.0, 258.0   # mm  service opening extent in Z
+SVC_R         = 12.0     # mm  corner radius of the opening
+LID_SCREW_X   = 70.0     # mm  +/- X of the lid screws
+LID_SCREW_Z   = (185.0, 215.0, 245.0)   # mm  Z of the lid screws (both sides)
 LID_INSERT_D  = 10.0     # mm  depth of the heat-set insert bore from the top face
 LID_INSERT_DIA= 4.2      # mm  bore for M3 heat-set insert
 LID_CLEAR_DIA = 3.4      # mm  M3 clearance hole through the lid
@@ -111,14 +110,14 @@ CAGE_SCREW_DIA= 3.4      # mm  M3 clearance through the 2.8 side wall
 FOOT_DIA      = 12.0     # mm  rubber foot recess
 FOOT_DEEP     = 2.0      # mm
 FOOT_X        = 61.0     # mm  +/- X of the foot centres
-FOOT_Z        = (14.0, 221.6)
+FOOT_Z        = (14.0, 260.0)
 
 # ---- entry lead-in -----------------------------------------------------------
 LEAD_IN       = 1.6      # mm  flare added to the aperture at the mouth
 LEAD_DEPTH    = 4.0      # mm  how deep that flare goes
 
 # ---- faceting ----------------------------------------------------------------
-DUCT_SEG      = 96       # segments of the rect->circle airflow transition
+DUCT_SEG      = 96       # polygon segments used for the entry lead-in flare
 
 # ---- output ------------------------------------------------------------------
 OUT_DIR       = os.path.join(os.path.dirname(os.path.abspath(__file__)), "out")
@@ -133,6 +132,11 @@ INT_H   = CAGE_H + 2 * FIT_CLEAR           # internal height of the bay sleeve
 OUT_W   = INT_W + 2 * WALL                 # outside width
 BAY_H   = INT_H + FLOOR_T + WALL           # outside height of the bay section
 
+# The rear section has to swallow the fan frame, which is taller than the cage.
+INT_H_PLEN = max(INT_H, FAN_SIZE + 2 * FAN_INNER_CLEAR)
+REAR_H     = FLOOR_T + INT_H_PLEN + WALL
+FLAT_TOP   = abs(REAR_H - BAY_H) < 1e-9
+
 REAR_WALL_T = REAR_WALL_LAYERS * WALL      # rear wall thickness (stiff, holds fan)
 Z_BAY   = CAGE_D                           # front face of the plenum
 Z_RIN   = CAGE_D + PLENUM_D                # inner face of the rear wall
@@ -141,20 +145,22 @@ Z_OUT   = Z_RIN + REAR_WALL_T              # very back of the enclosure
 BAY_Y0  = FLOOR_T                          # inside floor
 BAY_Y1  = FLOOR_T + INT_H                  # inside ceiling of the bay
 BAY_YC  = (BAY_Y0 + BAY_Y1) / 2.0          # bay vertical centre
+PLEN_Y1 = REAR_H - WALL                    # inside ceiling of the plenum
 
 FAN_R   = FAN_APERTURE / 2.0
 FAN_OFF = FAN_PATTERN / 2.0                # +/- offset of the 4 fan holes
+FAN_CY  = (BAY_Y0 + PLEN_Y1) / 2.0         # fan axis, centred in the plenum bore
+FAN_Z0  = Z_RIN - FAN_INSET                # front face of the fan
 
-# Rear section height: only as tall as the fan forces it to be.
-REAR_H  = max(BAY_H,                                       # never shorter
-              FAN_APERTURE + 2 * FAN_EDGE,                 # material round vent
-              2 * (FAN_OFF + FAN_HOLE / 2.0 + FAN_EDGE))   # material round holes
-PLEN_Y1 = REAR_H - WALL                    # inside ceiling of the plenum
-FAN_CY  = REAR_H / 2.0                     # fan axis height (centred)
-FLAT_TOP = abs(REAR_H - BAY_H) < 1e-9
+# honeycomb geometry: R sizes a perfect tiling, Rp the shrunken cells we cut
+GRILLE_R        = (GRILLE_CELL + GRILLE_WEB) / math.sqrt(3.0)
+GRILLE_RP       = GRILLE_R - GRILLE_WEB / math.sqrt(3.0)
+GRILLE_OPEN_R   = FAN_R - GRILLE_RP        # only centres inside this get a cell
+GRILLE_POCKET_R = FAN_R + GRILLE_RIM       # recess radius in the outer face
 
-XW      = OUT_W / 2.0                      # outer half width
-XI      = INT_W / 2.0                      # inner half width
+XW       = OUT_W / 2.0                     # outer half width
+XI       = INT_W / 2.0                     # inner half width
+SVC_HALF = XI - GUSSET_H                   # service opening half width
 
 
 # ==============================================================================
@@ -188,6 +194,11 @@ def polygon_wire(points, z):
     return Part.makePolygon(pts)
 
 
+def prism(points, z0, dz):
+    """Extrude a closed 2D polygon given in XY along +Z."""
+    return Part.Face(polygon_wire(points, z0)).extrude(Vector(0.0, 0.0, dz))
+
+
 def rect_points(half_w, half_h, cy, n):
     """n points ON the boundary of a rectangle, sampled by polar angle."""
     pts = []
@@ -199,13 +210,6 @@ def rect_points(half_w, half_h, cy, n):
         t = min(tx, ty)
         pts.append((t * c, cy + t * s))
     return pts
-
-
-def circle_points(radius, cy, n, phase=0.0):
-    """n points ON a circle, same angular ordering as rect_points()."""
-    return [(radius * math.cos(2 * math.pi * i / n + phase),
-             cy + radius * math.sin(2 * math.pi * i / n + phase))
-            for i in range(n)]
 
 
 def stadium(center_y, center_z, height_y, length_z, span_x0, span_x1, r):
@@ -227,6 +231,42 @@ def rounded_rect_prism(half_w, y0, y1, z0, z1, r, x_centre=0.0):
         for zz in (z0 + r, z1 - r):
             s = s.fuse(cyl_y(r, y1 - y0, xx, zz, y0))
     return s
+
+
+def gusset(x_wall, y_top, height, z0, z1, side):
+    """45 degree gusset filling the corner between a side wall and the roof.
+
+    Its sloping underside is what makes the roof printable and what gives the
+    lid screws enough material to bite into.
+    """
+    if side > 0:
+        p = [(x_wall, y_top - height), (x_wall - height, y_top), (x_wall, y_top)]
+    else:
+        p = [(-x_wall, y_top), (-(x_wall - height), y_top),
+             (-x_wall, y_top - height)]
+    return prism(p, z0, z1 - z0)
+
+
+def honeycomb_openings(cx, cy, r_centres, z0, dz, cell, web):
+    """Flat-top hexagonal cells whose centres lie inside radius r_centres."""
+    R = (cell + web) / math.sqrt(3.0)          # perfect-tiling circumradius
+    Rp = R - web / math.sqrt(3.0)              # cell circumradius after shrink
+    col_pitch = 1.5 * R
+    row_pitch = math.sqrt(3.0) * R
+    nc = int(math.ceil(r_centres / col_pitch)) + 1
+    nr = int(math.ceil(r_centres / row_pitch)) + 2
+    cells = []
+    for c in range(-nc, nc + 1):
+        x = cx + c * col_pitch
+        yoff = 0.0 if c % 2 == 0 else row_pitch / 2.0
+        for r in range(-nr, nr + 1):
+            y = cy + r * row_pitch + yoff
+            if math.hypot(x - cx, y - cy) > r_centres:
+                continue
+            pts = [(x + Rp * math.cos(math.radians(60.0 * i)),
+                    y + Rp * math.sin(math.radians(60.0 * i))) for i in range(6)]
+            cells.append(prism(pts, z0, dz))
+    return cells
 
 
 def _tidy(shape):
@@ -252,31 +292,11 @@ def build():
     outer = box(OUT_W, BAY_H, Z_BAY, -XW, 0.0, 0.0)
     outer = outer.fuse(box(OUT_W, REAR_H, Z_OUT - Z_BAY, -XW, 0.0, Z_BAY))
 
-    # drive-bay sleeve: open at the front (z = -1 so the cut really leaves)
+    # ---------------------------------------------------------------- voids ---
     bay_void = box(INT_W, INT_H, Z_BAY + 1.0, -XI, BAY_Y0, -1.0)
+    plen_void = box(INT_W, PLEN_Y1 - BAY_Y0, PLENUM_D, -XI, BAY_Y0, Z_BAY)
 
-    # ------------------------------------------- airflow transition (duct) ---
-    #  rectangle 145.8 x 87.8  ->  circle Ø86, both as matched n-gons so the
-    #  ruled loft cannot twist.  This is the "tapered bevel" of the spec.
-    w_rect = polygon_wire(rect_points(XI, INT_H / 2.0, BAY_YC, DUCT_SEG), Z_BAY)
-    w_circ = polygon_wire(circle_points(FAN_R, FAN_CY, DUCT_SEG),
-                          Z_RIN - FAN_DUCT_GAP)
-    duct = Part.makeLoft([w_rect, w_circ], solid=True, ruled=False)
-    duct = duct.fuse(cyl_z(FAN_R, FAN_DUCT_GAP + 1.0, 0.0, FAN_CY,
-                           Z_RIN - FAN_DUCT_GAP))
-    log.append(("airflow duct volume", duct.Volume))
-
-    # Upper plenum cavity - only exists when a big fan pushes the rear section
-    # above the bay height.  Zero height (and therefore absent) on a flat top:
-    # there the duct's own converging ceiling IS the plenum, and the service
-    # opening is simply cut through the 3 mm lid-side ceiling above it.
-    plenum_void = duct
-    if PLEN_Y1 > BAY_Y1 + 0.01:
-        plenum_void = plenum_void.fuse(
-            box(2 * (XI - 14.9), PLEN_Y1 - BAY_Y1, PLENUM_D,
-                -(XI - 14.9), BAY_Y1, Z_BAY))
-
-    body = outer.cut(bay_void.fuse(plenum_void))
+    body = outer.cut(bay_void.fuse(plen_void))
 
     # ------------------------------------- internal rear stop frame for cage ---
     ring = box(INT_W, INT_H, STOP_RIB_D, -XI, BAY_Y0, Z_BAY - STOP_RIB_D)
@@ -286,22 +306,33 @@ def build():
                         Z_BAY - STOP_RIB_D - 1.0))
     body = body.fuse(ring)
 
+    # ------------------------------------------- roof gussets beside the lid ---
+    for side in (1, -1):
+        body = body.fuse(gusset(XI, PLEN_Y1, GUSSET_H, Z_BAY, Z_RIN, side))
+
     # ------------------------------------------------------------------ cuts ---
     cuts = []
 
-    # --- fan: aperture, 4 mounting holes, cable notch ------------------------
-    cuts.append(cyl_z(FAN_R, REAR_WALL_T + 2.0, 0.0, FAN_CY, Z_RIN - 1.0))
+    # --- fan mounting holes (screws come from inside the plenum) -------------
     for sx in (-1, 1):
         for sy in (-1, 1):
             cuts.append(cyl_z(FAN_HOLE / 2.0, REAR_WALL_T + 2.0,
                               sx * FAN_OFF, FAN_CY + sy * FAN_OFF, Z_RIN - 1.0))
-    fx, fy, fw, fh, fside = FAN_CABLE_SLOT
-    cuts.append(rounded_rect_prism(fw / 2.0, fy - fh / 2.0, fy + fh / 2.0,
-                                   Z_RIN - 0.5, Z_OUT + 0.5, fh / 2.0 - 0.01,
-                                   x_centre=fside * fx))
+
+    # --- honeycomb exhaust grille -------------------------------------------
+    #  a shallow pocket in the outer face, then hexagonal cells punched through
+    #  the remaining membrane.  The pocket is wider than the cell field so no
+    #  cell can break out through the pocket wall.
+    cuts.append(cyl_z(GRILLE_POCKET_R, REAR_WALL_T - GRILLE_DEPTH + 1.0,
+                      0.0, FAN_CY, Z_OUT - (REAR_WALL_T - GRILLE_DEPTH)))
+    cells = honeycomb_openings(0.0, FAN_CY, GRILLE_OPEN_R,
+                               Z_RIN - 1.0, REAR_WALL_T + 2.0,
+                               GRILLE_CELL, GRILLE_WEB)
+    log.append(("honeycomb cells", len(cells)))
+    cuts.extend(cells)
 
     # --- top service opening -------------------------------------------------
-    cuts.append(rounded_rect_prism(SVC_W / 2.0, PLEN_Y1 - 6.0, REAR_H + 2.0,
+    cuts.append(rounded_rect_prism(SVC_HALF, PLEN_Y1 - 6.0, REAR_H + 2.0,
                                    SVC_Z0, SVC_Z1, SVC_R))
 
     # --- lid heat-set insert bores (from the top face downwards) -------------
@@ -346,7 +377,7 @@ def build():
 
     # ============================================================== service lid
     lid = box(OUT_W, LID_T, Z_OUT - Z_BAY, -XW, REAR_H, Z_BAY)
-    lid = lid.fuse(rounded_rect_prism(SVC_W / 2.0 - 0.5, REAR_H - LID_LIP_T,
+    lid = lid.fuse(rounded_rect_prism(SVC_HALF - 0.5, REAR_H - LID_LIP_T,
                                       REAR_H, SVC_Z0 + 0.5, SVC_Z1 - 0.5,
                                       SVC_R - 0.5))
     for sx in (-1, 1):
@@ -408,43 +439,44 @@ def report(body, lid, log):
     add("   top profile             : %s"
         % ("FLAT - rear section is the same height as the bay"
            if FLAT_TOP else
-           "STEPPED - rear section is %.1f mm taller than the bay"
+           "STEPPED - rear section is %.1f mm taller than the bay (fan is inside)"
            % (REAR_H - BAY_H)))
     add("   wall / floor / rear wall: %.1f / %.1f / %.1f mm"
         % (WALL, FLOOR_T, REAR_WALL_T))
     add("   plenum clear depth      : %.1f mm" % PLENUM_D)
+    add("   roof gussets            : %.1f mm tall at 45 deg, carrying the lid screws"
+        % GUSSET_H)
     add("")
     add(" FAN  -  %s" % FAN_MODEL)
-    add("   nominal size            : %.0f x %.0f x 25 mm, 106 g" % (FAN_SIZE, FAN_SIZE))
+    add("   nominal size            : %.0f x %.0f x 25 mm, 106 g"
+        % (FAN_SIZE, FAN_SIZE))
     add("   P9 PWM PST rating       : 200-3000 rpm PWM (0 rpm below 5%),")
     add("                             38.83 cfm | 65.97 m3/h, 3.12 mmH2O static,")
     add("                             0.12 A @ 12 V = 1.44 W, fluid dynamic bearing")
-    add("   supplied lead           : 400 mm + 80 mm PST daisy-chain, 4-pin")
-    add("                             plug + 4-pin socket")
-    add("   aperture                : O%.1f at (0, %.1f) in the rear wall"
-        % (FAN_APERTURE, FAN_CY))
+    add("   position                : INSIDE, against the rear wall, Z %.1f..%.1f"
+        % (FAN_Z0, Z_RIN))
+    add("   bore it sits in         : %.1f (W) x %.1f (H) x %.1f (D) mm"
+        % (INT_W, PLEN_Y1 - BAY_Y0, PLENUM_D))
+    add("   frame clearance         : %.1f mm on every side of the frame"
+        % FAN_INNER_CLEAR)
     add("   hole pattern            : %.1f x %.1f square, O%.1f"
         % (FAN_PATTERN, FAN_PATTERN, FAN_HOLE))
     add("   hole centres (X,Y)      : (+/-%.1f, %.1f)  (+/-%.1f, %.1f)"
         % (FAN_OFF, FAN_CY - FAN_OFF, FAN_OFF, FAN_CY + FAN_OFF))
-    add("   edge margin, aperture   : %.2f mm  (top and bottom)"
-        % (REAR_H / 2.0 - FAN_R))
-    add("   edge margin, holes      : %.2f mm  (top and bottom)"
-        % (REAR_H / 2.0 - (FAN_OFF + FAN_HOLE / 2.0)))
-    add("   frame fit on rear face  : %.1f wide x %.1f tall -> %.1f mm side"
-        % (OUT_W, REAR_H, (OUT_W - FAN_SIZE) / 2.0))
-    add("                             margin, %.1f mm top/bottom"
-        % ((REAR_H - FAN_SIZE) / 2.0))
-    add("   cable notch             : %.1f x %.1f mm at X=%+.1f Y=%.1f"
-        % (FAN_CABLE_SLOT[2], FAN_CABLE_SLOT[3],
-           FAN_CABLE_SLOT[4] * FAN_CABLE_SLOT[0], FAN_CABLE_SLOT[1]))
-    add("   mounting                : fan outside the %.1f mm rear wall;"
-        % REAR_WALL_T)
-    add("                             4x M3 heat-set insert pressed in from the")
-    add("                             outside face, M3 x 30 screws through the")
-    add("                             fan frame (~4.5 mm holes)")
-    add("   overall depth w/ fan    : %.1f mm (%.1f body + 25 fan)"
-        % (Z_OUT + 25.0, Z_OUT))
+    add("   mounting                : M3 heat-set inserts pressed into the rear")
+    add("                             wall from OUTSIDE, M3 x 30 screws through")
+    add("                             the fan frame from inside the plenum")
+    add("")
+    add(" HONEYCOMB EXHAUST GRILLE  (recessed into the outer face)")
+    add("   pocket                  : O%.1f, %.1f mm deep"
+        % (2 * GRILLE_POCKET_R, REAR_WALL_T - GRILLE_DEPTH))
+    add("   membrane                : %.1f mm thick" % GRILLE_DEPTH)
+    add("   cell / web              : %.1f mm across flats / %.1f mm walls"
+        % (GRILLE_CELL, GRILLE_WEB))
+    add("   cells                   : %d" % log[0][1])
+    add("   open fraction of field  : %.0f%%" % (((GRILLE_RP / GRILLE_R) ** 2) * 100.0))
+    add("   tightest edge margin    : %.2f mm (pocket to the top edge)"
+        % (REAR_H - FAN_CY - GRILLE_POCKET_R))
     add("")
     add(" CABLE EGRESS (left wall)")
     add("   stadium slot            : %.1f (Y) x %.1f (Z) mm at Y=%.1f Z=%.1f"
@@ -455,7 +487,7 @@ def report(body, lid, log):
     add("   plate                   : %.1f x %.1f x %.1f mm"
         % (OUT_W, LID_T, Z_OUT - Z_BAY))
     add("   opening                 : %.1f wide, Z %.1f..%.1f, R%.1f corners"
-        % (SVC_W, SVC_Z0, SVC_Z1, SVC_R))
+        % (2 * SVC_HALF, SVC_Z0, SVC_Z1, SVC_R))
     add("   %d x M3 lid screws       : X=+/-%.1f  Z=%s"
         % (2 * len(LID_SCREW_Z), LID_SCREW_X, LID_SCREW_Z))
     add("                             O%.1f insert bore / O%.1f clearance"
@@ -511,19 +543,22 @@ def report(body, lid, log):
     add("")
     add(" NOTES")
     if FLAT_TOP:
-        add("   * Flat top: the %.0f mm fan fits the %.1f mm bay height with"
-            % (FAN_SIZE, BAY_H))
-        add("     %.2f mm of material around the mounting holes."
-            % (REAR_H / 2.0 - (FAN_OFF + FAN_HOLE / 2.0)))
-        add("   * If you go back to a 120 mm fan set FAN_APERTURE=115.0 and")
-        add("     FAN_PATTERN=105.0; REAR_H then becomes %.1f mm by itself and"
-            % max(BAY_H, 115.0 + 2 * FAN_EDGE, 2 * (52.5 + 2.1 + 3.5)))
-        add("     the top steps up to a fan tower again.")
+        add("   * Flat top: the %.0f mm fan frame fits inside the bay bore, so the"
+            % FAN_SIZE)
+        add("     whole case is a single prism.")
     else:
-        add("   * The fan does not fit the %.1f mm bay height, so the rear"
-            % BAY_H)
-        add("     section is %.1f mm tall - the extra height is airflow plenum."
-            % REAR_H)
+        add("   * The %.0f mm fan frame is taller than the %.1f mm bay bore, so the"
+            % (FAN_SIZE, INT_H))
+        add("     rear section steps up %.1f mm to hold it inside."
+            % (REAR_H - BAY_H))
+        add("     The largest fan that would keep the top flat is %.1f mm."
+            % (BAY_H - WALL - FLOOR_T - 2 * FAN_INNER_CLEAR))
+    add("   * Air path: open front -> caddies -> plenum -> fan -> honeycomb grille.")
+    add("     No tapered duct any more: with the fan inside the plenum there is")
+    add("     nothing to funnel into, and the volume is needed for cabling.")
+    add("   * The grille is punched through a %.1f mm membrane, not the full %.1f mm"
+        % (GRILLE_DEPTH, REAR_WALL_T))
+    add("     wall, so it costs little airflow and still looks clean.")
     add("   * Cage side-screw Z positions are a starting suggestion: drill/print")
     add("     only the pair that lines up with your cage's own holes.")
     add("   * Rear stop frame inner aperture: %.1f x %.1f mm"
