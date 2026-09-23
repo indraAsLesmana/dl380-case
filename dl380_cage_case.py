@@ -87,11 +87,14 @@ GRILLE_WEB    =   1.2    # mm  material between cells (3 lines @ 0.4 mm nozzle)
 GRILLE_RIM    =   2.0    # mm  solid ring between the cells and the pocket wall
 GRILLE_DEPTH  =   3.0    # mm  membrane thickness the cells are punched through
 
-# ---- cable egress ------------------------------------------------------------
-#  Still on the side wall in this revision; the rear-wall version comes next.
-CABLE_SLOT_C  = (20.0, 213.0)  # (Y centre, Z centre) on the LEFT (-X) wall
-CABLE_SLOT_SZ = (16.0, 30.0)   # (height in Y, length in Z)   >= 14 x 28 per spec
-CABLE_SLOT_MIRROR = False      # True -> also cut the same slot in the right wall
+# ---- cable egress (rear wall, beside the grille pocket) ----------------------
+#  The SFF-8087 -> SFF-8088 leads now leave through the BACK, in two separate
+#  slots so each cable keeps its own strain relief and they stay clear of the
+#  fan.  X is negative - they exit on the left, where the cabling already runs.
+REAR_CABLE_SLOT_X = -60.0          # mm  slot centre X
+REAR_CABLE_SLOT_Y = (33.0, 50.0)   # mm  slot centre heights
+REAR_CABLE_SLOT_W =  17.0          # mm  slot width in X
+REAR_CABLE_SLOT_H =  12.0          # mm  slot height in Y
 
 # ---- service opening + lid screws -------------------------------------------
 SVC_Z0, SVC_Z1= 172.0, 258.0   # mm  service opening extent in Z
@@ -233,6 +236,16 @@ def rounded_rect_prism(half_w, y0, y1, z0, z1, r, x_centre=0.0):
     return s
 
 
+def rounded_rect_z(half_w, half_h, cx, cy, z0, z1, r):
+    """Rounded rectangle in the XY plane, extruded along Z."""
+    L = z1 - z0
+    s = box(2 * half_w, 2 * half_h, L, cx - half_w, cy - half_h, z0)
+    for xx in (cx - half_w + r, cx + half_w - r):
+        for yy in (cy - half_h + r, cy + half_h - r):
+            s = s.fuse(cyl_z(r, L, xx, yy, z0))
+    return s
+
+
 def gusset(x_wall, y_top, height, z0, z1, side):
     """45 degree gusset filling the corner between a side wall and the roof.
 
@@ -341,15 +354,13 @@ def build():
             cuts.append(cyl_y(LID_INSERT_DIA / 2.0, LID_INSERT_D,
                               sx * LID_SCREW_X, zz, REAR_H - LID_INSERT_D))
 
-    # --- cable egress slots --------------------------------------------------
-    cy, cz = CABLE_SLOT_C
-    sh, sz = CABLE_SLOT_SZ
-    sx_signs = (-1, 1) if CABLE_SLOT_MIRROR else (-1,)
-    for sx in sx_signs:
-        if sx < 0:
-            cuts.append(stadium(cy, cz, sh, sz, -XW - 2.0, -20.0, sh / 2.0))
-        else:
-            cuts.append(stadium(cy, cz, sh, sz, 20.0, XW + 2.0, sh / 2.0))
+    # --- cable egress slots through the rear wall ----------------------------
+    slot_r = min(REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H) / 2.0 - 0.01
+    for yy in REAR_CABLE_SLOT_Y:
+        cuts.append(rounded_rect_z(REAR_CABLE_SLOT_W / 2.0,
+                                   REAR_CABLE_SLOT_H / 2.0,
+                                   REAR_CABLE_SLOT_X, yy,
+                                   Z_RIN - 1.0, Z_OUT + 2.0, slot_r))
 
     # --- HP cage anchor screws ----------------------------------------------
     for sx in (-1, 1):
@@ -478,10 +489,20 @@ def report(body, lid, log):
     add("   tightest edge margin    : %.2f mm (pocket to the top edge)"
         % (REAR_H - FAN_CY - GRILLE_POCKET_R))
     add("")
-    add(" CABLE EGRESS (left wall)")
-    add("   stadium slot            : %.1f (Y) x %.1f (Z) mm at Y=%.1f Z=%.1f"
-        % (CABLE_SLOT_SZ[0], CABLE_SLOT_SZ[1], CABLE_SLOT_C[0], CABLE_SLOT_C[1]))
-    add("   mirrored to right wall  : %s" % ("YES" if CABLE_SLOT_MIRROR else "no"))
+    add(" CABLE EGRESS  (rear wall, beside the grille)")
+    add("   %d slots                : %.1f (X) x %.1f (Y) mm, rounded corners"
+        % (len(REAR_CABLE_SLOT_Y), REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H))
+    add("   centres                 : X=%+.1f   Y = %s"
+        % (REAR_CABLE_SLOT_X,
+           ", ".join("%.1f" % y for y in REAR_CABLE_SLOT_Y)))
+    add("   fitted SFF-8088 lead    : ~12.5 x 8 mm, so %.1f x %.1f mm of slack"
+        % (REAR_CABLE_SLOT_W - 12.5, REAR_CABLE_SLOT_H - 8.0))
+    add("   clearance to the grille : %.2f mm (slot corner to the pocket)"
+        % min(math.hypot(abs(REAR_CABLE_SLOT_X) - REAR_CABLE_SLOT_W / 2.0,
+                         y - FAN_CY) - GRILLE_POCKET_R
+              for y in REAR_CABLE_SLOT_Y))
+    add("   clearance to the edge   : %.2f mm outboard"
+        % (XW - abs(REAR_CABLE_SLOT_X) - REAR_CABLE_SLOT_W / 2.0))
     add("")
     add(" SERVICE LID")
     add("   plate                   : %.1f x %.1f x %.1f mm"
@@ -526,20 +547,14 @@ def report(body, lid, log):
             add("     X=%+7.1f Z=%6.1f : min %.1f mm / max %.1f mm  -> %s"
                 % (sx * LID_SCREW_X, zz, min(ds), max(ds),
                    "OK" if min(ds) >= LID_INSERT_D else "TOO SHALLOW"))
-    add("   cable egress slot through the left wall:")
-    cy, cz = CABLE_SLOT_C
-    sh, sz = CABLE_SLOT_SZ
-    for yy in (cy - sh / 2.0 + 2.0, cy, cy + sh / 2.0 - 2.0):
-        probe = Part.makeSphere(1.2, Vector(-XW + WALL / 2.0, yy, cz))
+    add("   cable egress slots through the rear wall:")
+    for yy in REAR_CABLE_SLOT_Y:
+        probe = Part.makeSphere(1.2, Vector(REAR_CABLE_SLOT_X, yy,
+                                            Z_RIN + REAR_WALL_T / 2.0))
         frac = probe.common(body).Volume / probe.Volume
-        add("     Y=%5.1f Z=%6.1f : %.0f%% inside solid  -> %s"
-            % (yy, cz, 100 * frac, "CLEAR" if frac < 0.05 else "BLOCKED"))
-    for dz in (-0.5, 0.0, 0.5):
-        zz = cz + dz * sz
-        d = material_depth(body, -XW + 0.15, zz, y_top=REAR_H,
-                           max_d=110.0, step=1.0)
-        add("     Z=%6.1f : solid wall from the top face down to Y=%.1f"
-            % (zz, REAR_H - d))
+        add("     X=%+6.1f Y=%5.1f : %.0f%% inside solid  -> %s"
+            % (REAR_CABLE_SLOT_X, yy, 100 * frac,
+               "CLEAR" if frac < 0.05 else "BLOCKED"))
     add("")
     add(" NOTES")
     if FLAT_TOP:

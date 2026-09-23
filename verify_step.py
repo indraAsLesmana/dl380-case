@@ -51,7 +51,8 @@ GRILLE_POCKET_R = FAN_R + GRILLE_RIM                      # 45.0
 GUSSET_H = 18.0
 SVC_HALF = XI - GUSSET_H                                  # 54.9
 LID_SCREW_X, LID_SCREW_Z = 70.0, 185.0
-CABLE_SLOT = (-XW + WALL / 2.0, 20.0, 213.0)              # side wall, mid thickness
+REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y = -60.0, (33.0, 50.0)
+REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H = 17.0, 12.0
 
 # the first honeycomb cell sits on the fan axis; the next column is offset
 _GR = (GRILLE_CELL + GRILLE_WEB) / math.sqrt(3.0)
@@ -75,7 +76,14 @@ CASES = [
     ("bay interior",              (0.0, FLOOR_T + INT_H / 2.0, 100.0), "void"),
     ("bay side wall",             (XI + WALL / 2.0, FLOOR_T + INT_H / 2.0, 100.0),
                                                                      "solid"),
-    ("side wall cable slot",      CABLE_SLOT,                        "void"),
+    ("rear cable slot  1",        (REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y[0], ZW),
+                                                                     "void"),
+    ("rear cable slot  2",        (REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y[1], ZW),
+                                                                     "void"),
+    ("web between slots",         (REAR_CABLE_SLOT_X,
+                                   (REAR_CABLE_SLOT_Y[0] + REAR_CABLE_SLOT_Y[1]) / 2.0,
+                                   ZW),                              "solid"),
+    ("web slot <-> grille",       (-(GRILLE_POCKET_R + 3.0), FAN_CY, ZW), "solid"),
     ("rear stop frame rib",       (0.0, FLOOR_T + 2.0, Z_BAY - 1.5), "solid"),
     ("floor material",            (0.0, 2.0, 100.0),                 "solid"),
     ("rubber foot recess",        (61.0, 1.0, 14.0),                 "void"),

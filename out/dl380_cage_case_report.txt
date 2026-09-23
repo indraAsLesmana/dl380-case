@@ -37,9 +37,12 @@
    open fraction of field  : 78%
    tightest edge margin    : 5.80 mm (pocket to the top edge)
 
- CABLE EGRESS (left wall)
-   stadium slot            : 16.0 (Y) x 30.0 (Z) mm at Y=20.0 Z=213.0
-   mirrored to right wall  : no
+ CABLE EGRESS  (rear wall, beside the grille)
+   2 slots                : 17.0 (X) x 12.0 (Y) mm, rounded corners
+   centres                 : X=-60.0   Y = 33.0, 50.0
+   fitted SFF-8088 lead    : ~12.5 x 8 mm, so 4.5 x 4.0 mm of slack
+   clearance to the grille : 6.54 mm (slot corner to the pocket)
+   clearance to the edge   : 7.20 mm outboard
 
  SERVICE LID
    plate                   : 151.4 x 3.0 x 108.4 mm
@@ -48,8 +51,8 @@
                              O4.2 insert bore / O3.4 clearance
 
  VOLUME / MASS
-   body   volume            :   499591.9 mm3  =  499.6 cm3
-   body   mass @1.27 g/cm3  :      634 g  (PETG, 100% infill equiv)
+   body   volume            :   497354.8 mm3  =  497.4 cm3
+   body   mass @1.27 g/cm3  :      632 g  (PETG, 100% infill equiv)
    lid    volume            :    67567.9 mm3  =   67.6 cm3
    lid    mass @1.27 g/cm3  :       86 g  (PETG, 100% infill equiv)
 
@@ -70,13 +73,9 @@
      X=  +70.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
      X=  +70.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK
      X=  +70.0 Z= 245.0 : min 13.0 mm / max 13.0 mm  -> OK
-   cable egress slot through the left wall:
-     Y= 14.0 Z= 213.0 : 0% inside solid  -> CLEAR
-     Y= 20.0 Z= 213.0 : 0% inside solid  -> CLEAR
-     Y= 26.0 Z= 213.0 : 0% inside solid  -> CLEAR
-     Z= 198.0 : solid wall from the top face down to Y=21.8
-     Z= 213.0 : solid wall from the top face down to Y=27.8
-     Z= 228.0 : solid wall from the top face down to Y=21.8
+   cable egress slots through the rear wall:
+     X= -60.0 Y= 33.0 : 0% inside solid  -> CLEAR
+     X= -60.0 Y= 50.0 : 0% inside solid  -> CLEAR
 
  NOTES
    * The 92 mm fan frame is taller than the 87.8 mm bay bore, so the
