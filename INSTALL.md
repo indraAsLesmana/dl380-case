@@ -195,7 +195,12 @@ check it for yourself.
 4. Check the airflow arrow points **out of the back** — this fan exhausts. Also
    check its cable is trailing out of the front of the fan, toward the cradle end,
    not pinched behind it.
-5. Start all four M3 × 30 screws by hand, then nip them up. The inserts are in
+5. **Route the lead now, while there is room.** Run it forward along one side of
+   the plenum, tucked down low against the floor, and leave it long enough to reach
+   the Wagos. The lid cannot trap it (its internal lip stops 6 mm short of the fan
+   and never enters the plenum), but a lead lying loose near the top opening is the
+   one thing you would have to fish out later.
+6. Start all four M3 × 30 screws by hand, then nip them up. The inserts are in
    PETG: **snug, not tight.**
 
 If it will not drop in, you are too far forward and standing it on the PSU cradle.
@@ -319,15 +324,33 @@ along the cradle by changing `PSU_BORE_Z`.
 
 ---
 
-## Step 11 — the service lid
+## Step 11 — the lid
 
-1. Check nothing is proud of the top face: no cable or Wago sticking up into where
-   the lid sits.
-2. Drop the lid on. Its 2 mm lip should settle into the opening with no force.
-3. Start all **6 × M3 × 10–12** by hand — three down each side at Z 185 / 215 / 245
-   — then tighten in a cross pattern, snug not tight.
+It is a **drop-on housing**. It slides straight down over the top of the case and
+stays there with **no screws at all** — the six screw positions are only there for
+shipping or if the case gets tipped.
 
-The lid is what closes the plenum and makes the case rigid, so fit all six.
+1. Check nothing is proud of the top: no cable or Wago sticking up into the opening.
+2. Drop the lid into place. Four skirts guide it — two long ones down the sides and
+   the back, a shorter one at the front. Nothing to line up, nothing to thread.
+3. Press it home. The last few millimetres are a light press fit as the friction
+   bead inside the skirt rides down over the case's outer walls. You will feel it
+   settle.
+4. Lift the front edge to check it is seated evenly. It should not rock.
+5. Optional: **6 × M3 × 10–12** at X = ±70, Z = 185 / 215 / 245.
+
+To get back in, just lift it off. No tools.
+
+**If it will not go on**: take a scraper to the friction bead — the narrow band
+about 10 mm up the inside of the skirt — or rebuild with `SKIRT_BEAD = SKIRT_CLEAR`
+for a free slip fit. If it drops on too easily, raise `SKIRT_BEAD`. That one number
+is the one to trim to your machine.
+
+**It cannot catch the fan cable.** The lip inside the lid is only 1.5 mm deep and
+stops 6 mm short of the fan, and the skirt is entirely outside the case. So there is
+nothing inside the plenum the lid can trap. That said, still tuck the fan's lead down
+flat before you drop the lid on rather than leaving it looped up near the opening —
+it is tidier and it means you never have to think about it.
 
 ---
 
@@ -363,7 +386,10 @@ dab of cyanoacrylate if they're loose.
 | PicoPSU won't start | PS_ON# isn't grounded (step 9) |
 | Strap won't sit down | the 24-pin ATX connector is standing up under it — move the strap along the cradle |
 | DC jack won't clamp | your jack's neck is shorter than 3.4 mm; reduce `DC_JACK_DEPTH` and rebuild |
-| Lid won't settle | a cable or Wago is proud of the top face, or the lip is catching on the grille side |
+| Lid won't settle | a cable or Wago is proud of the top face, or the skirt is catching on the case's outer wall — check the bead is not snagging on a proud fan insert |
+| Lid won't go on at all | the skirt bead is too proud for your printer; scrape the bead or rebuild with `SKIRT_BEAD = SKIRT_CLEAR` |
+| Lid drops on but is loose | raise `SKIRT_BEAD` above `SKIRT_CLEAR` and rebuild |
+| Lid pulls the fan cable | it can't — the lip stops 6 mm short of the fan and the skirt is outside the case. If you feel resistance, it's the bead on a fan insert, not a cable |
 
 ---
 

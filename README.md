@@ -24,18 +24,21 @@ the drive cage goes in and the order the internals have to be fitted.
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
 | Body solid | valid ✓ closed ✓ **151.40 × 102.80 × 281.40 mm** |
-| Lid solid | valid ✓ closed ✓ 151.40 × 5.00 × 116.40 mm |
+| Lid solid | valid ✓ closed ✓ **157.40 × 17.00 × 122.00 mm** — a skirted housing |
 | Strap solid | valid ✓ closed ✓ 50.20 × 4.00 × 20.00 mm |
-| Body ↔ lid / body ↔ strap interference | 0.0000 mm³ / 0.0000 mm³ |
+| **Lid retention** | **drop-on housing — it stays on with no screws at all** |
+| Body ↔ lid interference | 283 mm³ — the skirt bead's deliberate 0.15 mm press fit |
+| Body ↔ strap interference | 0.0000 mm³ |
 | PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR |
 | Build volume (Bambu Lab H2S, 340×320×340) | all three fit ✓ |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
-| All three STL watertight | 34 032 / 12 516 / 10 468 triangles, 0 non-manifold edges ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **35 probes, 0 failures** ✓ |
+| All three STL watertight | 34 032 / 31 844 / 10 468 triangles, 0 non-manifold edges ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **46 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
-written by the build; `verify_step.py` re-reads the exported STEP, so its 35 probes
-also prove the STEP round-trip lost nothing.
+written by the build; `verify_step.py` re-reads the exported STEP and probes the
+body and the lid separately, so its 46 probes also prove the STEP round-trip lost
+nothing.
 
 ---
 
@@ -114,11 +117,36 @@ barrel jacks will clamp.
 
 **PicoPSU cradle** — see below.
 
-**Lid** — the body is one cohesive print with a closed top over the bay; the plenum
-gets a separable **service lid** so you can get at the cabling and the PSU after the
-cage is in. A 3 mm plate with a locating lip that drops into the 109.8 mm opening,
-held by **6 × M3** screws into heat-set inserts (X = ±70, Z = 185 / 215 / 245), each
-with 13 mm of material behind it.
+**Lid — a drop-on housing that needs no screws.** The body is one cohesive print
+with a closed top over the bay; the plenum gets a separable lid that **slides
+straight down over the top of the case** and stays there.
+
+You fit it by dropping it on. Nothing to thread, nothing to line up:
+
+| | |
+|---|---|
+| Skirt | 2.8 mm thick, **14 mm deep** down the two sides and the back |
+| Front skirt | only **8 mm** — the drive bay's roof is 8.2 mm below the top of the rear section, and a full-depth skirt would land on it |
+| Fit | 0.2 mm slip clearance + a 0.35 mm friction bead = a light **0.15 mm press fit** |
+| Located by | the skirt in X and Z, the top rim in Y |
+| Removed by | lifting it — it cannot slide off in any direction |
+
+The bead is a deliberate interference, so `body ∩ lid` is no longer zero: the report
+prints it (283 mm³) and checks it against the ~231 mm³ that a 0.15 mm band should
+account for, rather than asserting zero. **Set `SKIRT_BEAD = SKIRT_CLEAR` for a free
+slip fit** if you would rather have that, and the six M3 screw positions are still
+cut in case you want it bolted for transport.
+
+**The fan cable is clear of the lid, three ways over** — all three numbers are
+printed in the build report:
+
+1. The locating lip is **1.5 mm** deep, so it bottoms out at y = 101.3, which is
+   **1.3 mm above** the plenum's interior ceiling at y = 100. It never enters the
+   plenum at all, so nothing loose in there can be snagged on it.
+2. The lip is cut short at **Z 242**, i.e. 6 mm before the fan starts at Z 248 —
+   there is no lip over the fan whatsoever.
+3. The skirt is entirely **outside** the case, so it cannot reach a cable that is
+   inside it.
 
 **Roof gussets** — because the plenum is a plain box, its roof would otherwise have
 bridged 145.8 mm in mid air. Two **18 mm 45° gussets** run the length of the roof/wall
@@ -239,7 +267,7 @@ footprint (625 mm³ of interference) which nothing visual had flagged.
 | Item | Qty | Notes |
 |---|---|---|
 | Printed body | 1 | ≈ 524 cm³ / ≈ 665 g at 1.27 g/cm³ |
-| Printed service lid | 1 | ≈ 74 cm³ / ≈ 94 g |
+| Printed lid (drop-on housing) | 1 | ≈ 88 cm³ / ≈ 112 g |
 | Printed PSU strap | 1 | ≈ 3.8 cm³ / ≈ 5 g |
 | **ARCTIC P9 PWM PST 92 mm** | 1 | inside the plenum, exhaust; 106 g |
 | **PicoPSU-120** (or similar) | 1 | 31 × 44 × 21 mm; add a 12 V brick + panel DC jack |
@@ -294,6 +322,9 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `WALL` / `FLOOR_T` | 2.8 / 4.0 | wall and floor thickness |
 | `FILLET_R` / `FILLET_R_LID` | 1.4 / 1.0 | outer edge rounds, body+strap / lid |
 | `LEAD_IN` / `LEAD_DEPTH` | 0.8 / 4.0 | cage lead-in flare — capped by the rounds |
+| `SKIRT_T` / `SKIRT_D` / `SKIRT_FRONT_D` | 2.8 / 14.0 / 8.0 | lid skirt thickness and depth |
+| `SKIRT_CLEAR` / `SKIRT_BEAD` | 0.2 / 0.35 | slip clearance / bead; bead > clearance = press fit |
+| `LID_LIP_T` / `LID_LIP_GAP` | 1.5 / 6.0 | locating lip depth, and its gap to the fan |
 | `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm |
 | `GUSSET_H` | 18.0 | 45° roof gusset size (sets the service opening width) |
 | `PLENUM_D` | 108.0 | clear depth behind the backplane |
@@ -328,9 +359,13 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
    change `DC_JACK_PAD` / `DC_JACK_DEPTH` if it wants something different.
 4. **Rear section is 8.2 mm taller than the bay.** That is what an internal 92 mm fan
    costs. Use an 83.8 mm-or-smaller fan and the top is flat again.
-5. **Dimensions are from the brief, not from calipers.** If your cage measures
+5. **The lid is a 0.15 mm press fit on its skirt bead.** If it will not go on, take
+   the bead down with a scraper, or set `SKIRT_BEAD = SKIRT_CLEAR` (0.2) for a free
+   slip fit. If it is too loose, raise `SKIRT_BEAD`. Printed dimensions vary; this is
+   the one number to trim to your machine.
+6. **Dimensions are from the brief, not from calipers.** If your cage measures
    differently, change `CAGE_W` / `CAGE_H` / `CAGE_D` and rebuild.
-6. **Nothing here has been printed yet.** The geometry is verified as valid, closed,
+7. **Nothing here has been printed yet.** The geometry is verified as valid, closed,
    non-interfering, phantom-fitted and feature-by-feature against the exported STEP,
    but that is not the same as a successful print.
 
