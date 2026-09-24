@@ -583,12 +583,12 @@ def build():
             (FLOOR_T + FAN_GUIDE_H, FAN_FRONT_Z_IN - FAN_FRONT_CHAM),
             (FLOOR_T + FAN_GUIDE_H, FAN_FRONT_Z_OUT)
         ]
-        x0 = sx * FAN_FRONT_X_IN if sx > 0 else sx * GUIDE_XO
-        dx = (GUIDE_XO - FAN_FRONT_X_IN)
-        vecs = [Vector(x0, y, z) for (y, z) in p_front_yz]
+        x_min = min(sx * FAN_FRONT_X_IN, sx * GUIDE_XO)
+        dx = abs(GUIDE_XO - FAN_FRONT_X_IN)
+        vecs = [Vector(x_min, y, z) for (y, z) in p_front_yz]
         poly = Part.makePolygon(vecs + [vecs[0]])
         face = Part.Face(poly)
-        front_solid = face.extrude(Vector(sx * dx if sx < 0 else dx, 0, 0))
+        front_solid = face.extrude(Vector(dx, 0, 0))
         body = body.fuse(front_solid)
 
     # ----------------------------------------------- PicoPSU cradle in plenum ---
