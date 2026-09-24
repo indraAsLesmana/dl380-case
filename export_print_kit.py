@@ -43,7 +43,7 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "out")
 DST = os.path.join(HERE, "print")
 
-RATE = 750.0      # Rp per gram of filament
+RATE = 600.0      # Rp per gram of filament
 DENS = 1.27       # PETG, g/cm3
 PROFILE = 0.75    # printed mass / solid mass at 3 perimeters and 15% infill
 
@@ -187,7 +187,7 @@ def main():
     add("=" * len(TITLE))
     add("")
     add("%-12s %10s %8s %9s %13s %24s %9s"
-        % ("part", "volume", "solid", "printed", "cost @ 750/g", "bbox (mm)", "triangles"))
+        % ("part", "volume", "solid", "printed", "cost @ 600/g", "bbox (mm)", "triangles"))
     add("-" * 92)
     for name, v, tris, bb in rows:
         add("%-12s %7.1f cm3 %6.0f g %7.0f g  Rp %10s  %6.1f x %6.1f x %5.1f %9d"

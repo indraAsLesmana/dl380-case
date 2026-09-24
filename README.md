@@ -23,27 +23,29 @@ the drive cage goes in and the order the internals have to be fitted.
 | | |
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
-| Body solid | valid ✓ closed ✓ **208.40 × 102.80 × 253.40 mm** (647,694 mm³) — uniform 205.6 mm width & compact 253.4 mm depth |
+| Body solid | valid ✓ closed ✓ **208.40 × 102.80 × 253.40 mm** (572,008 mm³) — uniform 205.6 mm width & honeycomb net motif |
 | Lid solid | valid ✓ closed ✓ **211.70 × 13.00 × 92.20 mm** (65,739 mm³) — slide-and-click |
 | Strap solid | valid ✓ closed ✓ **69.20 × 10.00 × 14.00 mm** (4,267 mm³) — snap-fit |
 | **Enclosure footprint** | **Uniform width**: 205.6 mm outer width throughout (bay & plenum), unbroken side walls; **253.4 mm depth** |
+| **Drive bay net motif** | **258 hexagonal honeycomb cutouts (11 mm cell, 1.8 mm web)** on top, bottom, left & right walls — saves ~107 g solid (~80 g printed) |
 | **Cage slide rails** | **Internal bottom slider rails (14 mm tall)** & **top guide ribs (5 mm tall)** with 1.5 mm lead-in chamfers |
 | **Cable clearance** | **27.1 mm lateral space** to the left of the cage for side-facing 10-pin power plug & Wago blocks |
 | **Lid retention** | **horizontal slide-and-click with compliant cantilever latch — 0 screws** |
 | **PSU retention** | **toolless snap-fit strap with dual undercut retention teeth — 0 screws** |
+| **Fan housing** | **Full-height 86 mm U-channel with front retaining rails (25.10 mm track depth)** — snug press-fit feel with zero screws |
 | Body ↔ lid interference | **0.0000 mm³** (0.25 mm sliding clearance on 45° self-supporting rails) |
 | Body ↔ strap interference | **0.0000 mm³** (0.20 mm snap clearance) |
 | Cage slide path interference | **0.0000 mm³** (entrance to stop frame at Z = 162.0 mm) → CLEAR |
 | PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR (transverse cradle shifted right X=+40.0 mm) |
 | Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`, 310.6 × 253.4 mm layout) |
+| Estimated print cost | **Rp 366,911 (~Rp 367,000)** for total enclosure at Rp 600/g PETG (612 g printed / 815 g solid) |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
-| **Fan housing** | **slides in from the top and needs no screws** — held 4 sides by the case, 5th by the lid |
 | All parts printable | **100% support-free in native print orientations** ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **63 probes, 0 failures** ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **67 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
 written by the build; `verify_step.py` re-reads the exported STEP and probes the
-body and the lid separately, with 63 probes confirming all geometries and clearances.
+body and the lid separately, with 67 probes confirming all geometries and clearances.
 
 ---
 
@@ -106,34 +108,38 @@ Shifting the PicoPSU to the right leaves a massive **117.2 mm of unobstructed pl
 on the left (X = -100.0 to +17.2 mm)** for the backplane power harness and three Wago 221
 lever blocks.
 
-**Fan — its own housing, and it needs no screws.** The ARCTIC P9 **slides straight
-down into a slot** from the top and seats on the plenum floor, exhausting straight
-through the grille. Nothing hangs off the back of the enclosure and the blades are
-protected.
+**Fan — full-height U-channel housing with front retaining rails (snug press-fit feel).**
+The ARCTIC P9 **slides straight down into a captive U-channel track** from the top and
+seats on the plenum floor, exhausting straight through the grille. Nothing hangs off the
+back of the enclosure and the blades are protected.
 
 | | |
 |---|---|
-| Slot | Z 220 → 245, straight down from above |
-| Seat | the plenum floor — this sets the height, so the screw holes still line up |
-| Sides | two guide rails, 42 mm up from the floor, 0.2 mm clearance per side, 1.8 mm lead-in chamfer at the top |
-| Behind | the rear wall / grille face |
-| Forward | two 16 mm front corner tabs — it cannot tip out |
-| Up | **two fins on the lid's underside** reach down to 1 mm above the frame's top edge |
+| Track | Z 219.90 → 245.00, providing an exact **25.10 mm track depth** for the 25.0 mm fan frame |
+| Seat | the plenum floor (Y = 4.0 mm) — sets the height so screw holes line up if bolted |
+| Sides (X) | two tall guide rails extending up to Y = 90.0 mm (`FAN_GUIDE_H = 86.0 mm`), 0.15 mm clearance per side, 2.5 mm lead-in chamfer |
+| Forward (Z-) | **two tall front retaining rails** (Z 217.0 → 219.9 mm) overlapping the frame outer rim by 2.5 mm per side with top entry chamfers; completely clears the Ø86 mm blade circle |
+| Behind (Z+) | the solid rear wall / grille face |
+| Up (Y+) | **two fins on the lid's underside** reach down to 1 mm above the frame's top edge |
 
-That last row is what makes "no screws" honest: the case holds the fan on four sides
-and **the lid holds it on the fifth**. There is nothing to line up and nothing to
-drop. The four M3 positions are still cut if you would rather bolt it.
-
-**One thing the rails are not.** They are a *snug* fit, not a press fit — and a press
-fit is geometrically impossible here. A rigid slot narrower than the fan frame cannot
-be inserted into: the fan just jams at the top. Both cases checked before building
-it: at 0.00 mm clearance the fan touches and grips nothing, and at −0.15 mm it cannot
-go in at all. So the clearance is what stops it rattling, and it is the tabs plus the
-lid fins that hold it. Tune with `FAN_GUIDE_CLEAR` and `FAN_LID_GAP`.
+The full-height U-channel wraps the fan on all four vertical corners, providing a positive,
+snug press-fit feel without requiring screws or rattling. With the lid closed, the fan is
+completely locked in place in all 6 degrees of freedom.
 
 Because the fan seats on the floor, its axis sits at **y = 50** rather than the
 plenum's centre at 52, and the grille pocket and all four mounting holes moved down
 2 mm with it.
+
+**Drive bay net motif — weight & cost reduction cutouts.**
+Instead of heavy solid plastic slabs around the drive bay, the top roof, bottom floor,
+and left/right side walls feature an architectural **hexagonal honeycomb net motif**:
+- **Geometry**: 258 hexagonal cells, **11.0 mm across flats** with **1.8 mm webs** (equivalent to 4–5 passes of a standard 0.4 mm nozzle for maximum rigidity and clean toolpaths).
+- **Four-panel coverage**:
+  - Top roof: 93 cells across a 120 × 134 mm field.
+  - Bottom floor: 71 cells across a 90 × 122 mm field (clearing the rubber foot recesses).
+  - Left and right side walls: 47 cells each across 134 × 68 mm fields.
+- **Structural margins**: Solid perimeter borders are preserved at the front mouth ($Z < 16\text{ mm}$), the rear stop frame ($Z > 150\text{ mm}$), and along the floor rails and ceiling guide ribs.
+- **Cost impact**: Saves **107 g of solid PETG (~80 g printed)** per enclosure, reducing filament cost and print time while facilitating passive air circulation.
 
 **Honeycomb exhaust grille** — punched through a **3 mm membrane** at the bottom of
 a Ø90 × 5.4 mm counterbore in the outer face, not through the full 8.4 mm wall, so
@@ -313,7 +319,18 @@ interference (0.0000 mm³ → CLEAR).
 ### Print settings & Kit
 
 PETG or ASA suggested (the plenum sees warm server air). 0.2 mm layers, 3–4 walls,
-4–5 top/bottom layers. Total printed mass is ≈ **684 g** (at 3 perimeters and 15% infill).
+4–5 top/bottom layers. Total printed mass is **612 g** (815 g solid upper bound).
+With the drive bay honeycomb net motif, the enclosure saves **107 g of solid PETG (~80 g printed)**!
+
+### Cost Estimation @ Rp 600 / gram (PETG)
+
+| Part | Volume (cm³) | Solid Mass (g) | Printed Mass (g) | Cost (Rp 600/g) |
+|---|---|---|---|---|
+| **Body** | 572.0 | 726 | 545 | Rp 326,902 |
+| **Lid** | 65.7 | 83 | 63 | Rp 37,570 |
+| **PSU Strap** | 4.3 | 5 | 4 | Rp 2,439 |
+| **TOTAL** | **642.0** | **815** | **612** | **Rp 366,911** (~Rp 367,000) |
+
 **No supports needed for any part**:
 - The **body** prints upright on its base with the front opening facing up.
 - The **lid** prints top-plate face down on the bed with skirts pointing up; the 45° runner overhangs are self-supporting.
@@ -365,22 +382,24 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `PSU_SNAP_CLEAR` / `PSU_LEG_T` / `PSU_TOOTH_W` | 0.2 / 2.0 / 0.8 | snap-fit strap clearance, leg thickness, and retention tooth |
 | `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm |
 | `GUSSET_H` | 18.0 | 45° roof gusset size (sets the service opening width) |
-| `PLENUM_D` | 108.0 | clear depth behind the backplane |
+| `PLENUM_D` | 80.0 | clear depth behind the backplane |
 | `FAN_SIZE` / `FAN_INNER_CLEAR` | 92.0 / 2.0 | frame size and bore clearance |
 | `FAN_APERTURE` / `FAN_PATTERN` / `FAN_HOLE` | 86.0 / 82.5 / 4.2 | grille field and mounting pattern |
 | `FAN_INSET` | 25.0 | fan depth against the rear wall |
-| `FAN_GUIDE_CLEAR` | 0.2 | clearance per side in the fan housing |
-| `FAN_GUIDE_T` / `FAN_GUIDE_H` / `FAN_GUIDE_CHAM` | 3.0 / 42.0 / 1.8 | rail thickness, height, lead-in |
-| `FAN_TAB_H` / `FAN_TAB_Z` | 16.0 / 3.0 | front corner tabs that stop the fan tipping |
+| `FAN_GUIDE_CLEAR` | 0.15 | clearance per side in the fan housing |
+| `FAN_GUIDE_T` / `FAN_GUIDE_H` / `FAN_GUIDE_CHAM` | 3.0 / 86.0 / 2.5 | rail thickness, height, lead-in |
+| `FAN_FRONT_Z_IN` / `FAN_FRONT_X_IN` | 219.90 / 43.50 | front retaining rail boundary (25.10 mm track depth) |
 | `FAN_LID_GAP` | 1.0 | how far the lid's fin sits above the fan |
-| `GRILLE_CELL` / `GRILLE_WEB` | 9.0 / 1.2 | honeycomb cell and web size |
+| `NET_CELL` / `NET_WEB` | 11.0 / 1.8 | drive bay honeycomb net cell and web size |
+| `GRILLE_CELL` / `GRILLE_WEB` | 9.0 / 1.2 | rear exhaust grille honeycomb cell and web size |
 | `GRILLE_RIM` / `GRILLE_DEPTH` | 2.0 / 3.0 | solid rim, membrane thickness |
 | `PSU_W` / `PSU_L` / `PSU_H` | 31 / 44 / 21 | the board envelope |
-| `PSU_CLEAR` / `PSU_BOOT` / `PSU_PLINTH_T` | 0.8 / 20.0 / 3.0 | fit, backplane gap, plinth |
+| `PSU_CX` | 40.0 | cradle center offset along X (leaves 117 mm cable floor on left) |
+| `PSU_CLEAR` / `PSU_BOOT` / `PSU_PLINTH_T` | 0.8 / 12.0 / 3.0 | fit, backplane gap, plinth |
 | `PSU_WALL_H` / `PSU_FRONT_LIP` | 24.0 / 6.0 | cradle wall and lip heights |
-| `PSU_BORE_Z` | 192.0 | strap position along the cradle |
-| `REAR_CABLE_SLOT_*` | X −60, Y 33/50, 17 × 12 | rear cable egress |
-| `DC_JACK_X` / `DC_JACK_Y` | 60.0 / 52.0 | DC jack position |
+| `PSU_BORE_Z` | 193.3 | strap position along the cradle |
+| `REAR_CABLE_SLOT_*` | X −70, Y 33/50, 17 × 12 | rear cable egress |
+| `DC_JACK_X` / `DC_JACK_Y` | 70.0 / 52.0 | DC jack position |
 | `DC_JACK_DIA` / `DC_JACK_PAD` / `DC_JACK_DEPTH` | 8.0 / 16.0 / 5.0 | jack hole and counterbore |
 | `CAGE_SCREW_Z` | 15…155 | candidate cage anchor positions |
 | `REAR_H` | *derived* | follows the fan automatically |

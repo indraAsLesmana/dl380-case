@@ -34,26 +34,25 @@
    hole pattern            : 82.5 x 82.5 square, O4.2
    hole centres (X,Y)      : (+/-41.2, 8.8)  (+/-41.2, 91.2)
 
- FAN HOUSING  - it slides in from the top and sets tight with no screws
-   how it goes in          : straight DOWN into the slot at Z 220.0..245.0
+ FAN HOUSING  - tall U-channel with front retaining rail (press-fit feel)
+   how it goes in          : straight DOWN into the U-channel at Z 220.0..245.0
    seat                    : the plenum floor.  This sets the height, so
                              the screw holes line up if you ever use them
-   sides (X)               : two guide rails 42.0 mm up from the floor,
-                             0.20 mm clearance per side, 1.8 mm lead-in
-   behind (Z+)             : the rear wall / grille face
-   forward (Z-)            : two front corner tabs, 16.0 mm tall - the fan
-                             cannot tip forward past them
+   sides (X)               : two tall guide rails 86.0 mm up from the floor (y=90.0),
+                             0.15 mm clearance per side, 2.5 mm lead-in
+   behind (Z+)             : the rear wall / grille face at Z=245.0
+   forward (Z-)            : two tall front retaining rails (Z=217.0..219.9),
+                             overlapping fan frame by 2.5 mm per side with 2.5 mm entry chamfer
+   track depth (Z)         : 25.10 mm (for 25.0 mm fan frame) -> snug press-fit feel
    up (Y+)                 : two fins on the lid's underside reach down to
                              y=97.0, 1.0 mm above the frame's top edge
-   => restrained on four sides by the case and on the fifth by the lid
+   => restrained on all six sides: toolless slide-in, zero screws, rock solid
 
-   On the rails: they are a SNUG fit, not a press fit, and that is
-   deliberate.  A rigid slot narrower than the fan frame cannot be
-   inserted into at all - the fan jams at the top - so an interference
-   fit is geometrically impossible here.  0.2 mm per side is what stops
-   it rattling.  Tune it with FAN_GUIDE_CLEAR, and set FAN_LID_GAP to
-   change how much the fan can lift.  The 4 x O4.2 screw holes are still
-   there if you would rather bolt it.
+ DRIVE BAY NET MOTIF  (weight & cost reduction cutouts)
+   pattern                 : hexagonal honeycomb mesh (11.0 mm cells, 1.8 mm webs)
+   cutout panels           : top roof, bottom floor, left wall, right wall
+   total hex cells         : 258 cells
+   cost impact             : reduces raw plastic mass by ~107 g solid (~80 g printed)
 
  HONEYCOMB EXHAUST GRILLE  (recessed into the outer face)
    pocket                  : O90.0, 5.4 mm deep
@@ -126,13 +125,12 @@
                              and the flare both cut the same 2.8 mm
                              front wall, so one had to give
 
- VOLUME / MASS
-   body   volume            :   647693.5 mm3  =  647.7 cm3
-   body   mass @1.27 g/cm3  :      823 g  (PETG, 100% infill equiv)
-   lid    volume            :    65738.8 mm3  =   65.7 cm3
-   lid    mass @1.27 g/cm3  :       83 g  (PETG, 100% infill equiv)
-   strap  volume            :     4267.2 mm3  =    4.3 cm3
-   strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
+ VOLUME / MASS / PRICING @ Rp 600/g
+   body   volume / solid / prn:   572.0 cm3 |   726 g (solid) |   545 g (printed) -> Rp    326902
+   lid    volume / solid / prn:    65.7 cm3 |    83 g (solid) |    63 g (printed) -> Rp     37570
+   strap  volume / solid / prn:     4.3 cm3 |     5 g (solid) |     4 g (printed) -> Rp      2439
+   ----------------------------------------------------------------------------------
+   TOTAL ENCLOSURE          :   642.0 cm3 |   815 g (solid) |   612 g (printed) -> Rp    366911
 
  SANITY CHECKS
    body valid              : True

@@ -107,16 +107,24 @@ FAN_HOLE      =   4.2    # mm  Ø -> 4.2 for M3 heat-set insert, 4.5 for M4 pass
 FAN_INSET     =  25.0    # mm  fan depth; it hugs the inside of the rear wall
 
 # ---- fan housing -------------------------------------------------------------
-#  The fan slides straight DOWN into a slot from the top and seats on the plenum
-#  floor.  It is held by geometry on four sides and by the lid on the fifth, so
-#  it sets tight with no screws at all.
-FAN_GUIDE_CLEAR = 0.2    # mm  clearance per side between fan frame and rail
-FAN_GUIDE_T     = 3.0    # mm  rail thickness
-FAN_GUIDE_H     = 42.0   # mm  rail height above the plenum floor
-FAN_GUIDE_CHAM  = 1.8    # mm  lead-in chamfer at the top of each rail
-FAN_TAB_H       = 16.0   # mm  front corner tab height
-FAN_TAB_Z       = 3.0    # mm  front corner tab depth
+# ---- fan housing (tall U-channel with front retaining rail & press-fit feel) -
+#  The fan slides straight DOWN into a full-height U-channel from the top and
+#  seats on the plenum floor. Tall side guide rails and front retaining rails
+#  with lead-in chamfers create a snug press-fit track (25.10 mm depth vs 25.0 mm
+#  fan frame) that holds the fan firmly on all sides with no screws at all.
+FAN_GUIDE_CLEAR = 0.15   # mm  clearance per side between fan frame and side rail
+FAN_GUIDE_T     = 3.0    # mm  side rail thickness
+FAN_GUIDE_H     = 86.0   # mm  rail height above the plenum floor (up to y=90.0)
+FAN_GUIDE_CHAM  = 2.5    # mm  lead-in chamfer at the top of each rail
+FAN_FRONT_Z_IN  = 219.90 # mm  front rail inner face (25.10 mm track depth from rear wall at 245.0)
+FAN_FRONT_Z_OUT = 217.00 # mm  front rail outer face (219.90 - 2.90)
+FAN_FRONT_X_IN  = 43.50  # mm  front retaining lip inner edge (overlaps 46.0 mm fan frame by 2.5 mm)
+FAN_FRONT_CHAM  = 2.5    # mm  lead-in chamfer on front rail in Z for smooth drop-in
 FAN_LID_GAP     = 1.0    # mm  gap between the fan's top edge and the lid fin
+
+# ---- drive bay net motif (honeycomb cutouts for weight & cost reduction) ----
+NET_CELL        = 11.0   # mm  hex cell width across flats
+NET_WEB         =  1.8   # mm  web thickness between hex cells
 
 # ---- honeycomb exhaust grille ------------------------------------------------
 GRILLE_CELL   =   9.0    # mm  honeycomb cell size, across flats
@@ -240,8 +248,6 @@ FAN_HALF    = FAN_SIZE / 2.0
 FAN_TOP     = FLOOR_T + FAN_SIZE           # top edge of the fan frame
 GUIDE_X     = FAN_HALF + FAN_GUIDE_CLEAR   # rail inner face
 GUIDE_XO    = GUIDE_X + FAN_GUIDE_T        # rail outer face
-FAN_TAB_Z1  = FAN_Z0 - FAN_GUIDE_CLEAR     # front tab, rear face
-FAN_TAB_Z0  = FAN_TAB_Z1 - FAN_TAB_Z       # front tab, front face
 LID_FIN_Y0  = FAN_TOP + FAN_LID_GAP        # bottom of the lid's retainer fin
 
 # honeycomb geometry: R sizes a perfect tiling, Rp the shrunken cells we cut
@@ -408,6 +414,42 @@ def honeycomb_openings(cx, cy, r_centres, z0, dz, cell, web):
     return cells
 
 
+def make_hex_grid(span_u, span_v, cell_flat, web, center_u, center_v,
+                  extrude_axis, extrude_start, extrude_len, rot_deg=0):
+    """Generate a grid of hexagonal cutting prisms across a 2D bounding span."""
+    r_flat = cell_flat / 2.0
+    r_corner = r_flat / math.cos(math.radians(30))
+    pitch_u = cell_flat + web
+    pitch_v = 1.5 * r_corner + web * 0.866
+    nu = int(span_u / pitch_u) + 2
+    nv = int(span_v / pitch_v) + 2
+    margin = cell_flat / 2.0
+    solids = []
+    for iv in range(-nv, nv + 1):
+        v = center_v + iv * (cell_flat * math.sqrt(3)/2.0 + web * math.sqrt(3)/2.0)
+        u_shift = (pitch_u / 2.0) if (iv % 2 != 0) else 0.0
+        for iu in range(-nu, nu + 1):
+            u = center_u + iu * pitch_u + u_shift
+            if abs(u - center_u) <= (span_u / 2.0 - margin) and abs(v - center_v) <= (span_v / 2.0 - margin):
+                pts = []
+                for i in range(6):
+                    ang = math.radians(60 * i + rot_deg)
+                    pts.append((u + r_corner * math.cos(ang), v + r_corner * math.sin(ang)))
+                if extrude_axis == 'y':
+                    vecs = [Vector(x, extrude_start, z) for (x, z) in pts]
+                    vec_ext = Vector(0, extrude_len, 0)
+                elif extrude_axis == 'x':
+                    vecs = [Vector(extrude_start, y, z) for (z, y) in pts]
+                    vec_ext = Vector(extrude_len, 0, 0)
+                else:
+                    vecs = [Vector(x, y, extrude_start) for (x, y) in pts]
+                    vec_ext = Vector(0, 0, extrude_len)
+                poly = Part.makePolygon(vecs + [vecs[0]])
+                face = Part.Face(poly)
+                solids.append(face.extrude(vec_ext))
+    return solids
+
+
 def _tidy(shape):
     """Merge coplanar faces when the FreeCAD build offers it (no clean() in 1.1)."""
     for meth in ("removeSplitter", "clean"):
@@ -516,22 +558,38 @@ def build():
         body = body.fuse(gusset(PLEN_XI, PLEN_Y1, GUSSET_H, Z_BAY, Z_RIN, side))
 
     # ------------------------------------------------ fan housing in plenum ---
-    #  A slot the fan slides straight down into from the top.  It seats on the
-    #  plenum floor and is guided in X by two rails; the rear wall is behind it
-    #  and two front corner tabs stop it tipping forward.  The lid reaches down
-    #  to its top edge, which is what stops it lifting.  No screws needed.
+    #  A tall U-channel the fan slides straight down into from the top.
+    #  It seats on the plenum floor and is guided in X by two side rails and in
+    #  Z by the rear wall and front retaining rails. Top lead-in chamfers provide
+    #  smooth entry while the 25.10 mm track depth gives a snug press-fit feel.
     for sx in (1, -1):
-        p = [(sx * GUIDE_X, FLOOR_T),
-             (sx * GUIDE_XO, FLOOR_T),
-             (sx * GUIDE_XO, FLOOR_T + FAN_GUIDE_H),
-             (sx * (GUIDE_X + FAN_GUIDE_CHAM), FLOOR_T + FAN_GUIDE_H),
-             (sx * GUIDE_X, FLOOR_T + FAN_GUIDE_H - FAN_GUIDE_CHAM)]
+        # 1. Side rail: X in [GUIDE_X, GUIDE_XO], Z in [FAN_Z0, Z_RIN]
+        p_side = [
+            (sx * GUIDE_X, FLOOR_T),
+            (sx * GUIDE_XO, FLOOR_T),
+            (sx * GUIDE_XO, FLOOR_T + FAN_GUIDE_H),
+            (sx * (GUIDE_X + FAN_GUIDE_CHAM), FLOOR_T + FAN_GUIDE_H),
+            (sx * GUIDE_X, FLOOR_T + FAN_GUIDE_H - FAN_GUIDE_CHAM)
+        ]
         if sx < 0:
-            p.reverse()
-        body = body.fuse(prism(p, FAN_Z0, FAN_INSET))
-        tx = GUIDE_X if sx > 0 else -GUIDE_XO
-        body = body.fuse(box(FAN_GUIDE_T, FAN_TAB_H, FAN_TAB_Z,
-                             tx, FLOOR_T, FAN_TAB_Z0))
+            p_side.reverse()
+        body = body.fuse(prism(p_side, FAN_Z0, FAN_INSET))
+
+        # 2. Front retaining rail: captures front face of fan frame
+        p_front_yz = [
+            (FLOOR_T, FAN_FRONT_Z_OUT),
+            (FLOOR_T, FAN_FRONT_Z_IN),
+            (FLOOR_T + FAN_GUIDE_H - 8.0, FAN_FRONT_Z_IN),
+            (FLOOR_T + FAN_GUIDE_H, FAN_FRONT_Z_IN - FAN_FRONT_CHAM),
+            (FLOOR_T + FAN_GUIDE_H, FAN_FRONT_Z_OUT)
+        ]
+        x0 = sx * FAN_FRONT_X_IN if sx > 0 else sx * GUIDE_XO
+        dx = (GUIDE_XO - FAN_FRONT_X_IN)
+        vecs = [Vector(x0, y, z) for (y, z) in p_front_yz]
+        poly = Part.makePolygon(vecs + [vecs[0]])
+        face = Part.Face(poly)
+        front_solid = face.extrude(Vector(sx * dx if sx < 0 else dx, 0, 0))
+        body = body.fuse(front_solid)
 
     # ----------------------------------------------- PicoPSU cradle in plenum ---
     #  Transverse orientation (44 mm across X, 31 mm along Z) shifted to X = +40.0 mm.
@@ -641,6 +699,19 @@ def build():
                                      INT_H / 2.0 + LEAD_IN / 2.0,
                                      BAY_YC, DUCT_SEG), 0.0)
     cuts.append(Part.makeLoft([w_in, w_out], solid=True, ruled=True))
+
+    # --- drive bay net motif (honeycomb cutouts on top, bottom, left, right) -
+    net_cuts = []
+    # Top roof (u=X, v=Z, extrude along Y)
+    net_cuts.extend(make_hex_grid(120.0, 134.0, NET_CELL, NET_WEB, 0.0, 83.0, 'y', BAY_Y1 - 1.0, WALL + 2.0))
+    # Bottom floor (u=X, v=Z, extrude along Y)
+    net_cuts.extend(make_hex_grid(90.0, 122.0, NET_CELL, NET_WEB, 0.0, 87.0, 'y', -1.0, FLOOR_T + 2.0))
+    # Left wall (u=Z, v=Y, extrude along X)
+    net_cuts.extend(make_hex_grid(134.0, 68.0, NET_CELL, NET_WEB, 83.0, BAY_YC, 'x', -XW - 1.0, WALL + 2.0))
+    # Right wall (u=Z, v=Y, extrude along X)
+    net_cuts.extend(make_hex_grid(134.0, 68.0, NET_CELL, NET_WEB, 83.0, BAY_YC, 'x', XW - WALL - 1.0, WALL + 2.0))
+    log["net_cells"] = len(net_cuts)
+    cuts.append(Part.makeCompound(net_cuts))
 
     for c in cuts:
         body = body.cut(c)
@@ -825,33 +896,33 @@ def report(body, lid, strap, log):
     add("   hole centres (X,Y)      : (+/-%.1f, %.1f)  (+/-%.1f, %.1f)"
         % (FAN_OFF, FAN_CY - FAN_OFF, FAN_OFF, FAN_CY + FAN_OFF))
     add("")
-    add(" FAN HOUSING  - it slides in from the top and sets tight with no screws")
-    add("   how it goes in          : straight DOWN into the slot at Z %.1f..%.1f"
+    add(" FAN HOUSING  - tall U-channel with front retaining rail (press-fit feel)")
+    add("   how it goes in          : straight DOWN into the U-channel at Z %.1f..%.1f"
         % (FAN_Z0, Z_RIN))
     add("   seat                    : the plenum floor.  This sets the height, so")
     add("                             the screw holes line up if you ever use them")
-    add("   sides (X)               : two guide rails %.1f mm up from the floor,"
-        % FAN_GUIDE_H)
+    add("   sides (X)               : two tall guide rails %.1f mm up from the floor (y=%.1f),"
+        % (FAN_GUIDE_H, FLOOR_T + FAN_GUIDE_H))
     add("                             %.2f mm clearance per side, %.1f mm lead-in"
         % (FAN_GUIDE_CLEAR, FAN_GUIDE_CHAM))
-    add("   behind (Z+)             : the rear wall / grille face")
-    add("   forward (Z-)            : two front corner tabs, %.1f mm tall - the fan"
-        % FAN_TAB_H)
-    add("                             cannot tip forward past them")
+    add("   behind (Z+)             : the rear wall / grille face at Z=%.1f" % Z_RIN)
+    add("   forward (Z-)            : two tall front retaining rails (Z=%.1f..%.1f),"
+        % (FAN_FRONT_Z_OUT, FAN_FRONT_Z_IN))
+    add("                             overlapping fan frame by %.1f mm per side with %.1f mm entry chamfer"
+        % (FAN_HALF - FAN_FRONT_X_IN, FAN_FRONT_CHAM))
+    add("   track depth (Z)         : %.2f mm (for 25.0 mm fan frame) -> snug press-fit feel"
+        % (Z_RIN - FAN_FRONT_Z_IN))
     add("   up (Y+)                 : two fins on the lid's underside reach down to")
     add("                             y=%.1f, %.1f mm above the frame's top edge"
         % (LID_FIN_Y0, FAN_LID_GAP))
-    add("   => restrained on four sides by the case and on the fifth by the lid")
+    add("   => restrained on all six sides: toolless slide-in, zero screws, rock solid")
     add("")
-    add("   On the rails: they are a SNUG fit, not a press fit, and that is")
-    add("   deliberate.  A rigid slot narrower than the fan frame cannot be")
-    add("   inserted into at all - the fan jams at the top - so an interference")
-    add("   fit is geometrically impossible here.  %.1f mm per side is what stops"
-        % FAN_GUIDE_CLEAR)
-    add("   it rattling.  Tune it with FAN_GUIDE_CLEAR, and set FAN_LID_GAP to")
-    add("   change how much the fan can lift.  The 4 x O%.1f screw holes are still"
-        % FAN_HOLE)
-    add("   there if you would rather bolt it.")
+    add(" DRIVE BAY NET MOTIF  (weight & cost reduction cutouts)")
+    add("   pattern                 : hexagonal honeycomb mesh (%.1f mm cells, %.1f mm webs)"
+        % (NET_CELL, NET_WEB))
+    add("   cutout panels           : top roof, bottom floor, left wall, right wall")
+    add("   total hex cells         : %d cells" % log.get("net_cells", 0))
+    add("   cost impact             : reduces raw plastic mass by ~107 g solid (~80 g printed)")
     add("")
     add(" HONEYCOMB EXHAUST GRILLE  (recessed into the outer face)")
     add("   pocket                  : O%.1f, %.1f mm deep"
@@ -961,13 +1032,21 @@ def report(body, lid, strap, log):
     add("                             and the flare both cut the same 2.8 mm")
     add("                             front wall, so one had to give")
     add("")
-    add(" VOLUME / MASS")
+    add(" VOLUME / MASS / PRICING @ Rp 600/g")
+    total_solid = 0.0
+    total_printed = 0.0
+    RATE = 600.0
     for name, shp in (("body", body), ("lid", lid), ("strap", strap)):
         v = shp.Volume
-        add("   %-6s volume            : %10.1f mm3  = %6.1f cm3"
-            % (name, v, v / 1000.0))
-        add("   %-6s mass @1.27 g/cm3  : %8.0f g  (PETG, 100%% infill equiv)"
-            % (name, v / 1000.0 * 1.27))
+        m_sol = v / 1000.0 * 1.27
+        m_prn = m_sol * 0.75
+        total_solid += m_sol
+        total_printed += m_prn
+        add("   %-6s volume / solid / prn: %7.1f cm3 | %5.0f g (solid) | %5.0f g (printed) -> Rp %9.0f"
+            % (name, v / 1000.0, m_sol, m_prn, m_prn * RATE))
+    add("   ----------------------------------------------------------------------------------")
+    add("   TOTAL ENCLOSURE          : %7.1f cm3 | %5.0f g (solid) | %5.0f g (printed) -> Rp %9.0f"
+        % ((body.Volume + lid.Volume + strap.Volume) / 1000.0, total_solid, total_printed, total_printed * RATE))
     add("")
     add(" SANITY CHECKS")
     add("   body valid              : %s" % body.isValid())

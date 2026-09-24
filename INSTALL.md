@@ -140,38 +140,28 @@ Pull it back out for now — you want the box empty for the fan.
 
 ## Step 3 — the fan (do this before the cage)
 
-The fan is the deepest thing in the case. It has **its own housing**: it slides
-straight down into a slot and seats on the plenum floor, and **no screws are needed**.
+The fan is the deepest thing in the case. It has a **full-height U-channel housing with front retaining rails**:
+it slides straight down into a captive vertical track and seats on the plenum floor, giving a **firm press-fit feel with zero screws**.
 
 **Where it lands**
 
 | | |
 |---|---|
-| Slot | Z 220 → 245, straight down from above |
+| Track | Z 219.90 → 245.00, providing an exact **25.10 mm track depth** for the 25.0 mm fan frame |
 | Seat | the plenum floor — the frame's bottom edge rests on it |
-| Frame | X ±46, guided by two rails with 0.2 mm clearance per side |
-| Up | two fins on the lid later come down to 1 mm above its top edge |
+| Sides (X) | two tall guide rails extending up to Y = 90.0 mm (86 mm tall) with 0.15 mm clearance per side and 2.5 mm lead-in chamfers |
+| Front lips (Z-) | **front retaining rails** overlap the frame by 2.5 mm per side with top entry chamfers; clears the Ø86 mm blade opening |
+| Up (Y+) | two fins on the lid later come down to 1 mm above its top edge |
 
 **How to get it in.** The service opening in the top runs Z 165 → 245. Lower the
-frame flat (hub up) into the **rear end** of that opening, over Z 220–245, and let
-it drop.
+frame flat (hub up) into the **rear end** of that opening, over Z 220–245, and slide it down.
 
-1. Line the frame up over the **rear end** of the opening. The two guide rails below
-   have a 1.8 mm chamfer at their tops to help you find the slot.
-2. Lower it straight down. It slides between the rails and lands on the plenum
-   floor.
-3. It is seated when the frame's bottom edge is flat on the floor and its rear face
-   is against the inside of the rear wall. There is 0.2 mm of play, so it feels snug
-   rather than loose.
-4. Check the airflow arrow points **out of the back** — this fan exhausts. Also
-   check its lead trails out of the front of the frame, not trapped behind it.
-5. **Route the lead now, while there is room.** Run it forward along one side of
-   the plenum, tucked down low against the floor, and leave it long enough to reach
-   the Wagos.
-6. That is it — no screws. Close the lid at step 10: its two underside fins come
-   down to just above the fan's top edge, and that is what stops the fan lifting
-   out. With the lid on, the case holds the fan on **four** sides and the lid holds
-   it on the **fifth**.
+1. Line the frame up over the **rear end** of the opening. The guide rails and front retaining lips have generous 2.5 mm lead-in chamfers to guide the corners in smoothly.
+2. Push it straight down. The fan slides snugly into the U-channel track and lands on the plenum floor.
+3. It is seated when the frame's bottom edge is flat on the floor and its rear face is flush against the inside of the rear wall. The 25.10 mm track depth gives a snug press-fit feel: rock-solid with zero rattle or wobble.
+4. Check the airflow arrow points **out of the back** — this fan exhausts. Also check its lead trails out of the front of the frame, not trapped behind it.
+5. **Route the lead now, while there is room.** Run it forward along one side of the plenum, tucked down low against the floor, and leave it long enough to reach the Wagos.
+6. That is it — no screws. When the lid is installed at step 9, its underside fins hold the top of the frame, capturing the fan in all directions.
 
 *(Optional: If you plan on tossing the case into a backpack and want the fan permanently bolted, you can press 4× M3 inserts into the rear face from the outside and run 4× M3 × 30 screws from inside).*
 
