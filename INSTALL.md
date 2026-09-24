@@ -38,19 +38,18 @@ top service opening or the front mouth.
 
 | Item | Qty | Where |
 |---|---|---|
-| M3 heat-set insert, 5.7 mm long | **12** | 4 fan, 2 PSU strap, 6 lid |
-| M3 × 30 screw | 4 | through the fan frame |
-| M3 × 10–12 screw | 8 | 6 lid, 2 PSU strap |
-| M3 × 6–8 screw + nut | 2–6 | cage anchoring |
+| **Mandatory screws / inserts** | **0** | **100% toolless assembly** |
+| ARCTIC P9 PWM PST 92 mm | 1 | rear fan housing |
+| PicoPSU-120 (31 × 44 × 21 mm) | 1 | cradle with snap-fit strap |
+| Panel-mount 5.5 × 2.5 mm DC jack | 1 | rear wall counterbore |
 | Rubber feet Ø12 × 2 mm | 4 | base |
-| Panel-mount 5.5 × 2.5 mm DC jack | 1 | rear wall |
-| ARCTIC P9 PWM PST 92 mm | 1 | 106 g |
-| PicoPSU-120 (31 × 44 × 21 mm) | 1 | cradle |
 | SFF-8087 → SFF-8088 cables | 2 | rear slots |
 | Wago 221 lever terminals | 3 | plenum |
+| *Optional: M3 heat-set inserts* | *4* | *fan mounting (only if bolting for transport)* |
+| *Optional: M3 × 30 screws* | *4* | *fan mounting (only if bolting for transport)* |
+| *Optional: M3 × 6–8 screw + nut* | *2–4* | *cage anchoring (only if bolting through side holes)* |
 
-**Tools**: 2.5 mm hex or the driver your screws need, a soldering iron with a
-heat-set insert tip, flush cutters, and a small scraper or deburring tool.
+**Tools**: Flush cutters and a small scraper or deburring tool. (No soldering iron or hex drivers needed for mandatory assembly!).
 
 ![the assembled layout, cut open](out/body_cut.png)
 
@@ -61,20 +60,19 @@ heat-set insert tip, flush cutters, and a small scraper or deburring tool.
 ```
  1  print + clean up
  2  dry-fit the cage                 (checks the slide before anything is captive)
- 3  12 x heat-set inserts            (all of them, while the box is empty)
- 4  fan                              <- goes to the very back, do it first
- 5  cage, in from the FRONT          <- straight slide, no tilt
- 6  cage anchor screws
- 7  DC jack in the rear wall
- 8  SFF-8087 cables in from the back, onto the backplane
- 9  wiring: PicoPSU -> Wagos -> backplane, ground PS_ON#
-10  PicoPSU into the cradle + strap
-11  service lid
-12  rubber feet
-13  first power-up
+ 3  fan                              <- slides straight down into rear housing slot
+ 4  cage, in from the FRONT          <- straight slide, no tilt
+ 5  (optional) cage anchor screws
+ 6  DC jack in the rear wall
+ 7  SFF-8087 cables in from the back, onto the backplane
+ 8  wiring: PicoPSU -> Wagos -> backplane, ground PS_ON#
+ 9  PicoPSU into the cradle + snap-fit strap
+10  slide-and-click service lid      <- slides +Z and clicks shut
+11  rubber feet
+12  first power-up
 ```
 
-Steps 4 and 5 can be swapped. Everything else has to be in this order: the cables
+Steps 3 and 4 can be swapped. Everything else has to be in this order: the cables
 want the cradle empty, the PSU wants the cables already routed, and the lid closes
 the only way in.
 
@@ -83,20 +81,22 @@ the only way in.
 ## Step 1 — print and clean up
 
 Print the body flat on its base with the front opening pointing up. **No supports
-are needed and none should be used** — the internal 45° roof gussets and the 3 mm
-grille membrane are designed to print unsupported.
+are needed and none should be used** — the internal 45° roof gussets, 45° slide rails,
+and the 3 mm grille membrane are designed to print unsupported.
+
+The lid prints top-plate face down on the bed with skirts pointing up (45° runner grooves
+are self-supporting). The strap prints flat on the bed.
 
 Check these before you go further:
 
 - **every outer edge is rounded** — R1.4 on the body, R1.0 on the lid, R1.4 on the
-  strap. Run a finger round it; if something feels sharp, it's a print defect, not
-  the design
-- the four Ø4.2 fan insert holes in the **outside** of the rear wall are clear
+  strap.
+- the 45° slide rails on the body's outer plenum walls are clean and free of z-blobs.
+- the recessed catch pocket on the front vertical step ($Z = 165\text{ mm}$) is clear.
+- the lid's runner grooves and cantilever latch tooth are cleanly resolved.
 - the honeycomb grille is open. The webs are 1.2 mm — **three 0.4 mm lines** — so
-  don't use a nozzle bigger than 0.4 mm, and don't jab them with a scraper
-- the two rear cable slots and the Ø8 DC jack hole are clear
-- the 12 insert bores are open: 4 in the rear wall (outside face), 2 in the PSU
-  strap bosses, 6 in the roof gussets
+  don't use a nozzle bigger than 0.4 mm, and don't jab them with a scraper.
+- the two rear cable slots and the Ø8 DC jack hole are clear.
 
 ---
 
@@ -141,35 +141,11 @@ a straight-edged hole than a funnel, and the cage has to go in **square** rather
 being guided in by the taper. Start it gently and correct the angle rather than
 pushing; once it's started it slides freely.
 
-Pull it back out for now — you want the box empty for the inserts.
+Pull it back out for now — you want the box empty for the fan.
 
 ---
 
-## Step 3 — the 12 heat-set inserts
-
-The bore is Ø4.2 × 10 mm everywhere. Set your iron to the insert maker's
-temperature, insert squarely, and stop when the insert is flush with the surface.
-**Do not push past flush** — you'll punch through into the cavity on the thin ones.
-
-| Qty | Location | Insert from | Bore centre |
-|---|---|---|---|
-| 4 | rear wall, fan mounting | **outside** face | (±41.25, 10.75) and (±41.25, 93.25) |
-| 2 | PSU strap bosses | top, through the service opening | (±20.7, Z 192) |
-| 6 | roof gussets, lid | top, on the outer top face | (±70, Z 185 / 215 / 245) |
-
-Three things worth knowing:
-
-- **The fan inserts go in from the outside.** They are the only ones you fit from
-  the outside face. Fit them now, before the cage is in, so you can sit the part
-  flat on the bench.
-- **The 2 PSU strap inserts** are down inside the plenum, on the two bosses either
-  side of the PSU cradle at Z 192. Reach in through the top opening.
-- **The 6 lid inserts** are in the 45° roof gussets, so the bore is in the flat top
-  face either side of the long opening, 5.7 mm inboard of the side walls.
-
----
-
-## Step 4 — the fan (do this before the cage)
+## Step 3 — the fan (do this before the cage)
 
 The fan is the deepest thing in the case. It has **its own housing**: it slides
 straight down into a slot and seats on the plenum floor, and **no screws are needed**.
@@ -198,25 +174,17 @@ it drop.
    check its lead trails out of the front of the frame, not trapped behind it.
 5. **Route the lead now, while there is room.** Run it forward along one side of
    the plenum, tucked down low against the floor, and leave it long enough to reach
-   the Wagos. The lid cannot trap it, but a lead left looped up near the opening is
-   the one thing you would have to fish out later.
-6. That is it — no screws. Close the lid at step 11: its two underside fins come
+   the Wagos.
+6. That is it — no screws. Close the lid at step 10: its two underside fins come
    down to just above the fan's top edge, and that is what stops the fan lifting
    out. With the lid on, the case holds the fan on **four** sides and the lid holds
    it on the **fifth**.
 
-**If you would rather bolt it**, the four M3 positions are still cut. Press heat-set
-inserts into the rear wall from **outside** and run M3 × 30 screws through the frame
-from inside the plenum. Nothing about the housing interferes with that.
-
-**If it will not go down**: check you are over the *rear end* of the opening and not
-the middle. The two front corner tabs — 16 mm tall, just in front of the slot — will
-stop the frame if you are forward of them. The fit is 0.2 mm per side, so if your
-printer runs tight that is the number to change.
+*(Optional: If you plan on tossing the case into a backpack and want the fan permanently bolted, you can press 4× M3 inserts into the rear face from the outside and run 4× M3 × 30 screws from inside).*
 
 ---
 
-## Step 5 — the cage, in from the front
+## Step 4 — the cage, in from the front
 
 Same slide as step 2, but now you know it fits. Push it in square and straight until
 it stops on the frame. Nothing else changes — the fan is behind it and out of the
@@ -224,24 +192,21 @@ way, at Z 248+, and the cage stops at Z 165.
 
 ---
 
-## Step 6 — anchor the cage
+## Step 5 — anchor the cage (optional)
 
 The side walls have **six candidate Ø3.4 holes per side** at Z 15 / 45 / 75 / 105 /
-135 / 155, all on the bay's mid-height. These are a *menu*, not a measurement — the
-real cage's own holes were never measured, so:
+135 / 155, all on the bay's mid-height. These are optional — the internal stop frame
+and lid hold the cage in place. If you wish to pin it:
 
 1. Look through the wall holes from outside and see which one lines up with a hole
    in the cage's sheet metal.
-2. Fit a screw in that one. Two per side, front and rear, is plenty.
+2. Fit a small screw in that one. Two per side, front and rear, is plenty.
 3. If none line up, stop here — the rear stop frame already holds the cage in
-   depth, and the lid holds it from above. Add a screw only where it's real.
-
-The hole is a clearance hole straight through 2.8 mm of wall, so a small M3 screw and
-nut works, as does a self-tapper. **Do not overtighten** — it's a 2.8 mm wall.
+   depth.
 
 ---
 
-## Step 7 — the DC jack
+## Step 6 — the DC jack
 
 The rear wall takes a panel-mount 5.5 × 2.5 mm barrel jack at **(+60, 52)**:
 
@@ -256,12 +221,9 @@ jacks won't clamp a panel that thick. Feed the jack through from **outside**, bo
 first, and the nut lands on the 3.4 mm floor of the counterbore. Solder your leads
 to the tags on the inside before you tighten it down.
 
-If your jack's neck is a different length, change `DC_JACK_PAD` / `DC_JACK_DEPTH`
-and rebuild.
-
 ---
 
-## Step 8 — the SFF-8087 cables
+## Step 7 — the SFF-8087 cables
 
 There are two slots in the rear wall, both at **X = −60**, at **Y = 33** and
 **Y = 50**, each 17 × 12 mm with rounded corners. Do these before the PicoPSU goes
@@ -275,13 +237,9 @@ in — you need the cradle empty to get your hand in.
 4. Pull the slack back so the cables lie along the **left-hand side** of the plenum
    and leave the middle clear for the PSU.
 
-Keep the two cables in separate slots — that's what gives each one its own strain
-relief, and two cables sawing against each other in one hole is how you get a
-fractured pair after a year.
-
 ---
 
-## Step 9 — wiring
+## Step 8 — wiring
 
 This part is yours, not the model's: no wire routing or Wago mounts are modelled,
 because your backplane's power connector is whatever it is.
@@ -299,12 +257,9 @@ them to the harness if you want them fixed.
    that mates with an HP backplane. You're cutting it down and landing 12 V / 5 V /
    3.3 V / ground on the Wagos, then out to the backplane's own power input.
 
-Rough current budget: the ARCTIC P9 draws 0.12 A at 12 V = **1.44 W**, which is
-nothing for a Wago 221, so the fan can share terminals with the drives.
-
 ---
 
-## Step 10 — the PicoPSU into the cradle
+## Step 9 — the PicoPSU into the cradle + snap-fit strap
 
 The cradle is sized for the **bare picoPSU-120 board, 31 × 44 × 21 mm**.
 
@@ -315,59 +270,47 @@ The cradle is sized for the **bare picoPSU-120 board, 31 × 44 × 21 mm**.
 | Board sits on | a 3 mm plinth, so the solder side never touches the floor |
 | Front lip | 6 mm tall — 3 mm above the plinth |
 | Backplane gap | the mouth is 20 mm behind the backplane; the board stops 21.6 mm short of it |
+| Snap strap | 56.2 × 10 × 20 mm snap-fit clip with 0.8 mm undercut catch teeth |
 
 1. Route the output harness and the DC input leads **out of the cradle toward the
    front** before you drop the board in, or you will not get them past the lip.
 2. Lower the board into the cradle, connectors facing whichever way leaves the
    harness room.
-3. The 6 mm front lip holds it from sliding forward onto the backplane. Nothing you
-   do here can make the board touch the backplane — that is what the 20 mm gap and
-   the lip are for.
-4. Set the strap across the top and fit **2 × M3 × 10–12** into the two boss
-   inserts. Snug only.
-
-**Watch the 24-pin connector.** If it faces up, it stands taller than the 21 mm
-board and the strap lands on it. Either lay the strap over the connector or move it
-along the cradle by changing `PSU_BORE_Z`.
+3. The 6 mm front lip holds it from sliding forward onto the backplane.
+4. Take the **snap-fit strap** and press it down over the cradle corner bosses.
+   The compliant legs will flex outward over the retention ledges and click
+   firmly into place. **No screws, no tools.**
 
 ---
 
-## Step 11 — the lid
+## Step 10 — the slide-and-click lid
 
-It is a **drop-on housing**. It slides straight down over the top of the case and
-stays there with **no screws at all** — the six screw positions are only there for
-shipping or if the case gets tipped.
+The service lid uses a **slide-and-click mechanism**: it slides forward horizontally
+into 45° beveled rails on the outer plenum walls and clicks shut with an integrated
+cantilever latch. **100% screwless.**
 
 1. Check nothing is proud of the top: no cable or Wago sticking up into the opening.
-2. Drop the lid into place. Four skirts guide it — two long ones down the sides and
-   the back, a shorter one at the front. Nothing to line up, nothing to thread.
-3. Press it home. The last few millimetres are a light press fit as the friction
-   bead inside the skirt rides down over the case's outer walls. You will feel it
-   settle.
-4. Lift the front edge to check it is seated evenly. It should not rock.
-5. Optional: **6 × M3 × 10–12** at X = ±70, Z = 185 / 215 / 245.
+2. Position the lid over the rear of the plenum, aligning the skirt runner grooves
+   with the 45° slide rails on the case's outer walls.
+3. Push the lid **forward (+Z)** along the rails. It slides smoothly toward the front.
+4. As it reaches the front step ($Z = 165\text{ mm}$), the cantilever snap latch
+   tooth will ride up over the step bevel and **click audibly** into the recessed
+   catch pocket.
+5. The lid is now locked in all 6 degrees of freedom:
+   - X and Y restrained by the 45° interlocking rails.
+   - -Z restrained by the front vertical step.
+   - +Z restrained by the snap latch tooth.
 
-To get back in, just lift it off. No tools.
+**To remove the lid:** Press the ergonomic thumb-release tab on the front face
+forward/up slightly to disengage the tooth from the catch pocket, and slide the
+lid backward (-Z).
 
 **The lid is also the fan's fifth restraint.** Its two underside fins come down to
-1 mm above the fan's top edge — that is why the fan needs no screws. So fit the lid
-before you tip or carry the case: with the lid off, the fan is held only by gravity
-and the housing's snug fit.
-
-**If it will not go on**: take a scraper to the friction bead — the narrow band
-about 10 mm up the inside of the skirt — or rebuild with `SKIRT_BEAD = SKIRT_CLEAR`
-for a free slip fit. If it drops on too easily, raise `SKIRT_BEAD`. That one number
-is the one to trim to your machine.
-
-**It cannot catch the fan cable.** The lip inside the lid is only 1.5 mm deep and
-stops 6 mm short of the fan, and the skirt is entirely outside the case. So there is
-nothing inside the plenum the lid can trap. That said, still tuck the fan's lead down
-flat before you drop the lid on rather than leaving it looped up near the opening —
-it is tidier and it means you never have to think about it.
+1 mm above the fan's top edge — that is why the fan needs no screws.
 
 ---
 
-## Step 12 — rubber feet
+## Step 11 — rubber feet
 
 Four Ø12 × 2 mm recesses in the base at (±61, Z 14) and (±61, Z 260). Push-fit; a
 dab of cyanoacrylate if they're loose.

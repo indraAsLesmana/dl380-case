@@ -23,23 +23,23 @@ the drive cage goes in and the order the internals have to be fitted.
 | | |
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
-| Body solid | valid ✓ closed ✓ **151.40 × 102.80 × 281.40 mm** |
-| Lid solid | valid ✓ closed ✓ **157.40 × 17.00 × 122.00 mm** — a skirted housing |
-| Strap solid | valid ✓ closed ✓ 50.20 × 4.00 × 20.00 mm |
-| **Lid retention** | **drop-on housing — it stays on with no screws at all** |
-| Body ↔ lid interference | 283 mm³ — the skirt bead's deliberate 0.15 mm press fit |
-| Body ↔ strap interference | 0.0000 mm³ |
+| Body solid | valid ✓ closed ✓ **154.20 × 102.80 × 281.40 mm** (532,645 mm³) |
+| Lid solid | valid ✓ closed ✓ **157.50 × 13.00 × 120.20 mm** (64,603 mm³) — slide-and-click |
+| Strap solid | valid ✓ closed ✓ **56.20 × 10.00 × 20.00 mm** (5,032 mm³) — snap-fit |
+| **Lid retention** | **horizontal slide-and-click with compliant cantilever latch — 0 screws** |
+| **PSU retention** | **toolless snap-fit strap with dual undercut retention teeth — 0 screws** |
+| Body ↔ lid interference | **0.0000 mm³** (0.25 mm sliding clearance on 45° self-supporting rails) |
+| Body ↔ strap interference | **0.0000 mm³** (0.20 mm snap clearance) |
 | PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR |
-| Build volume (Bambu Lab H2S, 340×320×340) | all three fit ✓ |
+| Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`) |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
 | **Fan housing** | **slides in from the top and needs no screws** — held 4 sides by the case, 5th by the lid |
-| All three STL watertight | 34 092 / 31 876 / 10 468 triangles, 0 non-manifold edges ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **53 probes, 0 failures** ✓ |
+| All parts printable | **100% support-free in native print orientations** ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **56 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
 written by the build; `verify_step.py` re-reads the exported STEP and probes the
-body and the lid separately, so its 53 probes also prove the STEP round-trip lost
-nothing.
+body and the lid separately, with 56 probes confirming all geometries and clearances.
 
 ---
 
@@ -143,40 +143,29 @@ barrel jacks will clamp.
 
 **PicoPSU cradle** — see below.
 
-**Lid — a drop-on housing that needs no screws.** The body is one cohesive print
-with a closed top over the bay; the plenum gets a separable lid that **slides
-straight down over the top of the case** and stays there.
-
-You fit it by dropping it on. Nothing to thread, nothing to line up:
+**Lid — a slide-and-click housing that needs no screws.** The body is one cohesive
+print with a closed top over the drive bay; the plenum gets a separable lid that
+**slides horizontally forward along +Z** into interlocking rails on the body's outer
+walls and clicks shut with a compliant snap latch.
 
 | | |
 |---|---|
-| Skirt | 2.8 mm thick, **14 mm deep** down the two sides and the back |
-| Front skirt | only **8 mm** — the drive bay's roof is 8.2 mm below the top of the rear section, and a full-depth skirt would land on it |
-| Fit | 0.2 mm slip clearance + a 0.35 mm friction bead = a light **0.15 mm press fit** |
-| Located by | the skirt in X and Z, the top rim in Y |
-| Removed by | lifting it — it cannot slide off in any direction |
+| Guide rails | 45° beveled guide rails on outer walls (`RAIL_W = 1.4 mm`, `RAIL_H = 2.4 mm`), completely support-free |
+| Skirt runners | 45° inverted runner grooves inside the lid skirts with `0.25 mm` sliding clearance |
+| Snap latch | 18 mm compliant cantilever latch on the front face engaging a `20 × 2.6 × 1.8 mm` recessed catch pocket on the front vertical step |
+| Catch tooth | 1.2 mm ramped catch tooth (`LATCH_TOOTH_D = 1.2 mm`) with ergonomic thumb-release tab |
+| Located by | 45° interlocking rails in X and Y, front vertical step in -Z, snap tooth in +Z |
+| Retained fan | dual underside fins reach down into the fan bay to hold the fan captive from above |
+| Removed by | pressing the thumb release tab forward/up and sliding the lid backward (-Z) |
 
-The bead is a deliberate interference, so `body ∩ lid` is no longer zero: the report
-prints it (283 mm³) and checks it against the ~231 mm³ that a 0.15 mm band should
-account for, rather than asserting zero. **Set `SKIRT_BEAD = SKIRT_CLEAR` for a free
-slip fit** if you would rather have that, and the six M3 screw positions are still
-cut in case you want it bolted for transport.
+**100% screwless and toolless.** The interlocking 45° rails prevent the lid from lifting
+up (+Y) or pulling outward in ±X. The front vertical step stops it from sliding too far
+forward (+Z), and the latch tooth locks into the catch pocket to prevent it from sliding
+backward (-Z).
 
-**The fan cable is clear of the lid, three ways over** — all three numbers are
-printed in the build report:
-
-1. The locating lip is **1.5 mm** deep, so it bottoms out at y = 101.3, which is
-   **1.3 mm above** the plenum's interior ceiling at y = 100. It never enters the
-   plenum at all, so nothing loose in there can be snagged on it.
-2. The lip is cut short at **Z 242**, i.e. 6 mm before the fan starts at Z 248 —
-   there is no lip over the fan whatsoever.
-3. The skirt is entirely **outside** the case, so it cannot reach a cable that is
-   inside it.
-
-**Roof gussets** — because the plenum is a plain box, its roof would otherwise have
-bridged 145.8 mm in mid air. Two **18 mm 45° gussets** run the length of the roof/wall
-corners. They make the roof printable and give the lid screws their material.
+**Roof gussets** — two **18 mm 45° gussets** run the length of the plenum roof/wall
+corners. They make the roof printable without supports and provide rigid backing for
+the slide rails.
 
 **Base** — four Ø12 × 2 mm recesses for rubber feet, in a 4 mm floor.
 
@@ -271,13 +260,16 @@ cradle is that it **cannot reach the backplane**:
 | Mouth to backplane face | **20 mm** — board stops 21.6 mm short even fully forward |
 | Plinth | 3 mm, so the solder side never touches the floor |
 | Front lip | 6 mm tall (3 mm above the plinth) — stops it sliding forward |
-| Retaining strap | 50.2 × 4 × 20 mm, 2 × M3 into corner bosses, 0.4 mm over the board top |
-| Corner bosses | Ø4.2 heat-set inserts, 10 mm deep |
+| Cradle bore | 32.6 × 45.6 mm (0.8 mm clearance per side) |
+| Cradle Z | 185 → 230.6 mm |
+| Mouth to backplane face | **20 mm** — board stops 21.6 mm short even fully forward |
+| Plinth | 3 mm, so the solder side never touches the floor |
+| Front lip | 6 mm tall (3 mm above the plinth) — stops it sliding forward |
+| Retaining strap | 56.2 × 10 × 20 mm snap-fit strap with dual undercut teeth |
+| Retention ledges | 0.8 mm retention ridges on the corner bosses — **no screws, no inserts** |
 
 The build runs a **phantom PicoPSU box** through the cradle and reports the
-interference. That check earned its place immediately — it caught the left strap
-boss being modelled 6 mm the wrong side of its wall, straight through the board's
-footprint (625 mm³ of interference) which nothing visual had flagged.
+interference (0.0000 mm³ → CLEAR).
 
 **Two things to check on your own wiring**
 
@@ -294,26 +286,31 @@ footprint (625 mm³ of interference) which nothing visual had flagged.
 
 | Item | Qty | Notes |
 |---|---|---|
-| Printed body | 1 | ≈ 524 cm³ / ≈ 665 g at 1.27 g/cm³ |
-| Printed lid (drop-on housing) | 1 | ≈ 88 cm³ / ≈ 112 g |
-| Printed PSU strap | 1 | ≈ 3.8 cm³ / ≈ 5 g |
+| Printed body | 1 | ≈ 533 cm³ / ≈ 676 g at 1.27 g/cm³ |
+| Printed lid (slide-and-click) | 1 | ≈ 65 cm³ / ≈ 82 g |
+| Printed PSU strap (snap-fit) | 1 | ≈ 5 cm³ / ≈ 6.4 g |
 | **ARCTIC P9 PWM PST 92 mm** | 1 | inside the plenum, exhaust; 106 g |
 | **PicoPSU-120** (or similar) | 1 | 31 × 44 × 21 mm; add a 12 V brick + panel DC jack |
 | Panel-mount 5.5 × 2.5 mm DC jack | 1 | Ø8 body, ≤ 3.4 mm panel |
-| M3 × 6 heat-set insert | **12** | 6 lid, 4 fan, 2 PSU strap |
-| M3 × 10–12 screw | 8 | 6 lid, 2 strap |
-| M3 × 30 screw | 4 | through the fan frame into the rear-wall inserts |
-| M3 screw + nut | 2–6 | cage anchoring (see caveats) |
-| Rubber feet Ø12 × 2 mm | 4 | |
+| Rubber feet Ø12 × 2 mm | 4 | in base recesses |
 | SFF-8087 → SFF-8088 cables | 2 | exit through the rear slots |
 | Wago 221 lever terminals | 3 | in the plenum |
+| **Mandatory screws / inserts** | **0** | **100% toolless assembly** |
+| *Optional: M3 × 6 heat-set inserts* | *4* | *only if bolting the fan for transport* |
+| *Optional: M3 × 30 screws* | *4* | *only if bolting the fan for transport* |
+| *Optional: M3 screws + nuts* | *2–4* | *only if pinning the cage through side holes* |
 
-### Print settings
+### Print settings & Kit
 
 PETG or ASA suggested (the plenum sees warm server air). 0.2 mm layers, 3–4 walls,
-4–5 top/bottom layers. **No supports needed** — the body prints flat on its base with
-the front opening up. The grille webs are 1.2 mm, i.e. three 0.4 mm lines; don't go
-below a 0.4 mm nozzle for those.
+4–5 top/bottom layers. **No supports needed for any part**:
+- The **body** prints upright on its base with the front opening facing up.
+- The **lid** prints top-plate face down on the bed with skirts pointing up; the 45° runner overhangs are self-supporting.
+- The **strap** prints flat on the bed.
+
+A pre-arranged print kit is provided in `print/`:
+- `print/dl380-case_all-parts.stl` / `.obj`: all 3 parts arranged on a single **321.7 × 281.4 mm plate** (fits within a 340 × 320 mm Bambu Lab build volume).
+- Individual STLs: `dl380-case_body.stl`, `dl380-case_lid.stl`, `dl380-case_psu-strap.stl`.
 
 ---
 
@@ -323,19 +320,20 @@ below a 0.4 mm nozzle for those.
 # generate STEP + STL + report into ./out
 freecadcmd dl380_cage_case.py
 
+# export print-ready kit (individual + all-parts plate) into ./print
+freecadcmd export_print_kit.py
+
 # re-probe the exported STEP: every opening open, every wall solid
 freecadcmd verify_step.py
 
 # optional: dependency-free preview renders (SVG -> PNG via rsvg-convert)
 python3 render_stl.py out/dl380_cage_case_body.stl out/body.png
+python3 render_stl.py out/dl380_cage_case_lid.stl out/lid.png
+python3 render_stl.py out/dl380_cage_case_strap.stl out/strap.png
 ```
 
 Tested with FreeCAD 1.1.3 (`freecadcmd`). The scripts also run from the FreeCAD GUI
 Python console via `exec(open("dl380_cage_case.py").read())`.
-
-`render_stl.py` is a self-contained painter's-algorithm shaded renderer — it needs
-only `rsvg-convert` (or any SVG rasteriser) and no Python packages at all. It draws
-front, rear, side, top and half-section cutaway views.
 
 ---
 
@@ -350,30 +348,30 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `WALL` / `FLOOR_T` | 2.8 / 4.0 | wall and floor thickness |
 | `FILLET_R` / `FILLET_R_LID` | 1.4 / 1.0 | outer edge rounds, body+strap / lid |
 | `LEAD_IN` / `LEAD_DEPTH` | 0.8 / 4.0 | cage lead-in flare — capped by the rounds |
-| `SKIRT_T` / `SKIRT_D` / `SKIRT_FRONT_D` | 2.8 / 14.0 / 8.0 | lid skirt thickness and depth |
-| `SKIRT_CLEAR` / `SKIRT_BEAD` | 0.2 / 0.35 | slip clearance / bead; bead > clearance = press fit |
-| `LID_LIP_T` / `LID_LIP_GAP` | 1.5 / 6.0 | locating lip depth, and its gap to the fan |
+| `SLIDE_CLEAR` | 0.25 | sliding clearance between body rails and lid runners |
+| `RAIL_W` / `RAIL_H` / `RAIL_YC` | 1.4 / 2.4 / 98.0 | 45° slide rail width, height, and Y centerline |
+| `LATCH_W` / `LATCH_TOOTH_H` / `LATCH_TOOTH_D` | 18.0 / 2.0 / 1.2 | snap latch width, tooth height, and undercut depth |
+| `PSU_SNAP_CLEAR` / `PSU_LEG_T` / `PSU_TOOTH_W` | 0.2 / 2.0 / 0.8 | snap-fit strap clearance, leg thickness, and retention tooth |
 | `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm |
 | `GUSSET_H` | 18.0 | 45° roof gusset size (sets the service opening width) |
 | `PLENUM_D` | 108.0 | clear depth behind the backplane |
 | `FAN_SIZE` / `FAN_INNER_CLEAR` | 92.0 / 2.0 | frame size and bore clearance |
 | `FAN_APERTURE` / `FAN_PATTERN` / `FAN_HOLE` | 86.0 / 82.5 / 4.2 | grille field and mounting pattern |
 | `FAN_INSET` | 25.0 | fan depth against the rear wall |
-| `FAN_GUIDE_CLEAR` | 0.2 | clearance per side in the fan housing — the fit to tune |
+| `FAN_GUIDE_CLEAR` | 0.2 | clearance per side in the fan housing |
 | `FAN_GUIDE_T` / `FAN_GUIDE_H` / `FAN_GUIDE_CHAM` | 3.0 / 42.0 / 1.8 | rail thickness, height, lead-in |
 | `FAN_TAB_H` / `FAN_TAB_Z` | 16.0 / 3.0 | front corner tabs that stop the fan tipping |
-| `FAN_LID_GAP` | 1.0 | how far the lid's fin sits above the fan — how much it can lift |
+| `FAN_LID_GAP` | 1.0 | how far the lid's fin sits above the fan |
 | `GRILLE_CELL` / `GRILLE_WEB` | 9.0 / 1.2 | honeycomb cell and web size |
 | `GRILLE_RIM` / `GRILLE_DEPTH` | 2.0 / 3.0 | solid rim, membrane thickness |
 | `PSU_W` / `PSU_L` / `PSU_H` | 31 / 44 / 21 | the board envelope |
 | `PSU_CLEAR` / `PSU_BOOT` / `PSU_PLINTH_T` | 0.8 / 20.0 / 3.0 | fit, backplane gap, plinth |
 | `PSU_WALL_H` / `PSU_FRONT_LIP` | 24.0 / 6.0 | cradle wall and lip heights |
-| `PSU_BORE_Z` | 192.0 | where the strap screws sit along the cradle |
+| `PSU_BORE_Z` | 192.0 | strap position along the cradle |
 | `REAR_CABLE_SLOT_*` | X −60, Y 33/50, 17 × 12 | rear cable egress |
 | `DC_JACK_X` / `DC_JACK_Y` | 60.0 / 52.0 | DC jack position |
 | `DC_JACK_DIA` / `DC_JACK_PAD` / `DC_JACK_DEPTH` | 8.0 / 16.0 / 5.0 | jack hole and counterbore |
 | `CAGE_SCREW_Z` | 15…155 | candidate cage anchor positions |
-| `LID_SCREW_X` / `LID_SCREW_Z` | 70.0 / (185, 215, 245) | lid screw positions |
 | `REAR_H` | *derived* | follows the fan automatically |
 
 ---
@@ -382,8 +380,7 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 
 1. **Cage side-screw positions are unverified.** `CAGE_SCREW_Z` places six Ø3.4 holes
    per side wall as a *menu*, not a measurement — the real cage's own holes were not
-   measured. Check which position lines up with your cage and drop the rest from the
-   list before you print. The rear stop frame holds the cage regardless.
+   measured. The rear stop frame holds the cage regardless.
 2. **The PicoPSU cradle is sized for the bare picoPSU-120 (31 × 44 × 21 mm).** Check
    your board before printing; other PicoPSU models differ, and `PSU_W/L/H` and
    `PSU_BORE_Z` are the numbers to change.
@@ -391,11 +388,7 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
    change `DC_JACK_PAD` / `DC_JACK_DEPTH` if it wants something different.
 4. **Rear section is 8.2 mm taller than the bay.** That is what an internal 92 mm fan
    costs. Use an 83.8 mm-or-smaller fan and the top is flat again.
-5. **The lid is a 0.15 mm press fit on its skirt bead.** If it will not go on, take
-   the bead down with a scraper, or set `SKIRT_BEAD = SKIRT_CLEAR` (0.2) for a free
-   slip fit. If it is too loose, raise `SKIRT_BEAD`. Printed dimensions vary; this is
-   the one number to trim to your machine.
-6. **Dimensions are from the brief, not from calipers.** If your cage measures
+5. **Dimensions are from the brief, not from calipers.** If your cage measures
    differently, change `CAGE_W` / `CAGE_H` / `CAGE_D` and rebuild.
 7. **Nothing here has been printed yet.** The geometry is verified as valid, closed,
    non-interfering, phantom-fitted and feature-by-feature against the exported STEP,

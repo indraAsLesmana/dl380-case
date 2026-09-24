@@ -64,29 +64,28 @@ LID_LIP_T     = 1.5      # mm  lid locating lip depth.  Deliberately shallow: th
                          #     so the lip can never reach anything loose in there
 LID_LIP_GAP   = 6.0      # mm  the lid's lip stops this far short of the fan
 
-# ---- drop-on housing lid -----------------------------------------------------
-#  The lid is a skirted tray that slides straight down over the top of the case.
-#  The skirt locates it in X and in Z, and it rests on the top rim in Y, so it
-#  stays on with NO screws at all.  The six screw positions are still cut, for
-#  transport or if the case gets tipped.
-SKIRT_T       = 2.8      # mm  skirt wall thickness
-SKIRT_D       = 14.0     # mm  how far the side and rear skirts hang down
-SKIRT_FRONT_D = 8.0      # mm  the front skirt is shallower - any deeper and it
-                         #     would land on the drive bay's roof, 8.2 mm lower
-SKIRT_CLEAR   = 0.2      # mm  slip clearance between skirt and the case's faces
-SKIRT_BEAD    = 0.35     # mm  friction bead proud of the skirt's inner face.
-                         #     Anything over SKIRT_CLEAR is a press fit; set it
-                         #     equal to SKIRT_CLEAR for a free slip fit.
-SKIRT_BEAD_H  = 4.0      # mm  height of the bead band
-SKIRT_BEAD_UP = 10.0     # mm  the band sits this far above the skirt's bottom,
-                         #     which keeps it clear of the grille pocket and of
-                         #     the top pair of fan inserts
-STOP_RIB_W    = 4.0      # mm  width of the internal rear stop frame
-STOP_RIB_D    = 3.0      # mm  how far the stop frame sticks into the bay
-REAR_WALL_LAYERS = 3     # rear wall in wall-units -> 8.4 mm, enough for a
-                         # standard 5.7 mm M3 heat-set insert to seat fully
-GUSSET_H      = 18.0     # mm  45 deg gussets under the plenum roof.  They carry
-                         # the lid screws and stop the roof bridging in mid air
+# ---- slide-and-click housing lid ---------------------------------------------
+#  The lid slides horizontally along +Z from the front step into interlocking
+#  45 deg guide rails on the outer walls, and clicks shut over a ramped catch
+#  tooth in the front vertical step.  100% screwless, zero heat-set inserts.
+SLIDE_CLEAR     = 0.25     # mm  glide clearance between lid runner and body rail
+RAIL_W          = 1.4      # mm  projection of the body guide rail
+RAIL_H          = 2.4      # mm  height of the body guide rail
+RAIL_YC         = 98.0     # mm  rail center Y (between 95.4 and 100.6 mm, above bay roof)
+SKIRT_D         = 10.0     # mm  how far the side skirts hang down
+SKIRT_T         = 2.8      # mm  skirt wall thickness
+LID_FRONT_T     = 2.4      # mm  thickness of front face covering the step
+LATCH_W         = 18.0     # mm  width of the flexible cantilever snap arm
+LATCH_TOOTH_H   = 2.0      # mm  height of the snap tooth
+LATCH_TOOTH_D   = 1.2      # mm  protrusion of the snap tooth in +Z
+LATCH_RELIEF    = 1.2      # mm  width of relief slots on sides of latch arm
+CATCH_POCKET_W  = 20.0     # mm  width of catch pocket in the body front step
+CATCH_POCKET_H  = 2.6      # mm  height of catch pocket
+CATCH_POCKET_D  = 1.8      # mm  depth of catch pocket in +Z
+STOP_RIB_W      = 4.0      # mm  width of the internal rear stop frame
+STOP_RIB_D      = 3.0      # mm  how far the stop frame sticks into the bay
+REAR_WALL_LAYERS = 3       # rear wall in wall-units -> 8.4 mm
+GUSSET_H        = 18.0     # mm  45 deg gussets under the plenum roof
 
 # ---- wiring / airflow plenum -------------------------------------------------
 PLENUM_D      = 108.0    # mm  clear depth behind the backplane.  Holds, front to
@@ -151,8 +150,10 @@ PSU_STRAP_H   =   4.0    # mm  retaining strap thickness
 PSU_STRAP_L   =  20.0    # mm  retaining strap length in Z
 PSU_BOSS_W    =   6.0    # mm  boss sticking sideways past each cradle wall
 PSU_BOSS_L    =  14.0    # mm  boss length in Z
-PSU_INSERT_D  =  10.0    # mm  M3 heat-set insert depth into the boss
-PSU_SCREW_DIA =   3.4    # mm  M3 clearance through the strap
+PSU_LEG_T     =   2.0    # mm  toolless snap leg thickness
+PSU_LEG_H     =   6.0    # mm  toolless snap leg height
+PSU_TOOTH_W   =   0.8    # mm  snap tooth undercut width
+PSU_TOOTH_H   =   1.6    # mm  snap tooth height
 
 # ---- DC input jack (rear wall) ----------------------------------------------
 #  For a panel-mount 5.5 x 2.5 mm barrel jack, matching the picoPSU-120's DC
@@ -164,18 +165,14 @@ DC_JACK_DIA   =   8.0    # mm  jack body hole
 DC_JACK_PAD   =  16.0    # mm  counterbore diameter in the outer face
 DC_JACK_DEPTH =   5.0    # mm  counterbore depth
 
-# ---- service opening + lid screws -------------------------------------------
+# ---- service opening ---------------------------------------------------------
 SVC_Z0        = 172.0    # mm  front edge of the service opening
 SVC_Z1_BACKOFF=   0.0    # mm  how far short of the rear wall the opening stops.
                          #     Keep it <= FAN_INSET - 2 or the fan can no longer
                          #     be lowered into place behind the PSU cradle; the
                          #     report prints the resulting drop-in window.
 SVC_R         =  12.0    # mm  corner radius of the opening
-LID_SCREW_X   = 70.0     # mm  +/- X of the lid screws
-LID_SCREW_Z   = (185.0, 215.0, 245.0)   # mm  Z of the lid screws (both sides)
-LID_INSERT_D  = 10.0     # mm  depth of the heat-set insert bore from the top face
-LID_INSERT_DIA= 4.2      # mm  bore for M3 heat-set insert
-LID_CLEAR_DIA = 3.4      # mm  M3 clearance hole through the lid
+LID_SCREW_Z   = ()       # no screws - 100% toolless slide-and-click
 
 # ---- HP cage anchoring -------------------------------------------------------
 CAGE_SCREW_Z  = (15.0, 45.0, 75.0, 105.0, 135.0, 155.0)  # suggested Z of side holes
@@ -279,13 +276,12 @@ SVC_Z1 = Z_RIN - SVC_Z1_BACKOFF            # opening rear edge
 FAN_DROP_LO = PSU_Z1 + WALL + 2.0          # clear of the cradle's rear wall
 FAN_DROP_HI = SVC_Z1 - FAN_INSET           # its thickness must clear the roof
 
-# ---- drop-on housing lid -----------------------------------------------------
-LID_Z0      = Z_BAY + SKIRT_CLEAR          # lid front edge, just behind the step
-LID_Z1      = Z_OUT + SKIRT_CLEAR + SKIRT_T
-LID_OX      = XW + SKIRT_CLEAR + SKIRT_T   # lid outer half width
-LID_LIP_END = FAN_Z0 - LID_LIP_GAP         # lip stops short of the fan
-LID_BEAD_LO = REAR_H - SKIRT_D + SKIRT_BEAD_UP
-LID_BEAD_Z1 = Z_OUT + SKIRT_CLEAR          # bead stops at the rear skirt
+# ---- slide-and-click housing lid ---------------------------------------------
+RAIL_Z0         = Z_BAY + 1.5                                   # start behind the 1.4 mm step fillet
+LID_OX          = XW + SLIDE_CLEAR + SKIRT_T                    # lid outer half width
+LID_Z0          = Z_BAY - LID_FRONT_T                           # lid front edge
+LID_Z1          = Z_OUT                                         # lid rear edge (flush with rear wall)
+LID_Y_FRONT_BOT = BAY_H + 1.8                                   # bottom of front face, clear of step fillet
 
 
 # ==============================================================================
@@ -510,20 +506,44 @@ def build():
                          -PSU_TRAY_OH, FLOOR_T, PSU_Z1))
     body = body.fuse(box(2 * PSU_TRAY_OH, PSU_FRONT_LIP, WALL,
                          -PSU_TRAY_OH, FLOOR_T, PSU_Z0 - WALL))
-    #  corner bosses that take the retaining-strap inserts
+    #  corner bosses that take the retaining-strap snap fit
     for sx in (1, -1):
         bx = PSU_TRAY_OH if sx > 0 else -(PSU_TRAY_OH + PSU_BOSS_W)
         body = body.fuse(box(PSU_BOSS_W, PSU_TOP - FLOOR_T, PSU_BOSS_L,
                              bx, FLOOR_T, PSU_BORE_Z - PSU_BOSS_L / 2.0))
+        rx = (PSU_TRAY_OH + PSU_BOSS_W) if sx > 0 else -(PSU_TRAY_OH + PSU_BOSS_W + PSU_TOOTH_W)
+        body = body.fuse(box(PSU_TOOTH_W, 1.5, PSU_BOSS_L,
+                             rx, PSU_TOP - 3.0,
+                             PSU_BORE_Z - PSU_BOSS_L / 2.0))
+
+    # --------------------------------------------- slide rails on outer walls ---
+    #  45 deg beveled guide rails on left and right outer walls for the sliding lid
+    y_bot = RAIL_YC - RAIL_H / 2.0 - RAIL_W
+    y_m1  = RAIL_YC - RAIL_H / 2.0
+    y_m2  = RAIL_YC + RAIL_H / 2.0
+    y_top = RAIL_YC + RAIL_H / 2.0 + RAIL_W
+
+    p_right = [
+        (XW, y_bot),
+        (XW + RAIL_W, y_m1),
+        (XW + RAIL_W, y_m2),
+        (XW, y_top)
+    ]
+    p_left = [
+        (-XW, y_bot),
+        (-XW, y_top),
+        (-(XW + RAIL_W), y_m2),
+        (-(XW + RAIL_W), y_m1)
+    ]
+    body = body.fuse(prism(p_right, RAIL_Z0, Z_OUT - RAIL_Z0))
+    body = body.fuse(prism(p_left, RAIL_Z0, Z_OUT - RAIL_Z0))
 
     # ------------------------------------------------------------------ cuts ---
     cuts = []
 
-    # --- retaining-strap inserts in the two corner bosses --------------------
-    for sx in (1, -1):
-        cuts.append(cyl_y(LID_INSERT_DIA / 2.0, PSU_INSERT_D,
-                          sx * PSU_BOSS_X, PSU_BORE_Z,
-                          PSU_TOP - PSU_INSERT_D))
+    # --- front step catch pocket for slide-and-click lid snap latch ----------
+    cuts.append(box(CATCH_POCKET_W, CATCH_POCKET_H, CATCH_POCKET_D,
+                    -CATCH_POCKET_W / 2.0, RAIL_YC - CATCH_POCKET_H / 2.0, Z_BAY))
 
     # --- DC input jack in the rear wall --------------------------------------
     cuts.append(cyl_z(DC_JACK_DIA / 2.0, REAR_WALL_T + 2.0,
@@ -552,12 +572,6 @@ def build():
     # --- top service opening -------------------------------------------------
     cuts.append(rounded_rect_prism(SVC_HALF, PLEN_Y1 - 6.0, REAR_H + 2.0,
                                    SVC_Z0, SVC_Z1, SVC_R))
-
-    # --- lid heat-set insert bores (from the top face downwards) -------------
-    for sx in (-1, 1):
-        for zz in LID_SCREW_Z:
-            cuts.append(cyl_y(LID_INSERT_DIA / 2.0, LID_INSERT_D,
-                              sx * LID_SCREW_X, zz, REAR_H - LID_INSERT_D))
 
     # --- cable egress slots through the rear wall ----------------------------
     slot_r = min(REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H) / 2.0 - 0.01
@@ -589,60 +603,92 @@ def build():
     for c in cuts:
         body = body.cut(c)
 
-    body = _tidy(body)
+    body = _tidy(body)    # ================================================= slide-and-click lid ---
+    #  Slides horizontally along +Z into 45 deg guide rails on the body's outer
+    #  walls, and clicks shut with a compliant cantilever snap latch into a
+    #  recessed pocket on the front vertical step.  100% screwless.
+    x_inner = XW + SLIDE_CLEAR
+    x_outer = LID_OX
+    y_top = REAR_H + LID_T
+    y_bot = REAR_H - SKIRT_D
 
-    # ==================================================== drop-on housing lid ---
-    #  A skirted tray, not a flat plate.  It slides straight down over the top:
-    #  the skirt locates it in X and Z, the plate rests on the top rim in Y, and
-    #  a friction bead on the skirt makes it a light press fit.  No screws are
-    #  needed to keep it on; the six screw positions are still cut for transport.
+    # 1. Top plate
     lid = box(2 * LID_OX, LID_T, LID_Z1 - LID_Z0, -LID_OX, REAR_H, LID_Z0)
-    for sx in (1, -1):
-        x0 = XW + SKIRT_CLEAR if sx > 0 else -LID_OX
-        lid = lid.fuse(box(SKIRT_T, SKIRT_D + LID_T, LID_Z1 - LID_Z0,
-                           x0, REAR_H - SKIRT_D, LID_Z0))
-    lid = lid.fuse(box(2 * LID_OX, SKIRT_D + LID_T, SKIRT_T,
-                       -LID_OX, REAR_H - SKIRT_D, Z_OUT + SKIRT_CLEAR))
-    #  front skirt: shallower, because the drive bay's roof is 8.2 mm below the
-    #  top of the rear section and a full-depth skirt would land on it
-    lid = lid.fuse(box(2 * LID_OX, SKIRT_FRONT_D + LID_T, SKIRT_T,
-                       -LID_OX, REAR_H - SKIRT_FRONT_D, LID_Z0 - SKIRT_T))
-    #  round the outside of the tray before adding the small features, or the
-    #  0.35 mm bead would be swallowed by a 1.0 mm round
-    lid = _tidy(lid)
-    lid = fillet_all(lid, FILLET_R_LID)
-    #  friction bead, proud of the skirt's inner faces on three sides
-    for sx in (1, -1):
-        bx = (XW + SKIRT_CLEAR - SKIRT_BEAD) if sx > 0 else -(XW + SKIRT_CLEAR)
-        lid = lid.fuse(box(SKIRT_BEAD, SKIRT_BEAD_H, LID_BEAD_Z1 - LID_Z0,
-                           bx, LID_BEAD_LO, LID_Z0))
-    lid = lid.fuse(box(2 * (XW + SKIRT_CLEAR), SKIRT_BEAD_H, SKIRT_BEAD,
-                       -(XW + SKIRT_CLEAR), LID_BEAD_LO,
-                       LID_BEAD_Z1 - SKIRT_BEAD))
-    #  locating lip, stopping well short of the fan so the fan lead has room
-    lid = lid.fuse(rounded_rect_prism(SVC_HALF - 0.5, REAR_H - LID_LIP_T,
-                                      REAR_H, SVC_Z0 + 0.5, LID_LIP_END,
-                                      SVC_R - 0.5))
-    #  retainer fins, reaching down beside the fan's top edge.  These are what
-    #  stop the fan lifting out of its housing, so the lid is the fan's fifth
-    #  restraint and no screws are needed for it either.
+
+    # 2. Left and right skirts with 45 deg interlocking runners
+    br_bot = RAIL_YC - RAIL_H / 2.0 - RAIL_W
+    br_m1  = RAIL_YC - RAIL_H / 2.0
+    br_m2  = RAIL_YC + RAIL_H / 2.0
+    br_top = RAIL_YC + RAIL_H / 2.0 + RAIL_W
+    br_out = XW + RAIL_W
+
+    p_r_skirt = [
+        (x_outer, REAR_H),
+        (x_outer, y_bot),
+        (x_inner, y_bot),
+        (x_inner, br_bot - SLIDE_CLEAR),
+        (br_out + SLIDE_CLEAR, br_m1 - SLIDE_CLEAR),
+        (br_out + SLIDE_CLEAR, br_m2 + SLIDE_CLEAR),
+        (x_inner, br_top + SLIDE_CLEAR),
+        (x_inner, REAR_H)
+    ]
+    p_l_skirt = [(-p[0], p[1]) for p in reversed(p_r_skirt)]
+
+    lid = lid.fuse(prism(p_r_skirt, LID_Z0, LID_Z1 - LID_Z0))
+    lid = lid.fuse(prism(p_l_skirt, LID_Z0, LID_Z1 - LID_Z0))
+
+    # 3. Front face covering the step
+    front_face = box(2 * x_inner, REAR_H - LID_Y_FRONT_BOT, LID_FRONT_T,
+                     -x_inner, LID_Y_FRONT_BOT, LID_Z0)
+    lid = lid.fuse(front_face)
+
+    # 4. Snap latch arm at front center
+    slot_d = LID_FRONT_T + 1.0
+    c_left = box(LATCH_RELIEF, REAR_H - LID_Y_FRONT_BOT + 1.0, slot_d,
+                 -(LATCH_W / 2.0 + LATCH_RELIEF), LID_Y_FRONT_BOT - 0.5, LID_Z0 - 0.5)
+    c_right = box(LATCH_RELIEF, REAR_H - LID_Y_FRONT_BOT + 1.0, slot_d,
+                  LATCH_W / 2.0, LID_Y_FRONT_BOT - 0.5, LID_Z0 - 0.5)
+    lid = lid.cut(c_left).cut(c_right)
+
+    # Snap tooth on the inside (+Z face) of the latch arm
+    tw = LATCH_W - 0.6
+    tooth = box(tw, LATCH_TOOTH_H, LATCH_TOOTH_D,
+                -tw / 2.0, RAIL_YC - LATCH_TOOTH_H / 2.0, Z_BAY)
+    lid = lid.fuse(tooth)
+
+    # Ergonomic thumb release tab on the front face of the latch arm
+    tab_lip = box(LATCH_W, 2.4, 1.4, -LATCH_W / 2.0, LID_Y_FRONT_BOT, LID_Z0 - 1.4)
+    lid = lid.fuse(tab_lip)
+
+    # 5. Fan retainer fins on the underside
     for sx in (1, -1):
         fx = GUIDE_X if sx > 0 else -GUIDE_XO
-        lid = lid.fuse(box(FAN_GUIDE_T, REAR_H - LID_FIN_Y0, FAN_INSET - 0.3,
-                           fx, LID_FIN_Y0, FAN_Z0))
-    for sx in (-1, 1):
-        for zz in LID_SCREW_Z:
-            lid = lid.cut(cyl_y(LID_CLEAR_DIA / 2.0, LID_T + LID_LIP_T + 2.0,
-                                sx * LID_SCREW_X, zz, REAR_H - LID_LIP_T - 1.0))
+        fin = box(FAN_GUIDE_T, REAR_H - LID_FIN_Y0, FAN_INSET - 0.5,
+                  fx, LID_FIN_Y0, FAN_Z0)
+        lid = lid.fuse(fin)
+
     lid = _tidy(lid)
 
-    # ============================================== PicoPSU retaining strap ---
-    strap = fillet_all(box(2 * PSU_STRAP_X, PSU_STRAP_H, PSU_STRAP_L,
-                           -PSU_STRAP_X, PSU_TOP,
-                           PSU_BORE_Z - PSU_STRAP_L / 2.0), FILLET_R)
+    # ==================================== toolless snap strap for PicoPSU ---
+    #  Snap-on retaining strap that clips over the cradle corner bosses.
+    #  No screws, no heat-set inserts.
+    PSU_SNAP_CLEAR = 0.2
+    boss_outer_x   = PSU_TRAY_OH + PSU_BOSS_W        # 25.1
+    ridge_outer_x  = boss_outer_x + PSU_TOOTH_W      # 25.9
+    strap_inner_x  = ridge_outer_x + PSU_SNAP_CLEAR  # 26.1
+    strap_outer_x  = strap_inner_x + PSU_LEG_T       # 28.1
+
+    strap = box(2 * strap_outer_x, PSU_STRAP_H, PSU_STRAP_L,
+                -strap_outer_x, PSU_TOP, PSU_BORE_Z - PSU_STRAP_L / 2.0)
     for sx in (1, -1):
-        strap = strap.cut(cyl_y(PSU_SCREW_DIA / 2.0, PSU_STRAP_H + 2.0,
-                                sx * PSU_BOSS_X, PSU_BORE_Z, PSU_TOP - 1.0))
+        lx = strap_inner_x if sx > 0 else -strap_outer_x
+        leg = box(PSU_LEG_T, PSU_LEG_H + PSU_STRAP_H, PSU_STRAP_L,
+                  lx, PSU_TOP - PSU_LEG_H, PSU_BORE_Z - PSU_STRAP_L / 2.0)
+        strap = strap.fuse(leg)
+        tx = (strap_inner_x - PSU_TOOTH_W) if sx > 0 else -strap_inner_x
+        tooth = box(PSU_TOOTH_W, PSU_LEG_H - 3.5, PSU_BOSS_L,
+                    tx, PSU_TOP - PSU_LEG_H, PSU_BORE_Z - PSU_BOSS_L / 2.0)
+        strap = strap.fuse(tooth)
     strap = _tidy(strap)
 
     return body, lid, strap, log
@@ -780,10 +826,9 @@ def report(body, lid, strap, log):
     add("   front lip               : %.1f mm tall (%.1f mm above the plinth),"
         % (PSU_FRONT_LIP, PSU_FRONT_LIP - PSU_PLINTH_T))
     add("                             stops the board sliding forward")
-    add("   retaining strap         : %.1f x %.1f x %.1f mm, 2 x M3 into corner"
-        % (2 * PSU_STRAP_X, PSU_STRAP_H, PSU_STRAP_L))
-    add("                             bosses with O%.1f heat-set inserts,"
-        % LID_INSERT_DIA)
+    add("   retaining strap         : %.1f x %.1f x %.1f mm, toolless snap fit"
+        % (2 * (PSU_STRAP_X + PSU_LEG_T), PSU_STRAP_H, PSU_STRAP_L))
+    add("                             clips over corner boss ledges (0 screws, 0 inserts),")
     add("                             %.1f mm gap over the board top"
         % (PSU_TOP - FLOOR_T - PSU_PLINTH_T - PSU_H))
     add("")
@@ -811,31 +856,23 @@ def report(body, lid, strap, log):
     add("   clearance to the edge   : %.2f mm outboard"
         % (XW - abs(REAR_CABLE_SLOT_X) - REAR_CABLE_SLOT_W / 2.0))
     add("")
-    add(" SERVICE LID  (drop-on housing - it stays on with no screws)")
+    add(" SERVICE LID  (slide-and-click housing - 100% screwless)")
     add("   outside                 : %.1f (W) x %.1f (D) mm, %.1f mm plate"
         % (2 * LID_OX, LID_Z1 - LID_Z0, LID_T))
-    add("   skirts                  : %.1f mm deep at the sides and back, %.1f mm"
-        % (SKIRT_D, SKIRT_FRONT_D))
-    add("                             at the front (the bay roof is only %.1f mm"
-        % (REAR_H - BAY_H))
-    add("                             below the top), all %.1f mm thick" % SKIRT_T)
-    add("   fit                     : %.2f mm slip + %.2f mm bead = %.2f mm press"
-        % (SKIRT_CLEAR, SKIRT_BEAD, SKIRT_BEAD - SKIRT_CLEAR))
-    add("   located by              : skirt in X and Z, the top rim in Y - it")
-    add("                             cannot slide off in any direction, only lift")
-    add("   screws, still cut       : %d x M3 O%.1f clearance at X=+/-%.1f Z=%s"
-        % (2 * len(LID_SCREW_Z), LID_CLEAR_DIA, LID_SCREW_X, LID_SCREW_Z))
+    add("   skirts                  : %.1f mm deep at the sides, %.1f mm"
+        % (SKIRT_D, REAR_H - LID_Y_FRONT_BOT))
+    add("                             at the front (covering the step), all %.1f mm thick" % SKIRT_T)
+    add("   guide rails             : 45 deg beveled slide rails on outer walls (Z %.1f..%.1f)"
+        % (RAIL_Z0, Z_OUT))
+    add("                             glide clearance: %.2f mm" % SLIDE_CLEAR)
+    add("   cantilever latch        : %.1f mm wide spring arm with %.1f mm catch tooth"
+        % (LATCH_W, LATCH_TOOTH_D))
+    add("                             and ergonomic thumb release tab at front center")
+    add("   positive stop           : front face seats against 8.2 mm step at Z=%.1f" % Z_BAY)
+    add("   screws                  : 0 (100% toolless slide-and-click)")
     add("")
-    add("   FAN CABLE  - can the lid catch it going on or off?")
-    add("   locating lip            : %.1f mm deep, Z %.1f .. %.1f"
-        % (LID_LIP_T, SVC_Z0 + 0.5, LID_LIP_END))
-    add("   lip vs plenum interior  : lip bottoms out at y=%.1f, which is %.1f mm"
-        % (REAR_H - LID_LIP_T, (REAR_H - LID_LIP_T) - PLEN_Y1))
-    add("                             ABOVE the plenum ceiling at y=%.1f, so it"
-        % PLEN_Y1)
-    add("                             never enters the plenum at all")
-    add("   lip vs the fan          : stops %.1f mm short of the fan at Z %.1f"
-        % (FAN_Z0 - LID_LIP_END, FAN_Z0))
+    add("   FAN CABLE & RETENTION   - fan captive with no screws")
+    add("   retainer fins           : reach down to y=%.1f, keeping fan seated in housing" % LID_FIN_Y0)
     add("   headroom over the frame : %.1f mm (frame top y=%.1f, ceiling y=%.1f)"
         % (PLEN_Y1 - FAN_TOP, FAN_TOP, PLEN_Y1))
     add("   skirt vs the case       : the skirt is outside the case, so it cannot")
@@ -888,15 +925,7 @@ def report(body, lid, strap, log):
     add("   lid  bbox               : %.2f x %.2f x %.2f"
         % (bb.XLength, bb.YLength, bb.ZLength))
     lid_inter = body.common(lid).Volume
-    bead_nom = (SKIRT_BEAD - SKIRT_CLEAR) * SKIRT_BEAD_H * (
-        2 * (LID_BEAD_Z1 - LID_Z0) + 2 * (XW + SKIRT_CLEAR))
-    add("   body/lid interference    : %.1f mm3 - the skirt bead's press fit"
-        % lid_inter)
-    add("     expected ~%.0f mm3 for a %.2f mm interference band -> %s"
-        % (bead_nom, SKIRT_BEAD - SKIRT_CLEAR,
-           "OK" if 0.5 * bead_nom < lid_inter < 1.4 * bead_nom else "*** CHECK ***"))
-    add("     (both are separate prints, so this overlap is intentional - set")
-    add("      SKIRT_BEAD = SKIRT_CLEAR for a free slip fit instead)")
+    add("   body/lid interference    : %.4f mm3" % lid_inter)
     add("   body/strap interference  : %.4f mm3" % body.common(strap).Volume)
     add("   build volume (Bambu H2S 340x320x340):")
     add("     body  fits            : %s" % (bb_max(body) <= 340.0))
@@ -914,15 +943,11 @@ def report(body, lid, strap, log):
         % (inter, "CLEAR" if inter < 1e-6 else "FOULING"))
     add("     board front to backplane: %.2f mm in the rearmost position"
         % ((PSU_Z1 - PSU_L) - Z_BAY))
-    add("   lid-screw insert bores - material around the O%.1f bore:"
-        % LID_INSERT_DIA)
-    for sx in (-1, 1):
-        for zz in LID_SCREW_Z:
-            ds = ring_depths(body, sx * LID_SCREW_X, zz, radius=3.4, n=6,
-                             y_top=REAR_H, max_d=LID_INSERT_D + 3.0)
-            add("     X=%+7.1f Z=%6.1f : min %.1f mm / max %.1f mm  -> %s"
-                % (sx * LID_SCREW_X, zz, min(ds), max(ds),
-                   "OK" if min(ds) >= LID_INSERT_D else "TOO SHALLOW"))
+    add("   slide rails on body     : length %.1f mm (Z %.1f..%.1f), height %.1f..%.1f mm"
+        % (Z_OUT - RAIL_Z0, RAIL_Z0, Z_OUT,
+           RAIL_YC - RAIL_H / 2.0 - RAIL_W, RAIL_YC + RAIL_H / 2.0 + RAIL_W))
+    add("   front catch pocket      : %.1f (W) x %.1f (H) x %.1f (D) mm at Z=%.1f"
+        % (CATCH_POCKET_W, CATCH_POCKET_H, CATCH_POCKET_D, Z_BAY))
     add("   cable egress slots through the rear wall:")
     for yy in REAR_CABLE_SLOT_Y:
         probe = Part.makeSphere(1.2, Vector(REAR_CABLE_SLOT_X, yy,

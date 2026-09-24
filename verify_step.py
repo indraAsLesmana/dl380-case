@@ -69,6 +69,7 @@ PSU_W, PSU_L, PSU_H = 31.0, 44.0, 21.0
 PSU_CLEAR, PSU_BOOT, PSU_PLINTH_T = 0.8, 20.0, 3.0
 PSU_WALL_H, PSU_FRONT_LIP = 24.0, 6.0
 PSU_BOSS_W, PSU_BOSS_L = 6.0, 14.0
+PSU_TOOTH_W = 0.8
 PSU_XH = (PSU_W + 2 * PSU_CLEAR) / 2.0                    # 16.3
 PSU_ZH = (PSU_L + 2 * PSU_CLEAR) / 2.0                    # 22.8
 PSU_Z0 = Z_BAY + PSU_BOOT                                 # 185.0
@@ -82,19 +83,19 @@ PSU_BORE_Z = PSU_Z0 + PSU_BOSS_L / 2.0                    # 192.0
 DC_JACK_X, DC_JACK_Y = 60.0, 52.0
 DC_JACK_DIA, DC_JACK_PAD, DC_JACK_DEPTH = 8.0, 16.0, 5.0
 
-# drop-on housing lid
-SKIRT_T, SKIRT_D, SKIRT_FRONT_D = 2.8, 14.0, 8.0
-SKIRT_CLEAR, SKIRT_BEAD, SKIRT_BEAD_H, SKIRT_BEAD_UP = 0.2, 0.35, 4.0, 10.0
-LID_T, LID_LIP_T, LID_LIP_GAP = 3.0, 1.5, 6.0
+# slide-and-click housing lid
+SLIDE_CLEAR = 0.25
+RAIL_W, RAIL_H, RAIL_YC = 1.4, 2.4, 98.0
+SKIRT_T, SKIRT_D = 2.8, 10.0
+LID_T = 3.0
 FAN_INSET = 25.0
 FAN_Z0 = Z_RIN - FAN_INSET                                # 248.0
-FAN_TOP = FAN_CY + FAN_SIZE / 2.0                         # 98.0
-LID_Z0 = Z_BAY + SKIRT_CLEAR                              # 165.2
-LID_Z1 = Z_OUT + SKIRT_CLEAR + SKIRT_T                    # 284.4
-LID_OX = XW + SKIRT_CLEAR + SKIRT_T                       # 78.7
-LID_LIP_END = FAN_Z0 - LID_LIP_GAP                        # 242.0
-LID_BEAD_LO = REAR_H - SKIRT_D + SKIRT_BEAD_UP            # 98.8
-LID_BEAD_Z1 = Z_OUT + SKIRT_CLEAR                         # 281.6
+FAN_TOP = FAN_CY + FAN_SIZE / 2.0                         # 96.0
+LID_FRONT_T = 2.4
+LID_Z0 = Z_BAY - LID_FRONT_T                              # 162.6
+LID_Z1 = Z_OUT                                            # 281.4
+LID_OX = XW + SLIDE_CLEAR + SKIRT_T                       # 78.75
+RAIL_Z0 = Z_BAY + 1.5
 
 # the first honeycomb cell sits on the fan axis; the next column is offset
 _GR = (GRILLE_CELL + GRILLE_WEB) / math.sqrt(3.0)
@@ -124,8 +125,8 @@ CASES = [
     ("cradle rear wall",          (0.0, 15.0, PSU_Z1 + WALL / 2.0), "solid"),
     ("cradle front lip",          (0.0, FLOOR_T + 1.0, PSU_Z0 - WALL / 2.0),
                                                                      "solid"),
-    ("strap boss insert bore",    (PSU_BOSS_X, PSU_TOP - 4.0, PSU_BORE_Z),
-                                                                     "void"),
+    ("strap boss ridge",          (PSU_TRAY_OH + PSU_BOSS_W + PSU_TOOTH_W / 2.0,
+                                   PSU_TOP - 1.8, PSU_BORE_Z),       "solid", 0.3),
     ("strap boss material",       (PSU_BOSS_X, FLOOR_T + 2.0, PSU_BORE_Z),
                                                                      "solid"),
     ("DC jack hole",              (DC_JACK_X, DC_JACK_Y, ZW),       "void"),
@@ -134,7 +135,9 @@ CASES = [
     ("rear wall beside jack",     (GRILLE_POCKET_R + 3.0, FAN_CY, ZW), "solid"),
     ("roof material  (gusset)",   (71.5, PLEN_Y1 + 1.5, 200.0),     "solid"),
     ("top service opening",       (0.0, REAR_H - 1.0, 215.0),       "void"),
-    ("lid insert bore",           (LID_SCREW_X, REAR_H - 4.6, LID_SCREW_Z), "void"),
+    ("slide rail right",          (XW + RAIL_W / 2.0, RAIL_YC, 220.0), "solid", 0.4),
+    ("slide rail left",           (-(XW + RAIL_W / 2.0), RAIL_YC, 220.0), "solid", 0.4),
+    ("catch pocket",              (0.0, RAIL_YC, Z_BAY + 0.5),      "void"),
     ("bay interior",              (0.0, FLOOR_T + INT_H / 2.0, 100.0), "void"),
     ("bay side wall",             (XI + WALL / 2.0, FLOOR_T + INT_H / 2.0, 100.0),
                                                                      "solid"),
@@ -162,26 +165,23 @@ CASES = [
 #  thick, so the default 1.0 mm sphere will not fit in either.
 LID_CASES = [
     ("plate material",            (0.0, REAR_H + LID_T / 2.0, 220.0), "solid"),
-    ("skirt, right wall",         (XW + SKIRT_CLEAR + SKIRT_T / 2.0, 95.0, 220.0),
+    ("skirt, right wall",         (XW + SLIDE_CLEAR + SKIRT_T / 2.0, 95.0, 220.0),
                                                                      "solid"),
-    ("skirt, left wall",          (-(XW + SKIRT_CLEAR + SKIRT_T / 2.0), 95.0, 220.0),
+    ("skirt, left wall",          (-(XW + SLIDE_CLEAR + SKIRT_T / 2.0), 95.0, 220.0),
                                                                      "solid"),
-    ("skirt, rear wall",          (0.0, 95.0, Z_OUT + SKIRT_CLEAR + SKIRT_T / 2.0),
-                                                                     "solid"),
-    ("skirt, front wall",         (0.0, 98.0, LID_Z0 - SKIRT_T / 2.0), "solid"),
+    ("runner, right skirt",       (XW + SLIDE_CLEAR + 0.6, 94.2, 220.0), "solid", 0.4),
+    ("runner, left skirt",        (-(XW + SLIDE_CLEAR + 0.6), 94.2, 220.0), "solid", 0.4),
+    ("skirt, front wall",         (0.0, 98.0, LID_Z0 + 1.0),         "solid"),
     ("lid clear of the case wall", (XW - 1.2, 95.0, 220.0),          "void"),
-    ("front skirt stops at roof", (0.0, 92.0, LID_Z0 - SKIRT_T / 2.0), "void"),
-    ("lip material",              (0.0, REAR_H - LID_LIP_T / 2.0, 200.0),
-                                                                     "solid", 0.5),
-    ("lip ends before the fan",   (0.0, REAR_H - LID_LIP_T / 2.0, 245.0),
-                                                                     "void", 0.5),
-    ("open over the fan",         (0.0, REAR_H - LID_LIP_T / 2.0, FAN_Z0 + 10.0),
+    ("front skirt stops at roof", (0.0, 92.0, LID_Z0 + 1.0),         "void"),
+    ("front cantilever latch",    (0.0, RAIL_YC, Z_BAY - 1.0),       "solid"),
+    ("lip ends before the fan",   (0.0, REAR_H - 1.0, 245.0),        "void", 0.5),
+    ("open over the fan",         (0.0, REAR_H - 1.0, FAN_Z0 + 10.0),
                                                                      "void", 0.5),
     ("fan retainer fin",          (GUIDE_XC, LID_FIN_Y0 + 2.0, FAN_Z0 + 12.0),
                                                                      "solid"),
     ("clearance under the fin",   (GUIDE_XC, FAN_TOP - 1.0, FAN_Z0 + 12.0), "void"),
-    ("lid screw hole",            (LID_SCREW_X, REAR_H + LID_T / 2.0, LID_SCREW_Z),
-                                                                     "void"),
+    ("latch snap tooth",          (0.0, RAIL_YC, Z_BAY + 0.6),       "solid", 0.4),
 ]
 
 

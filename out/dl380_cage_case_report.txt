@@ -66,8 +66,8 @@
    plinth                  : 3.0 mm, board sits clear of the floor
    front lip               : 6.0 mm tall (3.0 mm above the plinth),
                              stops the board sliding forward
-   retaining strap         : 50.2 x 4.0 x 20.0 mm, 2 x M3 into corner
-                             bosses with O4.2 heat-set inserts,
+   retaining strap         : 54.2 x 4.0 x 20.0 mm, toolless snap fit
+                             clips over corner boss ledges (0 screws, 0 inserts),
                              0.4 mm gap over the board top
 
  DC INPUT JACK  (rear wall)
@@ -84,22 +84,19 @@
    clearance to the grille : 6.50 mm (slot corner to the pocket)
    clearance to the edge   : 7.20 mm outboard
 
- SERVICE LID  (drop-on housing - it stays on with no screws)
-   outside                 : 157.4 (W) x 119.2 (D) mm, 3.0 mm plate
-   skirts                  : 14.0 mm deep at the sides and back, 8.0 mm
-                             at the front (the bay roof is only 8.2 mm
-                             below the top), all 2.8 mm thick
-   fit                     : 0.20 mm slip + 0.35 mm bead = 0.15 mm press
-   located by              : skirt in X and Z, the top rim in Y - it
-                             cannot slide off in any direction, only lift
-   screws, still cut       : 6 x M3 O3.4 clearance at X=+/-70.0 Z=(185.0, 215.0, 245.0)
+ SERVICE LID  (slide-and-click housing - 100% screwless)
+   outside                 : 157.5 (W) x 118.8 (D) mm, 3.0 mm plate
+   skirts                  : 10.0 mm deep at the sides, 6.4 mm
+                             at the front (covering the step), all 2.8 mm thick
+   guide rails             : 45 deg beveled slide rails on outer walls (Z 166.5..281.4)
+                             glide clearance: 0.25 mm
+   cantilever latch        : 18.0 mm wide spring arm with 1.2 mm catch tooth
+                             and ergonomic thumb release tab at front center
+   positive stop           : front face seats against 8.2 mm step at Z=165.0
+   screws                  : 0 (100% toolless slide-and-click)
 
-   FAN CABLE  - can the lid catch it going on or off?
-   locating lip            : 1.5 mm deep, Z 172.5 .. 242.0
-   lip vs plenum interior  : lip bottoms out at y=101.3, which is 1.3 mm
-                             ABOVE the plenum ceiling at y=100.0, so it
-                             never enters the plenum at all
-   lip vs the fan          : stops 6.0 mm short of the fan at Z 248.0
+   FAN CABLE & RETENTION   - fan captive with no screws
+   retainer fins           : reach down to y=97.0, keeping fan seated in housing
    headroom over the frame : 4.0 mm (frame top y=96.0, ceiling y=100.0)
    skirt vs the case       : the skirt is outside the case, so it cannot
                              reach any cable that is inside
@@ -122,12 +119,12 @@
                              front wall, so one had to give
 
  VOLUME / MASS
-   body   volume            :   530281.3 mm3  =  530.3 cm3
-   body   mass @1.27 g/cm3  :      673 g  (PETG, 100% infill equiv)
-   lid    volume            :    88693.6 mm3  =   88.7 cm3
-   lid    mass @1.27 g/cm3  :      113 g  (PETG, 100% infill equiv)
-   strap  volume            :     3822.2 mm3  =    3.8 cm3
-   strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
+   body   volume            :   532645.0 mm3  =  532.6 cm3
+   body   mass @1.27 g/cm3  :      676 g  (PETG, 100% infill equiv)
+   lid    volume            :    64603.1 mm3  =   64.6 cm3
+   lid    mass @1.27 g/cm3  :       82 g  (PETG, 100% infill equiv)
+   strap  volume            :     5032.0 mm3  =    5.0 cm3
+   strap  mass @1.27 g/cm3  :        6 g  (PETG, 100% infill equiv)
 
  SANITY CHECKS
    body valid              : True
@@ -135,12 +132,9 @@
    strap valid             : True
    body closed (solid)     : True
    strap closed (solid)    : True
-   body bbox               : 151.40 x 102.80 x 281.40
-   lid  bbox               : 157.40 x 17.00 x 122.00
-   body/lid interference    : 283.5 mm3 - the skirt bead's press fit
-     expected ~231 mm3 for a 0.15 mm interference band -> OK
-     (both are separate prints, so this overlap is intentional - set
-      SKIRT_BEAD = SKIRT_CLEAR for a free slip fit instead)
+   body bbox               : 154.20 x 102.80 x 281.40
+   lid  bbox               : 157.50 x 13.00 x 120.20
+   body/lid interference    : 0.0000 mm3
    body/strap interference  : 0.0000 mm3
    build volume (Bambu H2S 340x320x340):
      body  fits            : True
@@ -149,13 +143,8 @@
    PicoPSU phantom fit (board pushed to the rear of the cradle):
      board/body interference: 0.0000 mm3  -> CLEAR
      board front to backplane: 21.60 mm in the rearmost position
-   lid-screw insert bores - material around the O4.2 bore:
-     X=  -70.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  -70.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  -70.0 Z= 245.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  +70.0 Z= 185.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  +70.0 Z= 215.0 : min 13.0 mm / max 13.0 mm  -> OK
-     X=  +70.0 Z= 245.0 : min 13.0 mm / max 13.0 mm  -> OK
+   slide rails on body     : length 114.9 mm (Z 166.5..281.4), height 95.4..100.6 mm
+   front catch pocket      : 20.0 (W) x 2.6 (H) x 1.8 (D) mm at Z=165.0
    cable egress slots through the rear wall:
      X= -60.0 Y= 33.0 : 0% inside solid  -> CLEAR
      X= -60.0 Y= 50.0 : 0% inside solid  -> CLEAR
