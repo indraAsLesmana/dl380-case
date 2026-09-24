@@ -47,7 +47,6 @@ top service opening or the front mouth.
 | Wago 221 lever terminals | 3 | plenum |
 | *Optional: M3 heat-set inserts* | *4* | *fan mounting (only if bolting for transport)* |
 | *Optional: M3 × 30 screws* | *4* | *fan mounting (only if bolting for transport)* |
-| *Optional: M3 × 6–8 screw + nut* | *2–4* | *cage anchoring (only if bolting through side holes)* |
 
 **Tools**: Flush cutters and a small scraper or deburring tool. (No soldering iron or hex drivers needed for mandatory assembly!).
 
@@ -59,17 +58,16 @@ top service opening or the front mouth.
 
 ```
  1  print + clean up
- 2  dry-fit the cage                 (checks the slide before anything is captive)
+ 2  dry-fit the cage                 (checks the slide between rails before wiring)
  3  fan                              <- slides straight down into rear housing slot
- 4  cage, in from the FRONT          <- straight slide, no tilt
- 5  (optional) cage anchor screws
- 6  DC jack in the rear wall
- 7  SFF-8087 cables in from the back, onto the backplane
- 8  wiring: PicoPSU -> Wagos -> backplane, ground PS_ON#
- 9  PicoPSU into the cradle + snap-fit strap
-10  slide-and-click service lid      <- slides +Z and clicks shut
-11  rubber feet
-12  first power-up
+ 4  cage, in from the FRONT          <- slides along internal bottom rails and top ribs
+ 5  DC jack in the rear wall
+ 6  SFF-8087 cables in from the back, onto the backplane
+ 7  wiring: PicoPSU -> Wagos -> backplane, ground PS_ON#
+ 8  PicoPSU into the cradle + snap-fit strap
+ 9  slide-and-click service lid      <- slides +Z and clicks shut
+10  rubber feet
+11  first power-up
 ```
 
 Steps 3 and 4 can be swapped. Everything else has to be in this order: the cables
@@ -105,41 +103,36 @@ Check these before you go further:
 Do this now, while the box is completely empty and you can still see what you're
 doing.
 
-**Yes, the cage just slides in from the front — straight, not tilted, no clips and
-no flexing.** It goes in backplane-end first, and travels 165 mm until it stops.
+**The cage slides in from the front between internal guide rails — straight, not tilted, no screws.**
+It enters through the 145.8 × 87.8 mm front aperture, engages the bottom slider rails and ceiling ribs, and travels 162 mm until it seats firmly against the rear stop frame.
 
 ![the target cage](docs/reference/cage-front-bezel.png)
 
 | | |
 |---|---|
 | Cage | 145.0 × 87.0 × 165.0 mm |
-| Bore in the case | 145.8 × 87.8 mm |
-| Clearance | **0.4 mm per side** — a slide fit |
+| Front aperture | 145.8 × 87.8 mm (framed by 29.9 mm front cheeks) |
+| Internal guide rails | Bottom rails (14 mm tall) and ceiling ribs (5 mm tall) with 1.5 mm lead-in chamfers |
+| Clearance | **0.4 mm per side** — a smooth slide fit |
+| Lateral wiring space | **27.1 mm clear chamber** on the left for the 10-pin power socket and cable |
 
 0.4 mm per side is a proper slide fit but it is not loose. It will jam if you
 corkscrew it, so:
 
 1. Set the case on its base on the bench.
 2. Pick the cage up by both sides, backplane away from you.
-3. Line the cage up square in the mouth and push it in **straight** — both hands,
-   equal pressure, no rocking.
-4. It should slide freely and stop with a firm, definite feel when it meets the
-   internal stop frame at the back of the bay.
+3. Line the cage up square in the front mouth. The internal rails have 1.5 mm 45° chamfers to catch the cage edges.
+4. Push it in **straight** — both hands, equal pressure, no rocking.
+5. It should slide smoothly between the floor rails and ceiling ribs, stopping with a firm, definite feel when it meets the internal stop frame at Z = 162 mm.
+6. When seated, the cage's front bezel rests flush against the front face, completely sealing the front of the enclosure.
 
 That stop frame is a 4 mm-wide ledge with a 137.8 × 79.8 mm aperture in it. The
-cage's rear butts against it and that sets the depth — the cage's front bezel ends
-up flush with the case's front face.
+cage's rear butts against it and that sets the depth. The relief notch on the left
+rib gives unobstructed clearance for the 10-pin backplane power header.
 
 **If it fights you**: don't force it. Find the tight corner, lift it out, look for
-print elephant-footing or blobs on the inside of the sleeve, scrape them off, and
+print elephant-footing or blobs on the inside of the sleeve or guide rails, scrape them off, and
 try again.
-
-**One thing to expect**: the mouth's lead-in flare is only **0.8 mm** (0.4 mm per
-side) — half what it would be without the rounded outer corners, because the round
-and the flare both come out of the same 2.8 mm front wall. So the mouth is closer to
-a straight-edged hole than a funnel, and the cage has to go in **square** rather than
-being guided in by the taper. Start it gently and correct the angle rather than
-pushing; once it's started it slides freely.
 
 Pull it back out for now — you want the box empty for the fan.
 
@@ -187,26 +180,12 @@ it drop.
 ## Step 4 — the cage, in from the front
 
 Same slide as step 2, but now you know it fits. Push it in square and straight until
-it stops on the frame. Nothing else changes — the fan is behind it and out of the
-way, at Z 220+, and the cage stops at Z 165.
+it stops on the rear frame at Z = 162 mm. The cage is captured securely between the
+bottom rails and top ribs with zero screws needed.
 
 ---
 
-## Step 5 — anchor the cage (optional)
-
-The side walls have **six candidate Ø3.4 holes per side** at Z 15 / 45 / 75 / 105 /
-135 / 155, all on the bay's mid-height. These are optional — the internal stop frame
-and lid hold the cage in place. If you wish to pin it:
-
-1. Look through the wall holes from outside and see which one lines up with a hole
-   in the cage's sheet metal.
-2. Fit a small screw in that one. Two per side, front and rear, is plenty.
-3. If none line up, stop here — the rear stop frame already holds the cage in
-   depth.
-
----
-
-## Step 6 — the DC jack
+## Step 5 — the DC jack
 
 The rear wall takes a panel-mount 5.5 × 2.5 mm barrel jack at **(+70, 52)**:
 
@@ -223,7 +202,7 @@ to the tags on the inside before you tighten it down.
 
 ---
 
-## Step 7 — the SFF-8087 cables
+## Step 6 — the SFF-8087 cables
 
 There are two slots in the rear wall, both at **X = −70**, at **Y = 33** and
 **Y = 50**, each 17 × 12 mm with rounded corners. Do these before the PicoPSU goes
@@ -239,14 +218,14 @@ in — you need the cradle empty to get your hand in.
 
 ---
 
-## Step 8 — wiring & Wago layout
+## Step 7 — wiring & Wago layout
 
 The HP DL380 G6/G7 backplane features a 10-pin power socket that faces directly to
 the **left (-X)**.
 
 **Plenum clearance**:
-- The plenum is **200 mm wide internally (205.6 mm outside)**, providing **27.5 mm of
-  clearance** to the left of the backplane PCB ($X = -72.5\text{ mm}$ to $-100.0\text{ mm}$).
+- The plenum and bay are **200 mm wide internally (205.6 mm outside)**, providing **27.1 mm of
+  clearance** to the left of the cage and backplane PCB ($X = -72.9\text{ mm}$ to $-100.0\text{ mm}$).
 - An internal stop rib notch at $X = -72.9 \to -68.9\text{ mm}$ ($Y = 35 \to 85\text{ mm}$)
   ensures the connector housing seats cleanly without obstruction.
 - The 10-pin cable plugs in from the left and bends backward into the plenum.
@@ -269,7 +248,7 @@ the **left (-X)**.
 
 ---
 
-## Step 9 — the PicoPSU into the cradle + snap-fit strap
+## Step 8 — the PicoPSU into the cradle + snap-fit strap
 
 The cradle is sized for the **bare picoPSU-120 board, 31 × 44 × 21 mm**, oriented
 **transversely (44 mm across X, 31 mm along Z)** at $X = +40.0\text{ mm}$.
@@ -293,7 +272,7 @@ The cradle is sized for the **bare picoPSU-120 board, 31 × 44 × 21 mm**, orien
 
 ---
 
-## Step 10 — the slide-and-click lid
+## Step 9 — the slide-and-click lid
 
 The service lid uses a **slide-and-click mechanism**: it slides forward horizontally
 into 45° beveled rails on the outer plenum walls and clicks shut with an integrated
@@ -320,20 +299,20 @@ lid backward (-Z).
 
 ---
 
-## Step 11 — rubber feet
+## Step 10 — rubber feet
 
 Four Ø12 × 2 mm recesses in the base at (±61, Z 14) and (±61, Z 239.4). Push-fit; a
 dab of cyanoacrylate if they're loose.
 
 ---
 
-## Step 12 — first power-up
+## Step 11 — first power-up
 
 1. Before applying power: **no loose wires trapped between lid and body**, no bare
    conductor touching the backplane or sheet metal cage.
 2. Power up and confirm the fan spins and pushes air **out of the back**. Hold a
    tissue near the grille — it should be pushed away, not sucked in.
-3. If the fan doesn't run, check the PS_ON# jumper first (step 8).
+3. If the fan doesn't run, check the PS_ON# jumper first (step 7).
 4. Run it for ten minutes and feel the rear wall and the grille. If the plenum is
    uncomfortably hot, the fan is restricted or running too slow — the P9 is PWM and
    idles quietly, so give it some duty cycle.
@@ -351,7 +330,7 @@ dab of cyanoacrylate if they're loose.
 | Fan fits but rattles | the housing fit is 0.2 mm per side; lower `FAN_GUIDE_CLEAR` and rebuild |
 | Fan won't go into the housing | raise `FAN_GUIDE_CLEAR`, or scrape the two rails |
 | Fan lifts when I turn the case over | the lid is what holds it down — its two fins sit 1 mm above the frame. With the lid off, the fan is only held by gravity. Reduce `FAN_LID_GAP` if you want it clamped tighter |
-| PicoPSU won't start | PS_ON# isn't grounded (step 8) |
+| PicoPSU won't start | PS_ON# isn't grounded (step 7) |
 | Strap won't sit down | the 24-pin ATX connector is standing up under it — move the strap along the cradle |
 | DC jack won't clamp | your jack's neck is shorter than 3.4 mm; reduce `DC_JACK_DEPTH` and rebuild |
 | Lid won't slide smoothly | rail tolerance or print artifacts; gently deburr the 45° runner grooves or rails |

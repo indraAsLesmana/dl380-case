@@ -166,9 +166,15 @@ SVC_Z1_BACKOFF=   0.0    # mm  how far short of the rear wall the opening stops
 SVC_R         =  12.0    # mm  corner radius of the opening
 LID_SCREW_Z   = ()       # no screws - 100% toolless slide-and-click
 
-# ---- HP cage anchoring -------------------------------------------------------
-CAGE_SCREW_Z  = (15.0, 45.0, 75.0, 105.0, 135.0, 155.0)  # suggested Z of side holes
-CAGE_SCREW_DIA= 3.4      # mm  M3 clearance through the 2.8 side wall
+# ---- HP cage anchoring (internal bottom slider rails + top ribs) ------------
+#  The HP cage slides in from the front between internal guide rails on the floor
+#  and ceiling ribs, seating against the rear stop frame. No screws needed.
+CAGE_RAIL_H    = 14.0      # mm  internal bottom guide rail height
+CAGE_RAIL_W    =  4.0      # mm  rail thickness
+CAGE_TOP_RIB_H =  5.0      # mm  top guide rib height
+CAGE_TOP_RIB_W =  4.0      # mm  top guide rib thickness
+CAGE_SCREW_Z   = ()        # no screws - 100% toolless cage slide-in
+CAGE_SCREW_DIA = 3.4      # mm  legacy clearance
 
 # ---- base --------------------------------------------------------------------
 FOOT_DIA      = 12.0     # mm  rubber foot recess
@@ -202,9 +208,9 @@ BASENAME      = "dl380_cage_case"
 # 2. DERIVED DIMENSIONS  -  do not hand-edit, all computed
 # ==============================================================================
 
-INT_W   = CAGE_W + 2 * FIT_CLEAR           # internal width  of the bay sleeve
-INT_H   = CAGE_H + 2 * FIT_CLEAR           # internal height of the bay sleeve
-OUT_W   = INT_W + 2 * WALL                 # outside width
+INT_W   = CAGE_W + 2 * FIT_CLEAR           # internal width between guide rails (145.8 mm)
+INT_H   = CAGE_H + 2 * FIT_CLEAR           # internal height of the bay (87.8 mm)
+OUT_W   = PLEN_INT_W + 2 * WALL            # uniform outside width (205.6 mm)
 BAY_H   = INT_H + FLOOR_T + WALL           # outside height of the bay section
 
 # The rear section has to swallow the fan frame, which is taller than the cage.
@@ -244,13 +250,13 @@ GRILLE_RP       = GRILLE_R - GRILLE_WEB / math.sqrt(3.0)
 GRILLE_OPEN_R   = FAN_R - GRILLE_RP        # only centres inside this get a cell
 GRILLE_POCKET_R = FAN_R + GRILLE_RIM       # recess radius in the outer face
 
-XW       = OUT_W / 2.0                     # bay outer half width
-XI       = INT_W / 2.0                     # bay inner half width
+XW       = OUT_W / 2.0                     # uniform outer half width (102.8 mm)
+XI       = INT_W / 2.0                     # cage opening half width (72.9 mm)
 
-# ---- wider plenum dimensions -------------------------------------------------
-PLEN_OUT_W = PLEN_INT_W + 2 * WALL         # plenum outside width (205.6 mm)
+# ---- uniform width & plenum dimensions ---------------------------------------
+PLEN_OUT_W = OUT_W                         # plenum outside width equals bay (205.6 mm)
 PLEN_XI    = PLEN_INT_W / 2.0              # plenum inside half width (100.0 mm)
-PLEN_XW    = PLEN_OUT_W / 2.0              # plenum outside half width (102.8 mm)
+PLEN_XW    = XW                            # plenum outside half width (102.8 mm)
 SVC_HALF   = PLEN_XI - GUSSET_H            # service opening half width (82.0 mm)
 
 # ---- PicoPSU cradle placement (transverse, shifted right) -------------------
@@ -313,6 +319,13 @@ def polygon_wire(points, z):
 def prism(points, z0, dz):
     """Extrude a closed 2D polygon given in XY along +Z."""
     return Part.Face(polygon_wire(points, z0)).extrude(Vector(0.0, 0.0, dz))
+
+
+def prism_y(points_xz, y0, dy):
+    """Extrude a closed 2D polygon given in XZ along +Y."""
+    pts = [Vector(p[0], y0, p[1]) for p in points_xz]
+    pts.append(pts[0])
+    return Part.Face(Part.makePolygon(pts)).extrude(Vector(0.0, dy, 0.0))
 
 
 def rect_points(half_w, half_h, cy, n):
@@ -441,7 +454,7 @@ def build():
 
     # ---------------------------------------------------------------- shell ---
     outer = box(OUT_W, BAY_H, Z_BAY, -XW, 0.0, 0.0)
-    outer = outer.fuse(box(PLEN_OUT_W, REAR_H, Z_OUT - Z_BAY, -PLEN_XW, 0.0, Z_BAY))
+    outer = outer.fuse(box(OUT_W, REAR_H, Z_OUT - Z_BAY, -XW, 0.0, Z_BAY))
     #  Round every outer edge here, while the shell is still just two boxes.
     #  _tidy() first, or the coplanar seams between the two boxes' faces would
     #  get filleted into grooves.
@@ -452,10 +465,38 @@ def build():
     log["shell_volume_filleted"] = outer.Volume
 
     # ---------------------------------------------------------------- voids ---
-    bay_void = box(INT_W, INT_H, Z_BAY + 1.0, -XI, BAY_Y0, -1.0)
+    #  Front mouth opening (145.8 x 87.8 mm) through the 2.8 mm front wall,
+    #  opening into the full 200.0 mm wide interior chamber.
+    front_mouth = box(INT_W, INT_H, WALL + 1.0, -XI, BAY_Y0, -1.0)
+    bay_void = box(PLEN_INT_W, INT_H, Z_BAY - WALL, -PLEN_XI, BAY_Y0, WALL)
     plen_void = box(PLEN_INT_W, PLEN_Y1 - BAY_Y0, PLENUM_D, -PLEN_XI, BAY_Y0, Z_BAY)
 
-    body = outer.cut(bay_void.fuse(plen_void))
+    body = outer.cut(front_mouth.fuse(bay_void).fuse(plen_void))
+
+    # --------------------------------- internal guide rails for HP cage ---
+    #  Bottom guide rails (14 mm tall) and top guide ribs (5 mm tall) capture
+    #  and align the 145 mm HP drive cage, keeping 27.1 mm lateral clearance
+    #  on the left for the backplane power harness and Wago blocks.
+    #  Includes 1.5 mm 45-deg lead-in chamfers at the entry (Z = WALL to WALL + 3.0).
+    p_l_rail_xz = [
+        (-(XI + CAGE_RAIL_W), WALL),
+        (-XI - 1.5, WALL),
+        (-XI, WALL + 3.0),
+        (-XI, Z_BAY),
+        (-(XI + CAGE_RAIL_W), Z_BAY)
+    ]
+    p_r_rail_xz = [
+        (XI + CAGE_RAIL_W, WALL),
+        (XI + 1.5, WALL),
+        (XI, WALL + 3.0),
+        (XI, Z_BAY),
+        (XI + CAGE_RAIL_W, Z_BAY)
+    ]
+    l_rail = prism_y(p_l_rail_xz, BAY_Y0, CAGE_RAIL_H)
+    r_rail = prism_y(p_r_rail_xz, BAY_Y0, CAGE_RAIL_H)
+    l_top  = prism_y(p_l_rail_xz, BAY_Y1 - CAGE_TOP_RIB_H, CAGE_TOP_RIB_H)
+    r_top  = prism_y(p_r_rail_xz, BAY_Y1 - CAGE_TOP_RIB_H, CAGE_TOP_RIB_H)
+    body = body.fuse(l_rail).fuse(r_rail).fuse(l_top).fuse(r_top)
 
     # ------------------------------------- internal rear stop frame for cage ---
     ring = box(INT_W, INT_H, STOP_RIB_D, -XI, BAY_Y0, Z_BAY - STOP_RIB_D)
@@ -582,7 +623,7 @@ def build():
                                    REAR_CABLE_SLOT_X, yy,
                                    Z_RIN - 1.0, Z_OUT + 2.0, slot_r))
 
-    # --- HP cage anchor screws ----------------------------------------------
+    # --- HP cage anchor screws (omitted in toolless slide-in design) --------
     for sx in (-1, 1):
         for zz in CAGE_SCREW_Z:
             cuts.append(cyl_x(CAGE_SCREW_DIA / 2.0, WALL + 2.0, BAY_YC, zz,
@@ -738,12 +779,12 @@ def report(body, lid, strap, log):
         % (INT_W, INT_H, FIT_CLEAR))
     add("")
     add(" ENCLOSURE  (body)")
-    add("   outside W x H x D       : %.1f (bay) / %.1f (plenum) x %.1f x %.1f mm"
-        % (OUT_W, PLEN_OUT_W, REAR_H, Z_OUT))
+    add("   outside W x H x D       : %.1f (uniform) x %.1f x %.1f mm"
+        % (OUT_W, REAR_H, Z_OUT))
     add("   bay section             : %.1f (W) x %.1f (H) x %.1f (D) mm"
         % (OUT_W, BAY_H, Z_BAY))
     add("   fan/plenum section      : %.1f (W) x %.1f (H) x %.1f (D) mm"
-        % (PLEN_OUT_W, REAR_H, Z_OUT - Z_BAY))
+        % (OUT_W, REAR_H, Z_OUT - Z_BAY))
     add("   top profile             : %s"
         % ("FLAT - rear section is the same height as the bay"
            if FLAT_TOP else
@@ -754,6 +795,16 @@ def report(body, lid, strap, log):
     add("   plenum clear depth      : %.1f mm" % PLENUM_D)
     add("   roof gussets            : %.1f mm tall at 45 deg, carrying the lid rails"
         % GUSSET_H)
+    add("")
+    add(" HP CAGE SLIDER RAILS & GUIDE RIBS  (internal)")
+    add("   bottom guide rails      : %.1f mm tall x %.1f mm thick on floor (Z %.1f..%.1f)"
+        % (CAGE_RAIL_H, CAGE_RAIL_W, WALL, Z_BAY))
+    add("   top guide ribs          : %.1f mm tall x %.1f mm thick on roof (Z %.1f..%.1f)"
+        % (CAGE_TOP_RIB_H, CAGE_TOP_RIB_W, WALL, Z_BAY))
+    add("   front mouth lead-in     : 1.5 mm 45 deg chamfer at entry (Z=%.1f..%.1f)"
+        % (WALL, WALL + 3.0))
+    add("   lateral wiring clearance: %.1f mm open side chamber on left for 10-pin harness"
+        % (PLEN_XI - XI - CAGE_RAIL_W))
     add("")
     add(" FAN  -  %s" % FAN_MODEL)
     add("   nominal size            : %.0f x %.0f x 25 mm, 106 g"
@@ -949,6 +1000,12 @@ def report(body, lid, strap, log):
         % (inter, "CLEAR" if inter < 1e-6 else "FOULING"))
     add("     board front to backplane: %.2f mm in the rearmost position"
         % ((PSU_Z1 - PSU_W) - Z_BAY))
+    add("   HP cage slide path (145.0 x 87.0 mm, entrance to stop frame at Z=%.1f):"
+        % (Z_BAY - STOP_RIB_D))
+    cage_phantom = box(CAGE_W, CAGE_H, Z_BAY - STOP_RIB_D, -CAGE_W / 2.0, FLOOR_T, 0.0)
+    cage_inter = body.common(cage_phantom).Volume
+    add("     cage/body interference  : %.4f mm3  -> %s"
+        % (cage_inter, "CLEAR" if cage_inter < 1e-6 else "FOULING"))
     add("   slide rails on body     : length %.1f mm (Z %.1f..%.1f), height %.1f..%.1f mm"
         % (Z_OUT - RAIL_Z0, RAIL_Z0, Z_OUT,
            RAIL_YC - RAIL_H / 2.0 - RAIL_W, RAIL_YC + RAIL_H / 2.0 + RAIL_W))

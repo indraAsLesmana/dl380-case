@@ -47,13 +47,14 @@ FAN_LID_GAP = 1.0
 GUIDE_X = FAN_SIZE / 2.0 + FAN_GUIDE_CLEAR                # 46.2 rail inner face
 GUIDE_XC = GUIDE_X + FAN_GUIDE_T / 2.0                    # rail mid-thickness
 LID_FIN_Y0 = FAN_TOP + FAN_LID_GAP                        # 97.0 fin bottom
-
-XW = (INT_W + 2 * WALL) / 2.0                             # 75.7
-XI = INT_W / 2.0                                          # 72.9
 PLEN_INT_W = 200.0
 PLEN_OUT_W = PLEN_INT_W + 2 * WALL                        # 205.6
 PLEN_XI = PLEN_INT_W / 2.0                                # 100.0
 PLEN_XW = PLEN_OUT_W / 2.0                                # 102.8
+XW = PLEN_XW                                              # 102.8 (uniform outer half width)
+XI = INT_W / 2.0                                          # 72.9
+CAGE_RAIL_H, CAGE_RAIL_W = 14.0, 4.0
+CAGE_TOP_RIB_H, CAGE_TOP_RIB_W = 5.0, 4.0
 
 Z_BAY = CAGE_D                                            # 165.0
 Z_RIN = CAGE_D + PLENUM_D                                 # 245.0
@@ -144,7 +145,21 @@ CASES = [
     ("slide rail left",           (-(PLEN_XW + RAIL_W / 2.0), RAIL_YC, 200.0), "solid", 0.4),
     ("catch pocket",              (0.0, RAIL_YC, Z_BAY + 0.5),      "void"),
     ("bay interior",              (0.0, FLOOR_T + INT_H / 2.0, 100.0), "void"),
-    ("bay side wall",             (XI + WALL / 2.0, FLOOR_T + INT_H / 2.0, 100.0),
+    ("bay outer wall",            (XW - WALL / 2.0, FLOOR_T + INT_H / 2.0, 100.0),
+                                                                     "solid"),
+    ("cage bottom rail right",    (XI + CAGE_RAIL_W / 2.0, FLOOR_T + 5.0, 100.0),
+                                                                     "solid"),
+    ("cage bottom rail left",     (-(XI + CAGE_RAIL_W / 2.0), FLOOR_T + 5.0, 100.0),
+                                                                     "solid"),
+    ("cage top rib right",        (XI + CAGE_TOP_RIB_W / 2.0, FLOOR_T + INT_H - 2.5, 100.0),
+                                                                     "solid"),
+    ("cage top rib left",         (-(XI + CAGE_TOP_RIB_W / 2.0), FLOOR_T + INT_H - 2.5, 100.0),
+                                                                     "solid"),
+    ("bay side chamber left",     (-(XI + 12.0), FLOOR_T + INT_H / 2.0, 100.0),
+                                                                     "void"),
+    ("bay front cheek left",      (-(XI + 12.0), FLOOR_T + INT_H / 2.0, WALL / 2.0),
+                                                                     "solid"),
+    ("bay front cheek right",     (XI + 12.0, FLOOR_T + INT_H / 2.0, WALL / 2.0),
                                                                      "solid"),
     ("rear cable slot  1",        (REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y[0], ZW),
                                                                      "void"),

@@ -23,25 +23,27 @@ the drive cage goes in and the order the internals have to be fitted.
 | | |
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
-| Body solid | valid ✓ closed ✓ **208.40 × 102.80 × 253.40 mm** (548,769 mm³) — compact 253.4 mm depth |
+| Body solid | valid ✓ closed ✓ **208.40 × 102.80 × 253.40 mm** (647,694 mm³) — uniform 205.6 mm width & compact 253.4 mm depth |
 | Lid solid | valid ✓ closed ✓ **211.70 × 13.00 × 92.20 mm** (65,739 mm³) — slide-and-click |
 | Strap solid | valid ✓ closed ✓ **69.20 × 10.00 × 14.00 mm** (4,267 mm³) — snap-fit |
-| **Enclosure footprint** | **Stepped width**: bay 155.6 mm W, plenum 205.6 mm W; **shorter 253.4 mm depth** |
-| **Cable clearance** | **27.5 mm lateral space** to the left of the backplane for side-facing 10-pin power plug & bend |
+| **Enclosure footprint** | **Uniform width**: 205.6 mm outer width throughout (bay & plenum), unbroken side walls; **253.4 mm depth** |
+| **Cage slide rails** | **Internal bottom slider rails (14 mm tall)** & **top guide ribs (5 mm tall)** with 1.5 mm lead-in chamfers |
+| **Cable clearance** | **27.1 mm lateral space** to the left of the cage for side-facing 10-pin power plug & Wago blocks |
 | **Lid retention** | **horizontal slide-and-click with compliant cantilever latch — 0 screws** |
 | **PSU retention** | **toolless snap-fit strap with dual undercut retention teeth — 0 screws** |
 | Body ↔ lid interference | **0.0000 mm³** (0.25 mm sliding clearance on 45° self-supporting rails) |
 | Body ↔ strap interference | **0.0000 mm³** (0.20 mm snap clearance) |
+| Cage slide path interference | **0.0000 mm³** (entrance to stop frame at Z = 162.0 mm) → CLEAR |
 | PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR (transverse cradle shifted right X=+40.0 mm) |
 | Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`, 310.6 × 253.4 mm layout) |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
 | **Fan housing** | **slides in from the top and needs no screws** — held 4 sides by the case, 5th by the lid |
 | All parts printable | **100% support-free in native print orientations** ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **56 probes, 0 failures** ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **63 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
 written by the build; `verify_step.py` re-reads the exported STEP and probes the
-body and the lid separately, with 56 probes confirming all geometries and clearances.
+body and the lid separately, with 63 probes confirming all geometries and clearances.
 
 ---
 
@@ -67,31 +69,30 @@ Nominal cage envelope used for the model: **145.0 × 87.0 × 165.0 mm (W × H ×
  +================================+======+==============+========+==========+=======+ y=102.8
  | ^                              | boot |  PicoPSU     | cable  |   fan    |grille | STEP
  | |                              |      |  transverse  | space  |  INSIDE  | O90   | UP
- | | HP cage sleeve, 155.6 mm W   |      |  X=+40 mm    |        |   92     | honey |
- | | (145.8 x 87.8 sleeve bore)   |      |              |        |   frame  | comb  |
- | |                              |      | [] |--board| |        |          |       |
- | |                              |      | [] | 44x31 | |        |  O86     |       |
+ | | UNIFORM WIDE BODY (205.6 mm) |      |  X=+40 mm    |        |   92     | honey |
+ | |                              |      |              |        |   frame  | comb  |
+ | | [bottom rails + top ribs]    |      | [] |--board| |        |          |       |
+ | |  capturing 145 mm cage       |      | [] | 44x31 | |        |  O86     |       |
  | | ### rear stop frame ###      |      |    |       | |        |  field   |       | y=0
  | v                              |      |    |-------| |        |          |       |
  +================================+======+==============+========+==========+=======+ y=94.6
+ <------------------------------ 205.6 mm UNIFORM OUTER WIDTH ---------------------->
                                   <--------- 80 plenum ----------> (rear face)
-                                  <--------- 205.6 mm wide ------>
    [] = strap bosses          all of the cradle and fan sits INSIDE the case
 ```
 
 ### Sections
 
-**Bay (z 0 → 165)** — a plain sleeve, internal **145.8 × 87.8 mm**, outer width 155.6 mm,
-outer height 94.6 mm. The front is fully open so standard HP 2.5" SFF caddies and their
-latch/eject levers slide straight in and out. A **3 mm deep internal stop frame**
-around the rear seats the cage; its inner aperture is 137.8 × 79.8 mm, with a clearance
-notch on the left edge ($X = -72.9 \to -68.9\text{ mm}$, $Y = 35 \to 85\text{ mm}$) to
-ensure zero interference with the protruding 10-pin backplane power connector.
+**Bay (z 0 → 165)** — uniform outer width **205.6 mm** (matching the plenum for a clean,
+monolithic profile with continuous side walls) and outer height 94.6 mm.
+- **Front aperture**: 145.8 × 87.8 mm framed by 29.9 mm solid front cheeks on each side. The HP 2.5" SFF caddies and latch/eject levers slide straight in through the aperture, seating flush against the front face and sealing the front so that 100% of the exhaust fan's suction is pulled through the drive bays without bypass.
+- **Internal slider rails**: 14 mm tall bottom guide rails on the floor and 5 mm tall ceiling ribs align and securely guide the 145 mm wide HP cage. A 1.5 mm 45° entry chamfer ensures the cage starts effortlessly.
+- **Left wiring chamber**: Between the floor rails and ceiling ribs, a full **27.1 mm lateral clearance** on the left ($X = -72.9 \to -100.0\text{ mm}$) provides open routing space for the backplane's side-facing 10-pin power plug and harness.
+- **Rear stop frame**: A 3 mm deep internal stop frame at $Z = 162 \to 165\text{ mm}$ sets the cage insertion depth; an inner aperture of 137.8 × 79.8 mm with a clearance notch on the left edge ($X = -72.9 \to -68.9\text{ mm}$, $Y = 35 \to 85\text{ mm}$) guarantees zero fouling with the backplane connectors.
 
-**Plenum (z 165 → 245)** — **80 mm deep and widened to 200 mm internal (205.6 mm outer)**.
-The wider plenum gives **27.5 mm of lateral clearance** to the left of the backplane PCB
-($X = -72.5\text{ mm}$ backplane edge vs $X = -100.0\text{ mm}$ inner wall), giving ample
-room to plug in the 10-pin connector and execute a smooth bend toward the Wago lever blocks.
+**Plenum (z 165 → 245)** — **80 mm deep and 200 mm internal (205.6 mm outer)**.
+The wide plenum gives **27.1 mm of lateral clearance** to the left of the backplane PCB,
+providing ample room to plug in the 10-pin connector and execute a smooth bend toward the Wago lever blocks.
 Laid out front to back:
 
 | Z | What |
@@ -295,7 +296,7 @@ interference (0.0000 mm³ → CLEAR).
 
 | Item | Qty | Notes |
 |---|---|---|
-| Printed body | 1 | ≈ 549 cm³ / ≈ 697 g at 1.27 g/cm³ (solid) |
+| Printed body | 1 | ≈ 648 cm³ / ≈ 823 g at 1.27 g/cm³ (solid) |
 | Printed lid (slide-and-click) | 1 | ≈ 66 cm³ / ≈ 83 g |
 | Printed PSU strap (snap-fit) | 1 | ≈ 4.3 cm³ / ≈ 5 g |
 | **ARCTIC P9 PWM PST 92 mm** | 1 | inside the plenum, exhaust; 106 g |
@@ -312,7 +313,7 @@ interference (0.0000 mm³ → CLEAR).
 ### Print settings & Kit
 
 PETG or ASA suggested (the plenum sees warm server air). 0.2 mm layers, 3–4 walls,
-4–5 top/bottom layers. Total printed mass is ≈ **589 g** (at 3 perimeters and 15% infill).
+4–5 top/bottom layers. Total printed mass is ≈ **684 g** (at 3 perimeters and 15% infill).
 **No supports needed for any part**:
 - The **body** prints upright on its base with the front opening facing up.
 - The **lid** prints top-plate face down on the bed with skirts pointing up; the 45° runner overhangs are self-supporting.

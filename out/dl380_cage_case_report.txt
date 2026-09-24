@@ -7,13 +7,19 @@
    sleeve bore             : 145.8 x 87.8 mm  (0.4 mm/side clearance)
 
  ENCLOSURE  (body)
-   outside W x H x D       : 151.4 (bay) / 205.6 (plenum) x 102.8 x 253.4 mm
-   bay section             : 151.4 (W) x 94.6 (H) x 165.0 (D) mm
+   outside W x H x D       : 205.6 (uniform) x 102.8 x 253.4 mm
+   bay section             : 205.6 (W) x 94.6 (H) x 165.0 (D) mm
    fan/plenum section      : 205.6 (W) x 102.8 (H) x 88.4 (D) mm
    top profile             : STEPPED - rear section is 8.2 mm taller than the bay (fan is inside)
    wall / floor / rear wall: 2.8 / 4.0 / 8.4 mm
    plenum clear depth      : 80.0 mm
    roof gussets            : 18.0 mm tall at 45 deg, carrying the lid rails
+
+ HP CAGE SLIDER RAILS & GUIDE RIBS  (internal)
+   bottom guide rails      : 14.0 mm tall x 4.0 mm thick on floor (Z 2.8..165.0)
+   top guide ribs          : 5.0 mm tall x 4.0 mm thick on roof (Z 2.8..165.0)
+   front mouth lead-in     : 1.5 mm 45 deg chamfer at entry (Z=2.8..5.8)
+   lateral wiring clearance: 23.1 mm open side chamber on left for 10-pin harness
 
  FAN  -  ARCTIC P9 PWM PST  (ACFAN00298A)
    nominal size            : 92 x 92 x 25 mm, 106 g
@@ -114,15 +120,15 @@
    body / strap fillet     : R1.4 on every outer edge
    lid fillet              : R1.0 (its plate is only 3.0 mm thick)
    filleted                : yes
-   material the rounds took : 940 mm3 off the bare shell
+   material the rounds took : 941 mm3 off the bare shell
    wall at the mouth corner : 1.00 mm  (2.8 wall - R1.4 - 0.4 lead-in)
    lead-in flare           : 0.8 mm total, down from 1.6 mm - the round
                              and the flare both cut the same 2.8 mm
                              front wall, so one had to give
 
  VOLUME / MASS
-   body   volume            :   548769.3 mm3  =  548.8 cm3
-   body   mass @1.27 g/cm3  :      697 g  (PETG, 100% infill equiv)
+   body   volume            :   647693.5 mm3  =  647.7 cm3
+   body   mass @1.27 g/cm3  :      823 g  (PETG, 100% infill equiv)
    lid    volume            :    65738.8 mm3  =   65.7 cm3
    lid    mass @1.27 g/cm3  :       83 g  (PETG, 100% infill equiv)
    strap  volume            :     4267.2 mm3  =    4.3 cm3
@@ -145,6 +151,8 @@
    PicoPSU phantom fit (board pushed to the rear of the cradle):
      board/body interference: 0.0000 mm3  -> CLEAR
      board front to backplane: 13.60 mm in the rearmost position
+   HP cage slide path (145.0 x 87.0 mm, entrance to stop frame at Z=162.0):
+     cage/body interference  : 0.0000 mm3  -> CLEAR
    slide rails on body     : length 86.9 mm (Z 166.5..253.4), height 95.4..100.6 mm
    front catch pocket      : 20.0 (W) x 2.6 (H) x 1.8 (D) mm at Z=165.0
    cable egress slots through the rear wall:
