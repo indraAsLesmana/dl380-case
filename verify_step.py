@@ -204,9 +204,10 @@ LID_CASES = [
     ("lip ends before the fan",   (0.0, REAR_H - 1.0, 230.0),        "void", 0.5),
     ("open over the fan",         (0.0, REAR_H - 1.0, FAN_Z0 + 10.0),
                                                                      "void", 0.5),
-    ("fan retainer fin",          (GUIDE_XC, LID_FIN_Y0 + 2.0, FAN_Z0 + 12.0),
-                                                                     "solid"),
-    ("clearance under the fin",   (GUIDE_XC, FAN_TOP - 1.0, FAN_Z0 + 12.0), "void"),
+    ("open underside over fan",   (GUIDE_XC, LID_FIN_Y0 + 2.0, FAN_Z0 + 12.0), "void"),
+    ("ring holder front rim",     (0.0, REAR_H + LID_T / 2.0, 142.0), "solid"),
+    ("ring holder finger hole",   (0.0, REAR_H + LID_T / 2.0, 152.6), "void"),
+    ("ring holder side web",      (9.5, REAR_H + LID_T / 2.0, 152.6), "solid"),
     ("latch snap tooth",          (0.0, RAIL_YC, Z_BAY + 0.6),       "solid", 0.4),
 ]
 

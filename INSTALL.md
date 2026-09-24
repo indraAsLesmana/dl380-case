@@ -280,12 +280,9 @@ cantilever latch. **100% screwless.**
    - -Z restrained by the front vertical step.
    - +Z restrained by the snap latch tooth.
 
-**To remove the lid:** Press the ergonomic thumb-release tab on the front face
-forward/up slightly to disengage the tooth from the catch pocket, and slide the
-lid backward (-Z).
+**To remove the lid:** Hook your index finger into the **front pull ring** (Ø14 mm hole at front center) and pull backward. The snap latch disengages and the lid glides open smoothly along the slide rails.
 
-**The lid is also the fan's fifth restraint.** Its two underside fins come down to
-1 mm above the fan's top edge — that is why the fan needs no screws.
+**Fan retention:** The fan is captured firmly on all four vertical corners by the body's full-height press-fit U-channel track and front retaining rails. The lid underside is flush, providing a smooth, clean ceiling over the plenum without internal fins.
 
 ---
 

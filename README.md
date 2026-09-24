@@ -24,28 +24,28 @@ the drive cage goes in and the order the internals have to be fitted.
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
 | Body solid | valid ✓ closed ✓ **208.40 × 102.80 × 253.40 mm** (572,008 mm³) — uniform 205.6 mm width & honeycomb net motif |
-| Lid solid | valid ✓ closed ✓ **211.70 × 13.00 × 92.20 mm** (65,739 mm³) — slide-and-click |
+| Lid solid | valid ✓ closed ✓ **211.70 × 13.00 × 112.80 mm** (65,819 mm³) — slide-and-click with front pull ring |
 | Strap solid | valid ✓ closed ✓ **69.20 × 10.00 × 14.00 mm** (4,267 mm³) — snap-fit |
 | **Enclosure footprint** | **Uniform width**: 205.6 mm outer width throughout (bay & plenum), unbroken side walls; **253.4 mm depth** |
 | **Drive bay net motif** | **258 hexagonal honeycomb cutouts (11 mm cell, 1.8 mm web)** on top, bottom, left & right walls — saves ~107 g solid (~80 g printed) |
 | **Cage slide rails** | **Internal bottom slider rails (14 mm tall)** & **top guide ribs (5 mm tall)** with 1.5 mm lead-in chamfers |
 | **Cable clearance** | **27.1 mm lateral space** to the left of the cage for side-facing 10-pin power plug & Wago blocks |
-| **Lid retention** | **horizontal slide-and-click with compliant cantilever latch — 0 screws** |
+| **Lid retention** | **horizontal slide-and-click with front pull ring holder & compliant latch — 0 screws** |
 | **PSU retention** | **toolless snap-fit strap with dual undercut retention teeth — 0 screws** |
 | **Fan housing** | **Full-height 86 mm U-channel with front retaining rails (25.10 mm track depth)** — snug press-fit feel with zero screws |
 | Body ↔ lid interference | **0.0000 mm³** (0.25 mm sliding clearance on 45° self-supporting rails) |
 | Body ↔ strap interference | **0.0000 mm³** (0.20 mm snap clearance) |
 | Cage slide path interference | **0.0000 mm³** (entrance to stop frame at Z = 162.0 mm) → CLEAR |
 | PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR (transverse cradle shifted right X=+40.0 mm) |
-| Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`, 310.6 × 253.4 mm layout) |
-| Estimated print cost | **Rp 366,911 (~Rp 367,000)** for total enclosure at Rp 600/g PETG (612 g printed / 815 g solid) |
+| Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`, 331.2 × 253.4 mm layout) |
+| Estimated print cost | **Rp 366,957 (~Rp 367,000)** for total enclosure at Rp 600/g PETG (612 g printed / 815 g solid) |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
 | All parts printable | **100% support-free in native print orientations** ✓ |
-| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **67 probes, 0 failures** ✓ |
+| **Re-probed on the exported STEP** | `freecadcmd verify_step.py` → **71 probes, 0 failures** ✓ |
 
 Reports: [`out/dl380_cage_case_report.txt`](out/dl380_cage_case_report.txt) is
 written by the build; `verify_step.py` re-reads the exported STEP and probes the
-body and the lid separately, with 67 probes confirming all geometries and clearances.
+body and the lid separately, with 71 probes confirming all geometries and clearances.
 
 ---
 
@@ -173,9 +173,10 @@ walls and clicks shut with a compliant snap latch.
 | Skirt runners | 45° inverted runner grooves inside the lid skirts with `0.25 mm` sliding clearance |
 | Snap latch | 18 mm compliant cantilever latch on the front face engaging a `20 × 2.6 × 1.8 mm` recessed catch pocket on the front vertical step |
 | Catch tooth | 1.2 mm ramped catch tooth (`LATCH_TOOTH_D = 1.2 mm`) with ergonomic thumb-release tab |
+| Pull ring holder | **Ø14 mm circular finger ring** (24 mm outer width, 22 mm projection) at front center for effortless removal |
 | Located by | 45° interlocking rails in X and Y, front vertical step in -Z, snap tooth in +Z |
-| Retained fan | dual underside fins reach down into the fan bay to hold the fan captive from above |
-| Removed by | pressing the thumb release tab forward/up and sliding the lid backward (-Z) |
+| Retained fan | fan captured on 4 sides by body U-channel; lid underside is flush over the fan with 4.0 mm clearance |
+| Removed by | hooking index finger into the front pull ring and sliding the lid backward |
 
 **100% screwless and toolless.** The interlocking 45° rails prevent the lid from lifting
 up (+Y) or pulling outward in ±X. The front vertical step stops it from sliding too far
@@ -327,9 +328,9 @@ With the drive bay honeycomb net motif, the enclosure saves **107 g of solid PET
 | Part | Volume (cm³) | Solid Mass (g) | Printed Mass (g) | Cost (Rp 600/g) |
 |---|---|---|---|---|
 | **Body** | 572.0 | 726 | 545 | Rp 326,902 |
-| **Lid** | 65.7 | 83 | 63 | Rp 37,570 |
+| **Lid** | 65.8 | 84 | 63 | Rp 37,615 |
 | **PSU Strap** | 4.3 | 5 | 4 | Rp 2,439 |
-| **TOTAL** | **642.0** | **815** | **612** | **Rp 366,911** (~Rp 367,000) |
+| **TOTAL** | **642.1** | **815** | **612** | **Rp 366,957** (~Rp 367,000) |
 
 **No supports needed for any part**:
 - The **body** prints upright on its base with the front opening facing up.
@@ -337,7 +338,7 @@ With the drive bay honeycomb net motif, the enclosure saves **107 g of solid PET
 - The **strap** prints flat on the bed.
 
 A pre-arranged print kit is provided in `print/`:
-- `print/dl380-case_all-parts.stl` / `.obj`: all 3 parts arranged on a single **310.6 × 253.4 mm plate** (fits within a 340 × 320 mm Bambu Lab build volume).
+- `print/dl380-case_all-parts.stl` / `.obj`: all 3 parts arranged on a single **331.2 × 253.4 mm plate** (fits within a 340 × 320 mm Bambu Lab build volume).
 - Individual STLs: `dl380-case_body.stl`, `dl380-case_lid.stl`, `dl380-case_psu-strap.stl`.
 
 ---
@@ -379,6 +380,7 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `SLIDE_CLEAR` | 0.25 | sliding clearance between body rails and lid runners |
 | `RAIL_W` / `RAIL_H` / `RAIL_YC` | 1.4 / 2.4 / 98.0 | 45° slide rail width, height, and Y centerline |
 | `LATCH_W` / `LATCH_TOOTH_H` / `LATCH_TOOTH_D` | 18.0 / 2.0 / 1.2 | snap latch width, tooth height, and undercut depth |
+| `LID_RING_W` / `LID_RING_LEN` / `LID_RING_HOLE` | 24.0 / 22.0 / 14.0 | front pull ring width, projection, and finger hole Ø |
 | `PSU_SNAP_CLEAR` / `PSU_LEG_T` / `PSU_TOOTH_W` | 0.2 / 2.0 / 0.8 | snap-fit strap clearance, leg thickness, and retention tooth |
 | `REAR_WALL_LAYERS` | 3 | rear wall in wall-units → 8.4 mm |
 | `GUSSET_H` | 18.0 | 45° roof gusset size (sets the service opening width) |
@@ -389,7 +391,6 @@ All at the top of `dl380_cage_case.py`. Nothing derived is hand-edited.
 | `FAN_GUIDE_CLEAR` | 0.15 | clearance per side in the fan housing |
 | `FAN_GUIDE_T` / `FAN_GUIDE_H` / `FAN_GUIDE_CHAM` | 3.0 / 86.0 / 2.5 | rail thickness, height, lead-in |
 | `FAN_FRONT_Z_IN` / `FAN_FRONT_X_IN` | 219.90 / 43.50 | front retaining rail boundary (25.10 mm track depth) |
-| `FAN_LID_GAP` | 1.0 | how far the lid's fin sits above the fan |
 | `NET_CELL` / `NET_WEB` | 11.0 / 1.8 | drive bay honeycomb net cell and web size |
 | `GRILLE_CELL` / `GRILLE_WEB` | 9.0 / 1.2 | rear exhaust grille honeycomb cell and web size |
 | `GRILLE_RIM` / `GRILLE_DEPTH` | 2.0 / 3.0 | solid rim, membrane thickness |

@@ -44,8 +44,7 @@
    forward (Z-)            : two tall front retaining rails (Z=217.0..219.9),
                              overlapping fan frame by 2.5 mm per side with 2.5 mm entry chamfer
    track depth (Z)         : 25.10 mm (for 25.0 mm fan frame) -> snug press-fit feel
-   up (Y+)                 : two fins on the lid's underside reach down to
-                             y=97.0, 1.0 mm above the frame's top edge
+   up (Y+)                 : closed by lid plate (4.0 mm headroom above frame)
    => restrained on all six sides: toolless slide-in, zero screws, rock solid
 
  DRIVE BAY NET MOTIF  (weight & cost reduction cutouts)
@@ -98,12 +97,12 @@
    guide rails             : 45 deg beveled slide rails on outer walls (Z 166.5..253.4)
                              glide clearance: 0.25 mm
    cantilever latch        : 18.0 mm wide spring arm with 1.2 mm catch tooth
-                             and ergonomic thumb release tab at front center
+   pull ring holder        : O14.0 mm finger hole at front center for effortless removal
    positive stop           : front face seats against 8.2 mm step at Z=165.0
    screws                  : 0 (100% toolless slide-and-click)
 
    FAN CABLE & RETENTION   - fan captive with no screws
-   retainer fins           : reach down to y=97.0, keeping fan seated in housing
+   fan underside clearance : flush lid underside, fan captured in body U-channel
    headroom over the frame : 4.0 mm (frame top y=96.0, ceiling y=100.0)
    skirt vs the case       : the skirt is outside the case, so it cannot
                              reach any cable that is inside
@@ -127,10 +126,10 @@
 
  VOLUME / MASS / PRICING @ Rp 600/g
    body   volume / solid / prn:   572.0 cm3 |   726 g (solid) |   545 g (printed) -> Rp    326902
-   lid    volume / solid / prn:    65.7 cm3 |    83 g (solid) |    63 g (printed) -> Rp     37570
+   lid    volume / solid / prn:    65.8 cm3 |    84 g (solid) |    63 g (printed) -> Rp     37615
    strap  volume / solid / prn:     4.3 cm3 |     5 g (solid) |     4 g (printed) -> Rp      2439
    ----------------------------------------------------------------------------------
-   TOTAL ENCLOSURE          :   642.0 cm3 |   815 g (solid) |   612 g (printed) -> Rp    366911
+   TOTAL ENCLOSURE          :   642.1 cm3 |   815 g (solid) |   612 g (printed) -> Rp    366957
 
  SANITY CHECKS
    body valid              : True
@@ -139,7 +138,7 @@
    body closed (solid)     : True
    strap closed (solid)    : True
    body bbox               : 208.40 x 102.80 x 253.40
-   lid  bbox               : 211.70 x 13.00 x 92.20
+   lid  bbox               : 211.70 x 13.00 x 112.80
    body/lid interference    : 0.0000 mm3
    body/strap interference  : 0.0000 mm3
    build volume (Bambu H2S 340x320x340):

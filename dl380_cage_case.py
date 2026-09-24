@@ -79,6 +79,9 @@ LATCH_W         = 18.0     # mm  width of the flexible cantilever snap arm
 LATCH_TOOTH_H   = 2.0      # mm  height of the snap tooth
 LATCH_TOOTH_D   = 1.2      # mm  protrusion of the snap tooth in +Z
 LATCH_RELIEF    = 1.2      # mm  width of relief slots on sides of latch arm
+LID_RING_W      = 24.0     # mm  outer width of front pull ring
+LID_RING_LEN    = 22.0     # mm  forward extension of pull ring in -Z
+LID_RING_HOLE   = 14.0     # mm  Ø of finger pull hole
 CATCH_POCKET_W  = 20.0     # mm  width of catch pocket in the body front step
 CATCH_POCKET_H  = 2.6      # mm  height of catch pocket
 CATCH_POCKET_D  = 1.8      # mm  depth of catch pocket in +Z
@@ -775,12 +778,29 @@ def build():
     tab_lip = box(LATCH_W, 2.4, 1.4, -LATCH_W / 2.0, LID_Y_FRONT_BOT, LID_Z0 - 1.4)
     lid = lid.fuse(tab_lip)
 
-    # 5. Fan retainer fins on the underside
-    for sx in (1, -1):
-        fx = GUIDE_X if sx > 0 else -GUIDE_XO
-        fin = box(FAN_GUIDE_T, REAR_H - LID_FIN_Y0, FAN_INSET - 0.5,
-                  fx, LID_FIN_Y0, FAN_Z0)
-        lid = lid.fuse(fin)
+    # 5. Front center pull ring holder for easy lid removal
+    z_center = LID_Z0 - LID_RING_LEN + LID_RING_W / 2.0
+    p_ring = [
+        ( -LID_RING_W / 2.0, LID_Z0),
+        ( -LID_RING_W / 2.0, z_center),
+    ]
+    for i in range(1, 16):
+        ang = math.pi + i * (math.pi / 16.0)
+        p_ring.append(((LID_RING_W / 2.0) * math.cos(ang), z_center + (LID_RING_W / 2.0) * math.sin(ang)))
+    p_ring.append((LID_RING_W / 2.0, z_center))
+    p_ring.append((LID_RING_W / 2.0, LID_Z0))
+
+    vecs = [Vector(p[0], REAR_H, p[1]) for p in p_ring]
+    poly = Part.makePolygon(vecs + [vecs[0]])
+    face = Part.Face(poly)
+    ring_solid = face.extrude(Vector(0, LID_T, 0))
+
+    hole = Part.makeCylinder(LID_RING_HOLE / 2.0, LID_T + 4.0,
+                             Vector(0, REAR_H - 2.0, z_center), Vector(0, 1, 0))
+    ring_solid = ring_solid.cut(hole)
+    lid = lid.fuse(ring_solid)
+
+    # Note: Underside fan retainer fins removed; fan is captive in body U-channel track.
 
     lid = _tidy(lid)
 
@@ -912,9 +932,8 @@ def report(body, lid, strap, log):
         % (FAN_HALF - FAN_FRONT_X_IN, FAN_FRONT_CHAM))
     add("   track depth (Z)         : %.2f mm (for 25.0 mm fan frame) -> snug press-fit feel"
         % (Z_RIN - FAN_FRONT_Z_IN))
-    add("   up (Y+)                 : two fins on the lid's underside reach down to")
-    add("                             y=%.1f, %.1f mm above the frame's top edge"
-        % (LID_FIN_Y0, FAN_LID_GAP))
+    add("   up (Y+)                 : closed by lid plate (%.1f mm headroom above frame)"
+        % (PLEN_Y1 - FAN_TOP))
     add("   => restrained on all six sides: toolless slide-in, zero screws, rock solid")
     add("")
     add(" DRIVE BAY NET MOTIF  (weight & cost reduction cutouts)")
@@ -995,12 +1014,13 @@ def report(body, lid, strap, log):
     add("                             glide clearance: %.2f mm" % SLIDE_CLEAR)
     add("   cantilever latch        : %.1f mm wide spring arm with %.1f mm catch tooth"
         % (LATCH_W, LATCH_TOOTH_D))
-    add("                             and ergonomic thumb release tab at front center")
+    add("   pull ring holder        : O%.1f mm finger hole at front center for effortless removal"
+        % LID_RING_HOLE)
     add("   positive stop           : front face seats against 8.2 mm step at Z=%.1f" % Z_BAY)
     add("   screws                  : 0 (100% toolless slide-and-click)")
     add("")
     add("   FAN CABLE & RETENTION   - fan captive with no screws")
-    add("   retainer fins           : reach down to y=%.1f, keeping fan seated in housing" % LID_FIN_Y0)
+    add("   fan underside clearance : flush lid underside, fan captured in body U-channel")
     add("   headroom over the frame : %.1f mm (frame top y=%.1f, ceiling y=%.1f)"
         % (PLEN_Y1 - FAN_TOP, FAN_TOP, PLEN_Y1))
     add("   skirt vs the case       : the skirt is outside the case, so it cannot")
