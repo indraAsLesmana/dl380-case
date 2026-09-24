@@ -66,7 +66,7 @@ GRILLE_POCKET_R = FAN_R + GRILLE_RIM                      # 45.0
 FILLET_R = 1.4
 GUSSET_H = 18.0
 SVC_HALF = PLEN_XI - GUSSET_H                             # 82.0
-REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y = -70.0, (33.0, 50.0)
+REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y =  70.0, (33.0, 50.0)
 REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H = 17.0, 12.0
 
 # PicoPSU cradle (transverse orientation, shifted right)
@@ -75,7 +75,7 @@ PSU_CLEAR, PSU_BOOT, PSU_PLINTH_T = 0.8, 12.0, 3.0
 PSU_WALL_H, PSU_FRONT_LIP = 24.0, 6.0
 PSU_BOSS_W, PSU_BOSS_L = 6.0, 14.0
 PSU_TOOTH_W = 0.8
-PSU_CX = 40.0
+PSU_CX = -40.0
 PSU_XH = (PSU_L + 2 * PSU_CLEAR) / 2.0                    # 22.8
 PSU_ZH = (PSU_W + 2 * PSU_CLEAR) / 2.0                    # 16.3
 PSU_Z0 = Z_BAY + PSU_BOOT                                 # 177.0
@@ -86,7 +86,7 @@ PSU_BOSS_X = PSU_XH + (WALL + PSU_BOSS_W) / 2.0           # 27.2
 PSU_BORE_Z = (PSU_Z0 + PSU_Z1) / 2.0                      # 193.3
 
 # DC input jack
-DC_JACK_X, DC_JACK_Y = 70.0, 52.0
+DC_JACK_X, DC_JACK_Y = -70.0, 52.0
 DC_JACK_DIA, DC_JACK_PAD, DC_JACK_DEPTH = 8.0, 16.0, 5.0
 
 # slide-and-click housing lid
@@ -141,7 +141,7 @@ CASES = [
     ("DC jack hole",              (DC_JACK_X, DC_JACK_Y, ZW),       "void"),
     ("DC jack counterbore",       (DC_JACK_X, DC_JACK_Y, Z_OUT - DC_JACK_DEPTH / 2.0),
                                                                      "void"),
-    ("rear wall beside jack",     (GRILLE_POCKET_R + 3.0, FAN_CY, ZW), "solid"),
+    ("rear wall beside jack",     (-(GRILLE_POCKET_R + 3.0), FAN_CY, ZW), "solid"),
     ("roof material  (gusset)",   (PLEN_XI - 1.5, PLEN_Y1 + 1.5, 200.0), "solid"),
     ("top service opening",       (0.0, REAR_H - 1.0, 200.0),       "void"),
     ("slide rail right",          (PLEN_XW + RAIL_W / 2.0, RAIL_YC, 200.0), "solid", 0.4),
@@ -174,7 +174,7 @@ CASES = [
     ("web between slots",         (REAR_CABLE_SLOT_X,
                                    (REAR_CABLE_SLOT_Y[0] + REAR_CABLE_SLOT_Y[1]) / 2.0,
                                    ZW),                              "solid"),
-    ("web slot <-> grille",       (-(GRILLE_POCKET_R + 3.0), FAN_CY, ZW), "solid"),
+    ("web slot <-> grille",       (GRILLE_POCKET_R + 3.0, FAN_CY, ZW), "solid"),
     ("rear stop frame rib",       (0.0, FLOOR_T + 2.0, Z_BAY - 1.5), "solid"),
     ("floor material",            (0.0, 2.0, 100.0),                 "solid"),
     ("rubber foot recess",        (61.0, 1.0, 14.0),                 "void"),

@@ -210,21 +210,20 @@ in — you need the cradle empty to get your hand in.
 
 ## Step 7 — wiring & Wago layout
 
-The HP DL380 G6/G7 backplane features a 10-pin power socket that faces directly to
-the **left (-X)**.
+The HP DL380 G6/G7 backplane features a 10-pin power socket that faces to the **bottom-right (+X)** when the cage is upright.
 
 **Plenum clearance**:
 - The plenum and bay are **200 mm wide internally (205.6 mm outside)**, providing **27.1 mm of
-  clearance** to the left of the cage and backplane PCB ($X = -72.9\text{ mm}$ to $-100.0\text{ mm}$).
-- An internal stop rib notch at $X = -72.9 \to -68.9\text{ mm}$ ($Y = 35 \to 85\text{ mm}$)
-  ensures the connector housing seats cleanly without obstruction.
-- The 10-pin cable plugs in from the left and bends backward into the plenum.
+  clearance** to the right of the cage and backplane PCB ($X = +72.9\text{ mm}$ to $+100.0\text{ mm}$).
+- An internal stop rib notch on the lower right at $X = +68.9 \to +72.9\text{ mm}$ ($Y = 4 \to 50\text{ mm}$)
+  ensures the connector housing seats cleanly without obstruction, while leaving the entire left stop rib solid.
+- The 10-pin cable plugs in from the right and bends backward into the plenum.
 
 **Wago lever block placement**:
-- The transverse PicoPSU cradle is shifted to the right ($X = +40.0\text{ mm}$),
-  leaving **117.2 mm of wide, open floor on the left (X = -100.0 to +17.2 mm)**.
+- The transverse PicoPSU cradle is shifted to the left ($X = -40.0\text{ mm}$),
+  leaving **117.2 mm of wide, open floor on the right (X = -17.2 to +100.0 mm)**.
 - Place three Wago 221 lever connectors (12 V, 5 V, Ground) on the open floor on the
-  left side.
+  right side.
 - Connect the 10-pin backplane power leads and PicoPSU outputs into the Wago blocks:
   - Yellow: 12 V (from PicoPSU 12 V rail & external DC input)
   - Red: 5 V (from PicoPSU 5 V rail)

@@ -137,19 +137,19 @@ GRILLE_DEPTH  =   3.0    # mm  membrane thickness the cells are punched through
 
 # ---- cable egress (rear wall, beside the grille pocket) ----------------------
 #  The SFF-8087 -> SFF-8088 leads leave through the BACK at X = -70.0.
-REAR_CABLE_SLOT_X = -70.0          # mm  slot centre X
+REAR_CABLE_SLOT_X =  70.0          # mm  slot centre X
 REAR_CABLE_SLOT_Y = (33.0, 50.0)   # mm  slot centre heights
 REAR_CABLE_SLOT_W =  17.0          # mm  slot width in X
 REAR_CABLE_SLOT_H =  12.0          # mm  slot height in Y
 
-# ---- PicoPSU cradle (transverse orientation, shifted right) ------------------
+# ---- PicoPSU cradle (transverse orientation, shifted left) -------------------
 #  mini-box picoPSU-120 measured 31 x 44 x 21 mm (1U), 57 g with its harness.
 #  Oriented transversely (44 mm across X, 31 mm along Z) to save depth, and
-#  shifted right to X = +40.0 mm to leave the left plenum wide open for the
+#  shifted left to X = -40.0 mm to leave the right plenum wide open for the
 #  backplane power harness and Wago 221 lever blocks.
 PSU_W, PSU_L, PSU_H = 31.0, 44.0, 21.0   # mm  board envelope (31 mm W along Z, 44 mm L across X)
 PSU_CLEAR     =   0.8    # mm  clearance per side in the cradle
-PSU_CX        =  40.0    # mm  cradle centre X (shifted to right)
+PSU_CX        = -40.0    # mm  cradle centre X (shifted to left)
 PSU_BOOT      =  12.0    # mm  gap between the backplane and the cradle mouth
 PSU_PLINTH_T  =   3.0    # mm  the board sits on this, off the floor
 PSU_WALL_H    =  24.0    # mm  cradle wall height above the floor
@@ -165,7 +165,7 @@ PSU_TOOTH_W   =   0.8    # mm  snap tooth undercut width
 PSU_TOOTH_H   =   1.6    # mm  snap tooth height
 
 # ---- DC input jack (rear wall) ----------------------------------------------
-DC_JACK_X     =  70.0    # mm  centre X (right of the grille; cables exit left)
+DC_JACK_X     = -70.0    # mm  centre X (left of the grille; cables exit right)
 DC_JACK_Y     =  52.0    # mm  centre Y
 DC_JACK_DIA   =   8.0    # mm  jack body hole
 DC_JACK_PAD   =  16.0    # mm  counterbore diameter in the outer face
@@ -268,7 +268,7 @@ PLEN_XI    = PLEN_INT_W / 2.0              # plenum inside half width (100.0 mm)
 PLEN_XW    = XW                            # plenum outside half width (102.8 mm)
 SVC_HALF   = PLEN_XI - GUSSET_H            # service opening half width (82.0 mm)
 
-# ---- PicoPSU cradle placement (transverse, shifted right) -------------------
+# ---- PicoPSU cradle placement (transverse, shifted left) --------------------
 PSU_XH      = (PSU_L + 2 * PSU_CLEAR) / 2.0    # cradle inner half width in X (22.8 mm)
 PSU_ZH      = (PSU_W + 2 * PSU_CLEAR) / 2.0    # cradle inner half length in Z (16.3 mm)
 PSU_Z0      = Z_BAY + PSU_BOOT                 # cradle mouth (177.0 mm)
@@ -549,10 +549,10 @@ def build():
                         STOP_RIB_D + 2.0,
                         -(XI - STOP_RIB_W), BAY_Y0 + STOP_RIB_W,
                         Z_BAY - STOP_RIB_D - 1.0))
-    #  Relief notch on the left stop rib: provides clear, direct clearance for
-    #  the side-facing 10-pin power port on the left edge of the HP backplane.
-    pwr_notch = box(STOP_RIB_W + 2.0, 50.0, STOP_RIB_D + 2.0,
-                    -XI - 1.0, 35.0, Z_BAY - STOP_RIB_D - 1.0)
+    #  Relief notch on the right stop rib: provides clear, direct clearance for
+    #  the side-facing 10-pin power port on the bottom-right edge of the upright HP backplane.
+    pwr_notch = box(STOP_RIB_W + 2.0, 46.0, STOP_RIB_D + 2.0,
+                    XI - STOP_RIB_W - 1.0, BAY_Y0 - 0.5, Z_BAY - STOP_RIB_D - 1.0)
     ring = ring.cut(pwr_notch)
     body = body.fuse(ring)
 
@@ -894,7 +894,7 @@ def report(body, lid, strap, log):
         % (CAGE_TOP_RIB_H, CAGE_TOP_RIB_W, WALL, Z_BAY))
     add("   front mouth lead-in     : 1.5 mm 45 deg chamfer at entry (Z=%.1f..%.1f)"
         % (WALL, WALL + 3.0))
-    add("   lateral wiring clearance: %.1f mm open side chamber on left for 10-pin harness"
+    add("   lateral wiring clearance: %.1f mm open side chamber on right for 10-pin harness"
         % (PLEN_XI - XI - CAGE_RAIL_W))
     add("")
     add(" FAN  -  %s" % FAN_MODEL)
@@ -954,7 +954,7 @@ def report(body, lid, strap, log):
     add("   tightest edge margin    : %.2f mm (pocket to the top edge)"
         % (REAR_H - FAN_CY - GRILLE_POCKET_R))
     add("")
-    add(" PicoPSU CRADLE  (transverse, shifted right X=%+.1f mm)"
+    add(" PicoPSU CRADLE  (transverse, shifted left X=%+.1f mm)"
         % PSU_CX)
     add("   board                   : %.1f (L, across X) x %.1f (W, along Z) x %.1f (H) mm"
         % (PSU_L, PSU_W, PSU_H))
@@ -965,8 +965,8 @@ def report(body, lid, strap, log):
     add("   backplane clearance     : %.1f mm from the cradle mouth to the"
         % PSU_BOOT)
     add("                             backplane face - the board cannot reach it")
-    add("   lateral clearance       : %.1f mm open plenum floor on left (X=%.1f..%.1f)"
-        % (PSU_CX - PSU_XH - (-PLEN_XI), -PLEN_XI, PSU_CX - PSU_XH))
+    add("   lateral clearance       : %.1f mm open plenum floor on right (X=%.1f..%.1f)"
+        % (PLEN_XI - (PSU_CX + PSU_XH), PSU_CX + PSU_XH, PLEN_XI))
     add("                             for backplane power cable and Wago 221 lever blocks")
     add("   plinth                  : %.1f mm, board sits clear of the floor"
         % PSU_PLINTH_T)

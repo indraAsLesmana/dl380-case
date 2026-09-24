@@ -19,7 +19,7 @@
    bottom guide rails      : 14.0 mm tall x 4.0 mm thick on floor (Z 2.8..165.0)
    top guide ribs          : 5.0 mm tall x 4.0 mm thick on roof (Z 2.8..165.0)
    front mouth lead-in     : 1.5 mm 45 deg chamfer at entry (Z=2.8..5.8)
-   lateral wiring clearance: 23.1 mm open side chamber on left for 10-pin harness
+   lateral wiring clearance: 23.1 mm open side chamber on right for 10-pin harness
 
  FAN  -  ARCTIC P9 PWM PST  (ACFAN00298A)
    nominal size            : 92 x 92 x 25 mm, 106 g
@@ -61,13 +61,13 @@
    open fraction of field  : 78%
    tightest edge margin    : 7.80 mm (pocket to the top edge)
 
- PicoPSU CRADLE  (transverse, shifted right X=+40.0 mm)
+ PicoPSU CRADLE  (transverse, shifted left X=-40.0 mm)
    board                   : 44.0 (L, across X) x 31.0 (W, along Z) x 21.0 (H) mm
    cradle inner            : 45.6 x 32.6 mm, 0.8 mm clearance per side
    cradle Z                : 177.0 .. 209.6  (mouth to rear wall)
    backplane clearance     : 12.0 mm from the cradle mouth to the
                              backplane face - the board cannot reach it
-   lateral clearance       : 117.2 mm open plenum floor on left (X=-100.0..17.2)
+   lateral clearance       : 117.2 mm open plenum floor on right (X=-17.2..100.0)
                              for backplane power cable and Wago 221 lever blocks
    plinth                  : 3.0 mm, board sits clear of the floor
    front lip               : 6.0 mm tall (3.0 mm above the plinth),
@@ -77,15 +77,15 @@
                              0.4 mm gap over the board top
 
  DC INPUT JACK  (rear wall)
-   centre                  : (+70.0, 52.0)
+   centre                  : (-70.0, 52.0)
    panel counterbore       : O16.0 x 5.0 mm deep, leaving a 3.4 mm
                              thick panel for the jack nut
    jack hole               : O8.0 through
-   edge margin             : 24.80 mm outboard
+   edge margin             : 164.80 mm outboard
 
  CABLE EGRESS  (rear wall, beside the grille)
    2 slots                : 17.0 (X) x 12.0 (Y) mm, rounded corners
-   centres                 : X=-70.0   Y = 33.0, 50.0
+   centres                 : X=+70.0   Y = 33.0, 50.0
    fitted SFF-8088 lead    : ~12.5 x 8 mm, so 4.5 x 4.0 mm of slack
    clearance to the grille : 16.50 mm (slot corner to the pocket)
    clearance to the edge   : 24.30 mm outboard
@@ -125,11 +125,11 @@
                              front wall, so one had to give
 
  VOLUME / MASS / PRICING @ Rp 600/g
-   body   volume / solid / prn:   572.0 cm3 |   726 g (solid) |   545 g (printed) -> Rp    326902
+   body   volume / solid / prn:   572.0 cm3 |   727 g (solid) |   545 g (printed) -> Rp    326926
    lid    volume / solid / prn:    65.8 cm3 |    84 g (solid) |    63 g (printed) -> Rp     37615
    strap  volume / solid / prn:     4.3 cm3 |     5 g (solid) |     4 g (printed) -> Rp      2439
    ----------------------------------------------------------------------------------
-   TOTAL ENCLOSURE          :   642.1 cm3 |   815 g (solid) |   612 g (printed) -> Rp    366957
+   TOTAL ENCLOSURE          :   642.1 cm3 |   816 g (solid) |   612 g (printed) -> Rp    366981
 
  SANITY CHECKS
    body valid              : True
@@ -153,8 +153,8 @@
    slide rails on body     : length 86.9 mm (Z 166.5..253.4), height 95.4..100.6 mm
    front catch pocket      : 20.0 (W) x 2.6 (H) x 1.8 (D) mm at Z=165.0
    cable egress slots through the rear wall:
-     X= -70.0 Y= 33.0 : 0% inside solid  -> CLEAR
-     X= -70.0 Y= 50.0 : 0% inside solid  -> CLEAR
+     X= +70.0 Y= 33.0 : 0% inside solid  -> CLEAR
+     X= +70.0 Y= 50.0 : 0% inside solid  -> CLEAR
 
  NOTES
    * The 92 mm fan frame is taller than the 87.8 mm bay bore, so the

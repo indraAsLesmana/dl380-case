@@ -3,11 +3,11 @@ DL380 drive-cage enclosure - print kit
 
 part             volume    solid   printed  cost @ 600/g                bbox (mm) triangles
 --------------------------------------------------------------------------------------------
-body           572.0 cm3    726 g     545 g  Rp    326.902   208.4 x  253.4 x 102.8     31512
+body           572.0 cm3    727 g     545 g  Rp    326.926   208.4 x  253.4 x 102.8     31506
 lid             65.8 cm3     84 g      63 g  Rp     37.615   112.8 x  211.7 x  13.0       736
 psu-strap        4.3 cm3      5 g       4 g  Rp      2.439    69.2 x   14.0 x  10.0        44
 --------------------------------------------------------------------------------------------
-TOTAL          642.1 cm3    815 g     612 g  Rp    366.957
+TOTAL          642.1 cm3    816 g     612 g  Rp    366.981
 
 The combined file lays all three out in 331.2 x 253.4 x 102.8 mm - fits a 340 x 320 plate.
 
@@ -49,8 +49,8 @@ SUGGESTED SETTINGS
                     three 0.4 mm lines, and a bigger nozzle would close them up.
 
 WEIGHT AND COST  (PETG at 1.27 g/cm3)
-  Solid (100% infill, upper bound)  :   815 g   Rp 489.275
-  Printed (3 perimeters, 15% infill):   612 g   Rp 366.957
+  Solid (100% infill, upper bound)  :   816 g   Rp 489.307
+  Printed (3 perimeters, 15% infill):   612 g   Rp 366.981
 
   Please quote from your own slice of these files.  The solid figure is the CAD
   volume and is the absolute ceiling; the printed figure assumes 3 perimeters and

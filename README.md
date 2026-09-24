@@ -36,7 +36,7 @@ the drive cage goes in and the order the internals have to be fitted.
 | Body ↔ lid interference | **0.0000 mm³** (0.25 mm sliding clearance on 45° self-supporting rails) |
 | Body ↔ strap interference | **0.0000 mm³** (0.20 mm snap clearance) |
 | Cage slide path interference | **0.0000 mm³** (entrance to stop frame at Z = 162.0 mm) → CLEAR |
-| PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR (transverse cradle shifted right X=+40.0 mm) |
+| PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR (transverse cradle shifted left X=-40.0 mm) |
 | Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`, 331.2 × 253.4 mm layout) |
 | Estimated print cost | **Rp 366,957 (~Rp 367,000)** for total enclosure at Rp 600/g PETG (612 g printed / 815 g solid) |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
@@ -89,23 +89,23 @@ Nominal cage envelope used for the model: **145.0 × 87.0 × 165.0 mm (W × H ×
 monolithic profile with continuous side walls) and outer height 94.6 mm.
 - **Front aperture**: 145.8 × 87.8 mm framed by 29.9 mm solid front cheeks on each side. The HP 2.5" SFF caddies and latch/eject levers slide straight in through the aperture, seating flush against the front face and sealing the front so that 100% of the exhaust fan's suction is pulled through the drive bays without bypass.
 - **Internal slider rails**: 14 mm tall bottom guide rails on the floor and 5 mm tall ceiling ribs align and securely guide the 145 mm wide HP cage. A 1.5 mm 45° entry chamfer ensures the cage starts effortlessly.
-- **Left wiring chamber**: Between the floor rails and ceiling ribs, a full **27.1 mm lateral clearance** on the left ($X = -72.9 \to -100.0\text{ mm}$) provides open routing space for the backplane's side-facing 10-pin power plug and harness.
-- **Rear stop frame**: A 3 mm deep internal stop frame at $Z = 162 \to 165\text{ mm}$ sets the cage insertion depth; an inner aperture of 137.8 × 79.8 mm with a clearance notch on the left edge ($X = -72.9 \to -68.9\text{ mm}$, $Y = 35 \to 85\text{ mm}$) guarantees zero fouling with the backplane connectors.
+- **Right wiring chamber**: Between the floor rails and ceiling ribs, a full **27.1 mm lateral clearance** on the right ($X = +72.9 \to +100.0\text{ mm}$) provides open routing space for the backplane's side-facing 10-pin power plug and harness.
+- **Rear stop frame**: A 3 mm deep internal stop frame at $Z = 162 \to 165\text{ mm}$ sets the cage insertion depth; an inner aperture of 137.8 × 79.8 mm with a clearance notch on the lower-right edge ($X = +68.9 \to +72.9\text{ mm}$, $Y = 4 \to 50\text{ mm}$) guarantees zero fouling with the bottom-right backplane power port while leaving the left pillar solid from top to bottom.
 
 **Plenum (z 165 → 245)** — **80 mm deep and 200 mm internal (205.6 mm outer)**.
-The wide plenum gives **27.1 mm of lateral clearance** to the left of the backplane PCB,
-providing ample room to plug in the 10-pin connector and execute a smooth bend toward the Wago lever blocks.
+The wide plenum gives **27.1 mm of lateral clearance** to the right of the backplane PCB,
+providing ample room to plug in the 10-pin connector on the bottom right and execute a smooth bend toward the Wago lever blocks.
 Laid out front to back:
 
 | Z | What |
 |---|---|
 | 165 → 177 | 12 mm of clear boot space behind the backplane |
-| 177 → 209.6 | the transverse PicoPSU cradle (shifted right to X = +40.0 mm) |
+| 177 → 209.6 | the transverse PicoPSU cradle (shifted left to X = -40.0 mm) |
 | 209.6 → 220 | 10.4 mm cable routing lane between cradle and fan |
 | 220 → 245 | the fan, in its drop-in slot against the inside of the rear wall |
 
-Shifting the PicoPSU to the right leaves a massive **117.2 mm of unobstructed plenum floor
-on the left (X = -100.0 to +17.2 mm)** for the backplane power harness and three Wago 221
+Shifting the PicoPSU to the left leaves a massive **117.2 mm of unobstructed plenum floor
+on the right (X = -17.2 to +100.0 mm)** for the backplane power harness and three Wago 221
 lever blocks.
 
 **Fan — full-height U-channel housing with front retaining rails (snug press-fit feel).**
