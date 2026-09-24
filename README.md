@@ -23,15 +23,17 @@ the drive cage goes in and the order the internals have to be fitted.
 | | |
 |---|---|
 | Shell | `freecadcmd dl380_cage_case.py` builds and exports clean, no errors |
-| Body solid | valid ✓ closed ✓ **154.20 × 102.80 × 281.40 mm** (532,645 mm³) |
-| Lid solid | valid ✓ closed ✓ **157.50 × 13.00 × 120.20 mm** (64,603 mm³) — slide-and-click |
-| Strap solid | valid ✓ closed ✓ **56.20 × 10.00 × 20.00 mm** (5,032 mm³) — snap-fit |
+| Body solid | valid ✓ closed ✓ **208.40 × 102.80 × 253.40 mm** (548,769 mm³) — compact 253.4 mm depth |
+| Lid solid | valid ✓ closed ✓ **211.70 × 13.00 × 92.20 mm** (65,739 mm³) — slide-and-click |
+| Strap solid | valid ✓ closed ✓ **69.20 × 10.00 × 14.00 mm** (4,267 mm³) — snap-fit |
+| **Enclosure footprint** | **Stepped width**: bay 155.6 mm W, plenum 205.6 mm W; **shorter 253.4 mm depth** |
+| **Cable clearance** | **27.5 mm lateral space** to the left of the backplane for side-facing 10-pin power plug & bend |
 | **Lid retention** | **horizontal slide-and-click with compliant cantilever latch — 0 screws** |
 | **PSU retention** | **toolless snap-fit strap with dual undercut retention teeth — 0 screws** |
 | Body ↔ lid interference | **0.0000 mm³** (0.25 mm sliding clearance on 45° self-supporting rails) |
 | Body ↔ strap interference | **0.0000 mm³** (0.20 mm snap clearance) |
-| PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR |
-| Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`) |
+| PicoPSU phantom fit in the cradle | 0.0000 mm³ interference → CLEAR (transverse cradle shifted right X=+40.0 mm) |
+| Build volume (Bambu Lab H2S / X1C) | **all parts fit on single 340×320 mm plate** (`print/dl380-case_all-parts.stl`, 310.6 × 253.4 mm layout) |
 | Edge treatment | **every outer edge rounded** — body R1.4, lid R1.0, strap R1.4 |
 | **Fan housing** | **slides in from the top and needs no screws** — held 4 sides by the case, 5th by the lid |
 | All parts printable | **100% support-free in native print orientations** ✓ |
@@ -51,7 +53,7 @@ The cage this was designed around, photographed on the bench:
 |---|---|
 | ![side](docs/reference/cage-side-mounting.png) | Stamped steel cage, side/top mounting holes |
 | ![front](docs/reference/cage-front-bezel.png) | Black plastic front bezel, 8 × 2.5" caddy slots |
-| ![backplane](docs/reference/cage-rear-backplane.png) | Backplane PCBs and the top mounting rail |
+| ![backplane](docs/reference/cage-rear-backplane.png) | Backplane PCBs, left-facing 10-pin power socket, and top mounting rail |
 
 Nominal cage envelope used for the model: **145.0 × 87.0 × 165.0 mm (W × H × D)**.
 
@@ -60,37 +62,48 @@ Nominal cage envelope used for the model: **145.0 × 87.0 × 165.0 mm (W × H ×
 ## Design
 
 ```
- z=0                                                        z=281.4
- | <---------- 165 bay ---------->|<-20->|<--- cradle --->|<-25 fan->|<-8.4->|
- +================================+======+=================+==========+=======+ y=102.8
- | ^                              | boot |  PicoPSU cradle |   fan    |grille | STEP
- | |                              |      |  strap over it  |  INSIDE  | O90   | UP
- | | HP cage sleeve, wide open    |      |                 |   92     | honey |
- | | 145.8 x 87.8 (+0.4/side)     |      | [] |--board--|  |   frame  | comb  |
- | |                              |      | [] |         |  |          |       |
- | | ### rear stop frame ###       |      |    |         |  |  O86     |       |
- | v                              |      |    |-cables->|  |  field   |       | y=0
- +================================+======+=================+==========+=======+ y=94.6
-                                  <--------- 108 plenum ----------> (rear face)
+ z=0                                                               z=253.4
+ | <---------- 165 bay ---------->|<-12->|<-- cradle -->|<-10.4->|<-25 fan->|<-8.4->|
+ +================================+======+==============+========+==========+=======+ y=102.8
+ | ^                              | boot |  PicoPSU     | cable  |   fan    |grille | STEP
+ | |                              |      |  transverse  | space  |  INSIDE  | O90   | UP
+ | | HP cage sleeve, 155.6 mm W   |      |  X=+40 mm    |        |   92     | honey |
+ | | (145.8 x 87.8 sleeve bore)   |      |              |        |   frame  | comb  |
+ | |                              |      | [] |--board| |        |          |       |
+ | |                              |      | [] | 44x31 | |        |  O86     |       |
+ | | ### rear stop frame ###      |      |    |       | |        |  field   |       | y=0
+ | v                              |      |    |-------| |        |          |       |
+ +================================+======+==============+========+==========+=======+ y=94.6
+                                  <--------- 80 plenum ----------> (rear face)
+                                  <--------- 205.6 mm wide ------>
    [] = strap bosses          all of the cradle and fan sits INSIDE the case
 ```
 
 ### Sections
 
-**Bay (z 0 → 165)** — a plain sleeve, internal **145.8 × 87.8 mm**, outer height
-94.6 mm. The front is fully open so standard HP 2.5" SFF caddies and their
+**Bay (z 0 → 165)** — a plain sleeve, internal **145.8 × 87.8 mm**, outer width 155.6 mm,
+outer height 94.6 mm. The front is fully open so standard HP 2.5" SFF caddies and their
 latch/eject levers slide straight in and out. A **3 mm deep internal stop frame**
-around the rear seats the cage; its inner aperture is 137.8 × 79.8 mm, so it stops
-the cage without choking the airflow path through the backplane.
+around the rear seats the cage; its inner aperture is 137.8 × 79.8 mm, with a clearance
+notch on the left edge ($X = -72.9 \to -68.9\text{ mm}$, $Y = 35 \to 85\text{ mm}$) to
+ensure zero interference with the protruding 10-pin backplane power connector.
 
-**Plenum (z 165 → 273)** — 108 mm deep, laid out front to back:
+**Plenum (z 165 → 245)** — **80 mm deep and widened to 200 mm internal (205.6 mm outer)**.
+The wider plenum gives **27.5 mm of lateral clearance** to the left of the backplane PCB
+($X = -72.5\text{ mm}$ backplane edge vs $X = -100.0\text{ mm}$ inner wall), giving ample
+room to plug in the 10-pin connector and execute a smooth bend toward the Wago lever blocks.
+Laid out front to back:
 
 | Z | What |
 |---|---|
-| 165 → 185 | 20 mm of cable boot space behind the backplane |
-| 185 → 233.4 | the PicoPSU cradle |
-| 233.4 → 248 | cable routing |
-| 248 → 273 | the fan, against the inside of the rear wall |
+| 165 → 177 | 12 mm of clear boot space behind the backplane |
+| 177 → 209.6 | the transverse PicoPSU cradle (shifted right to X = +40.0 mm) |
+| 209.6 → 220 | 10.4 mm cable routing lane between cradle and fan |
+| 220 → 245 | the fan, in its drop-in slot against the inside of the rear wall |
+
+Shifting the PicoPSU to the right leaves a massive **117.2 mm of unobstructed plenum floor
+on the left (X = -100.0 to +17.2 mm)** for the backplane power harness and three Wago 221
+lever blocks.
 
 **Fan — its own housing, and it needs no screws.** The ARCTIC P9 **slides straight
 down into a slot** from the top and seats on the plenum floor, exhausting straight
@@ -99,7 +112,7 @@ protected.
 
 | | |
 |---|---|
-| Slot | Z 248 → 273, straight down from above |
+| Slot | Z 220 → 245, straight down from above |
 | Seat | the plenum floor — this sets the height, so the screw holes still line up |
 | Sides | two guide rails, 42 mm up from the floor, 0.2 mm clearance per side, 1.8 mm lead-in chamfer at the top |
 | Behind | the rear wall / grille face |
@@ -126,20 +139,19 @@ a Ø90 × 5.4 mm counterbore in the outer face, not through the full 8.4 mm wall
 it costs little airflow and the wall stays stiff enough to carry the fan inserts.
 55 flat-top hexagonal cells, 9 mm across flats with 1.2 mm webs, **78 % open** across
 the field. The cell field is inset from the pocket wall so no cell can break out of
-it; the tightest edge margin, pocket to case edge, is **5.8 mm**.
+it; the tightest edge margin, pocket to case top edge, is **7.80 mm**.
 
-**Rear wall (z 273 → 281.4)** — **8.4 mm** thick (3 × wall). Carries the grille, the
+**Rear wall (z 245 → 253.4)** — **8.4 mm** thick (3 × wall). Carries the grille, the
 four fan mounting holes, two cable slots and the DC jack.
 
-**Cable egress — out of the back.** Two 17 × 12 mm rounded slots at X = −60,
+**Cable egress — out of the back.** Two 17 × 12 mm rounded slots at X = −70,
 Y = 33 and 50 take the two SFF-8087 → SFF-8088 leads. Separate slots so each cable
 keeps its own strain relief instead of two cables sawing against each other in one
-hole. 6.54 mm from the slot corners to the grille pocket, 7.20 mm outboard.
+hole. 16.50 mm from the slot corners to the grille pocket, 24.30 mm outboard.
 
 **DC input jack** — Ø8 through, counterbored Ø16 × 5 mm on the outer face at
-(+60, 52). The counterbore matters: it leaves a **3.4 mm panel** for the jack's nut
-instead of the full 8.4 mm wall, which is thicker than most panel-mount 5.5 × 2.5 mm
-barrel jacks will clamp.
+(+70, 52). The counterbore leaves a **3.4 mm panel** for the jack's nut
+instead of the full 8.4 mm wall. 24.80 mm outboard margin.
 
 **PicoPSU cradle** — see below.
 
@@ -227,12 +239,12 @@ reseller listing.
 
 | | |
 |---|---|
-| Bore it sits in | 145.8 × 96.0 × 108 mm |
+| Bore it sits in | 200.0 × 96.0 × 80.0 mm |
 | Frame clearance | 2.0 mm on every side |
-| Fan position | Z 248 → 273, flat against the rear wall |
+| Fan position | Z 220 → 245, flat against the rear wall |
 | Grille field | Ø90 pocket, Ø~86 of actual honeycomb |
 | Mounting holes | Ø4.2 at (±41.25, 50 ± 41.25) — optional, the housing holds it |
-| Housing | slot at Z 248→273, 0.2 mm per side, lid fins 1 mm above the frame top |
+| Housing | slot at Z 220→245, 0.2 mm per side, lid fins 1 mm above the frame top |
 
 **Mounting** — with the housing, mounting is just "lower it in". The four M3 × 30
 positions are still cut into the rear wall (heat-set inserts pressed in from the
@@ -250,22 +262,19 @@ Route the lead forward along the plenum and tuck it down before the lid goes on.
 Sized from mini-box's own figures for the **picoPSU-120: 31 × 44 × 21 mm (1U)**,
 57 g with its harness, DC input a 5.5 × 2.5 × 10 mm barrel.
 
-The board sits on the plenum floor behind the backplane, and the whole point of the
-cradle is that it **cannot reach the backplane**:
+The board is **oriented transversely (44 mm across X, 31 mm along Z)** and shifted
+right to **X = +40.0 mm** on the plenum floor. This leaves **117.2 mm of unobstructed
+plenum floor on the left (X = -100.0 to +17.2 mm)** for the backplane power harness and
+Wago 221 lever blocks.
 
 | | |
 |---|---|
-| Cradle bore | 32.6 × 45.6 mm (0.8 mm clearance per side) |
-| Cradle Z | 185 → 230.6 mm |
-| Mouth to backplane face | **20 mm** — board stops 21.6 mm short even fully forward |
+| Cradle bore | 45.6 (across X) × 32.6 (along Z) mm (0.8 mm clearance per side) |
+| Cradle Z | 177.0 → 209.6 mm |
+| Mouth to backplane face | **12 mm** — board stops 13.6 mm short even fully forward |
 | Plinth | 3 mm, so the solder side never touches the floor |
 | Front lip | 6 mm tall (3 mm above the plinth) — stops it sliding forward |
-| Cradle bore | 32.6 × 45.6 mm (0.8 mm clearance per side) |
-| Cradle Z | 185 → 230.6 mm |
-| Mouth to backplane face | **20 mm** — board stops 21.6 mm short even fully forward |
-| Plinth | 3 mm, so the solder side never touches the floor |
-| Front lip | 6 mm tall (3 mm above the plinth) — stops it sliding forward |
-| Retaining strap | 56.2 × 10 × 20 mm snap-fit strap with dual undercut teeth |
+| Retaining strap | 67.2 × 4 × 14 mm snap-fit strap with dual undercut teeth |
 | Retention ledges | 0.8 mm retention ridges on the corner bosses — **no screws, no inserts** |
 
 The build runs a **phantom PicoPSU box** through the cradle and reports the
@@ -286,9 +295,9 @@ interference (0.0000 mm³ → CLEAR).
 
 | Item | Qty | Notes |
 |---|---|---|
-| Printed body | 1 | ≈ 533 cm³ / ≈ 676 g at 1.27 g/cm³ |
-| Printed lid (slide-and-click) | 1 | ≈ 65 cm³ / ≈ 82 g |
-| Printed PSU strap (snap-fit) | 1 | ≈ 5 cm³ / ≈ 6.4 g |
+| Printed body | 1 | ≈ 549 cm³ / ≈ 697 g at 1.27 g/cm³ (solid) |
+| Printed lid (slide-and-click) | 1 | ≈ 66 cm³ / ≈ 83 g |
+| Printed PSU strap (snap-fit) | 1 | ≈ 4.3 cm³ / ≈ 5 g |
 | **ARCTIC P9 PWM PST 92 mm** | 1 | inside the plenum, exhaust; 106 g |
 | **PicoPSU-120** (or similar) | 1 | 31 × 44 × 21 mm; add a 12 V brick + panel DC jack |
 | Panel-mount 5.5 × 2.5 mm DC jack | 1 | Ø8 body, ≤ 3.4 mm panel |
@@ -303,13 +312,14 @@ interference (0.0000 mm³ → CLEAR).
 ### Print settings & Kit
 
 PETG or ASA suggested (the plenum sees warm server air). 0.2 mm layers, 3–4 walls,
-4–5 top/bottom layers. **No supports needed for any part**:
+4–5 top/bottom layers. Total printed mass is ≈ **589 g** (at 3 perimeters and 15% infill).
+**No supports needed for any part**:
 - The **body** prints upright on its base with the front opening facing up.
 - The **lid** prints top-plate face down on the bed with skirts pointing up; the 45° runner overhangs are self-supporting.
 - The **strap** prints flat on the bed.
 
 A pre-arranged print kit is provided in `print/`:
-- `print/dl380-case_all-parts.stl` / `.obj`: all 3 parts arranged on a single **321.7 × 281.4 mm plate** (fits within a 340 × 320 mm Bambu Lab build volume).
+- `print/dl380-case_all-parts.stl` / `.obj`: all 3 parts arranged on a single **310.6 × 253.4 mm plate** (fits within a 340 × 320 mm Bambu Lab build volume).
 - Individual STLs: `dl380-case_body.stl`, `dl380-case_lid.stl`, `dl380-case_psu-strap.stl`.
 
 ---

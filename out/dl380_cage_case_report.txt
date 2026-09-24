@@ -7,20 +7,20 @@
    sleeve bore             : 145.8 x 87.8 mm  (0.4 mm/side clearance)
 
  ENCLOSURE  (body)
-   outside W x H x D       : 151.4 x 102.8 x 281.4 mm
+   outside W x H x D       : 151.4 (bay) / 205.6 (plenum) x 102.8 x 253.4 mm
    bay section             : 151.4 (W) x 94.6 (H) x 165.0 (D) mm
-   fan/plenum section      : 151.4 (W) x 102.8 (H) x 116.4 (D) mm
+   fan/plenum section      : 205.6 (W) x 102.8 (H) x 88.4 (D) mm
    top profile             : STEPPED - rear section is 8.2 mm taller than the bay (fan is inside)
    wall / floor / rear wall: 2.8 / 4.0 / 8.4 mm
-   plenum clear depth      : 108.0 mm
-   roof gussets            : 18.0 mm tall at 45 deg, carrying the lid screws
+   plenum clear depth      : 80.0 mm
+   roof gussets            : 18.0 mm tall at 45 deg, carrying the lid rails
 
  FAN  -  ARCTIC P9 PWM PST  (ACFAN00298A)
    nominal size            : 92 x 92 x 25 mm, 106 g
    P9 PWM PST rating       : 200-3000 rpm PWM (0 rpm below 5%),
                              38.83 cfm | 65.97 m3/h, 3.12 mmH2O static,
                              0.12 A @ 12 V = 1.44 W, fluid dynamic bearing
-   position                : in a slot against the rear wall, Z 248.0..273.0,
+   position                : in a slot against the rear wall, Z 220.0..245.0,
                              seated on the plenum floor
    fan axis                : (0, 50.0) - the frame sits ON the floor at
                              y=4.0, so the axis is 2.0 mm below the
@@ -29,7 +29,7 @@
    hole centres (X,Y)      : (+/-41.2, 8.8)  (+/-41.2, 91.2)
 
  FAN HOUSING  - it slides in from the top and sets tight with no screws
-   how it goes in          : straight DOWN into the slot at Z 248.0..273.0
+   how it goes in          : straight DOWN into the slot at Z 220.0..245.0
    seat                    : the plenum floor.  This sets the height, so
                              the screw holes line up if you ever use them
    sides (X)               : two guide rails 42.0 mm up from the floor,
@@ -57,38 +57,40 @@
    open fraction of field  : 78%
    tightest edge margin    : 7.80 mm (pocket to the top edge)
 
- PicoPSU CRADLE  (plenum floor, 20.0 mm behind the backplane)
-   board                   : 31.0 (W) x 44.0 (L) x 21.0 (H) mm
-   cradle inner            : 32.6 x 45.6 mm, 0.8 mm clearance per side
-   cradle Z                : 185.0 .. 230.6  (mouth to rear wall)
-   backplane clearance     : 20.0 mm from the cradle mouth to the
+ PicoPSU CRADLE  (transverse, shifted right X=+40.0 mm)
+   board                   : 44.0 (L, across X) x 31.0 (W, along Z) x 21.0 (H) mm
+   cradle inner            : 45.6 x 32.6 mm, 0.8 mm clearance per side
+   cradle Z                : 177.0 .. 209.6  (mouth to rear wall)
+   backplane clearance     : 12.0 mm from the cradle mouth to the
                              backplane face - the board cannot reach it
+   lateral clearance       : 117.2 mm open plenum floor on left (X=-100.0..17.2)
+                             for backplane power cable and Wago 221 lever blocks
    plinth                  : 3.0 mm, board sits clear of the floor
    front lip               : 6.0 mm tall (3.0 mm above the plinth),
                              stops the board sliding forward
-   retaining strap         : 54.2 x 4.0 x 20.0 mm, toolless snap fit
+   retaining strap         : 67.2 x 4.0 x 14.0 mm, toolless snap fit
                              clips over corner boss ledges (0 screws, 0 inserts),
                              0.4 mm gap over the board top
 
  DC INPUT JACK  (rear wall)
-   centre                  : (+60.0, 52.0)
+   centre                  : (+70.0, 52.0)
    panel counterbore       : O16.0 x 5.0 mm deep, leaving a 3.4 mm
                              thick panel for the jack nut
    jack hole               : O8.0 through
-   edge margin             : 7.70 mm outboard
+   edge margin             : 24.80 mm outboard
 
  CABLE EGRESS  (rear wall, beside the grille)
    2 slots                : 17.0 (X) x 12.0 (Y) mm, rounded corners
-   centres                 : X=-60.0   Y = 33.0, 50.0
+   centres                 : X=-70.0   Y = 33.0, 50.0
    fitted SFF-8088 lead    : ~12.5 x 8 mm, so 4.5 x 4.0 mm of slack
-   clearance to the grille : 6.50 mm (slot corner to the pocket)
-   clearance to the edge   : 7.20 mm outboard
+   clearance to the grille : 16.50 mm (slot corner to the pocket)
+   clearance to the edge   : 24.30 mm outboard
 
  SERVICE LID  (slide-and-click housing - 100% screwless)
-   outside                 : 157.5 (W) x 118.8 (D) mm, 3.0 mm plate
+   outside                 : 211.7 (W) x 90.8 (D) mm, 3.0 mm plate
    skirts                  : 10.0 mm deep at the sides, 6.4 mm
                              at the front (covering the step), all 2.8 mm thick
-   guide rails             : 45 deg beveled slide rails on outer walls (Z 166.5..281.4)
+   guide rails             : 45 deg beveled slide rails on outer walls (Z 166.5..253.4)
                              glide clearance: 0.25 mm
    cantilever latch        : 18.0 mm wide spring arm with 1.2 mm catch tooth
                              and ergonomic thumb release tab at front center
@@ -101,30 +103,30 @@
    skirt vs the case       : the skirt is outside the case, so it cannot
                              reach any cable that is inside
 
-   service opening         : 109.8 wide, Z 172.0..273.0, R12.0 corners
-   entry for the fan       : Z 248.0..273.0, straight down into the housing.
+   service opening         : 164.0 wide, Z 165.0..245.0, R12.0 corners
+   entry for the fan       : Z 220.0..245.0, straight down into the housing.
                              The front tabs and rails make that the only
                              way in, so there is nothing to slide or align
-   roof left beside opening: 18.0 mm each side, plus 7.0 mm across
+   roof left beside opening: 18.0 mm each side, plus 0.0 mm across
                              the front
 
  EDGE TREATMENT  (outside edges only, for handling and to stop chipping)
    body / strap fillet     : R1.4 on every outer edge
    lid fillet              : R1.0 (its plate is only 3.0 mm thick)
    filleted                : yes
-   material the rounds took : 896 mm3 off the bare shell
+   material the rounds took : 940 mm3 off the bare shell
    wall at the mouth corner : 1.00 mm  (2.8 wall - R1.4 - 0.4 lead-in)
    lead-in flare           : 0.8 mm total, down from 1.6 mm - the round
                              and the flare both cut the same 2.8 mm
                              front wall, so one had to give
 
  VOLUME / MASS
-   body   volume            :   532645.0 mm3  =  532.6 cm3
-   body   mass @1.27 g/cm3  :      676 g  (PETG, 100% infill equiv)
-   lid    volume            :    64603.1 mm3  =   64.6 cm3
-   lid    mass @1.27 g/cm3  :       82 g  (PETG, 100% infill equiv)
-   strap  volume            :     5032.0 mm3  =    5.0 cm3
-   strap  mass @1.27 g/cm3  :        6 g  (PETG, 100% infill equiv)
+   body   volume            :   548769.3 mm3  =  548.8 cm3
+   body   mass @1.27 g/cm3  :      697 g  (PETG, 100% infill equiv)
+   lid    volume            :    65738.8 mm3  =   65.7 cm3
+   lid    mass @1.27 g/cm3  :       83 g  (PETG, 100% infill equiv)
+   strap  volume            :     4267.2 mm3  =    4.3 cm3
+   strap  mass @1.27 g/cm3  :        5 g  (PETG, 100% infill equiv)
 
  SANITY CHECKS
    body valid              : True
@@ -132,8 +134,8 @@
    strap valid             : True
    body closed (solid)     : True
    strap closed (solid)    : True
-   body bbox               : 154.20 x 102.80 x 281.40
-   lid  bbox               : 157.50 x 13.00 x 120.20
+   body bbox               : 208.40 x 102.80 x 253.40
+   lid  bbox               : 211.70 x 13.00 x 92.20
    body/lid interference    : 0.0000 mm3
    body/strap interference  : 0.0000 mm3
    build volume (Bambu H2S 340x320x340):
@@ -142,12 +144,12 @@
      strap fits            : True
    PicoPSU phantom fit (board pushed to the rear of the cradle):
      board/body interference: 0.0000 mm3  -> CLEAR
-     board front to backplane: 21.60 mm in the rearmost position
-   slide rails on body     : length 114.9 mm (Z 166.5..281.4), height 95.4..100.6 mm
+     board front to backplane: 13.60 mm in the rearmost position
+   slide rails on body     : length 86.9 mm (Z 166.5..253.4), height 95.4..100.6 mm
    front catch pocket      : 20.0 (W) x 2.6 (H) x 1.8 (D) mm at Z=165.0
    cable egress slots through the rear wall:
-     X= -60.0 Y= 33.0 : 0% inside solid  -> CLEAR
-     X= -60.0 Y= 50.0 : 0% inside solid  -> CLEAR
+     X= -70.0 Y= 33.0 : 0% inside solid  -> CLEAR
+     X= -70.0 Y= 50.0 : 0% inside solid  -> CLEAR
 
  NOTES
    * The 92 mm fan frame is taller than the 87.8 mm bay bore, so the

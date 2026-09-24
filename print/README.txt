@@ -3,26 +3,27 @@ DL380 drive-cage enclosure - print kit
 
 part             volume    solid   printed  cost @ 750/g                bbox (mm) triangles
 --------------------------------------------------------------------------------------------
-body           532.6 cm3    676 g     507 g  Rp    380.508   154.2 x  281.4 x 102.8     30116
-lid             64.6 cm3     82 g      62 g  Rp     46.151   157.5 x  120.2 x  13.0       176
-psu-strap        5.0 cm3      6 g       5 g  Rp      3.595    56.2 x   20.0 x  10.0        60
+body           548.8 cm3    697 g     523 g  Rp    392.027   208.4 x  253.4 x 102.8     36968
+lid             65.7 cm3     83 g      63 g  Rp     46.962    92.2 x  211.7 x  13.0       176
+psu-strap        4.3 cm3      5 g       4 g  Rp      3.048    69.2 x   14.0 x  10.0        44
 --------------------------------------------------------------------------------------------
-TOTAL          602.3 cm3    765 g     574 g  Rp    430.254
+TOTAL          618.8 cm3    786 g     589 g  Rp    442.038
 
-The combined file lays all three out in 321.7 x 281.4 x 102.8 mm - fits a 340 x 320 plate.
+The combined file lays all three out in 310.6 x 253.4 x 102.8 mm - fits a 340 x 320 plate.
 
 WHAT THIS IS
   Three printed parts for an external enclosure that turns an HP ProLiant DL380
   G6/G7 8-bay 2.5" SFF drive cage (with backplane) into a standalone, fan-cooled
   JBOD box.  Fan, PicoPSU, grille, cable exits and DC jack all live in the body.
+  Slide-and-click lid and snap-fit PSU strap mean 100% screwless enclosure assembly.
 
 UNITS
   Millimetres.  STL and OBJ carry no units, so please import as mm.
 
 FILES
   dl380-case_body.stl / .obj        x1   the main part
-  dl380-case_lid.stl  / .obj        x1   drop-on cover for the body
-  dl380-case_psu-strap.stl / .obj   x1   small retaining strap
+  dl380-case_lid.stl  / .obj        x1   toolless slide-and-click cover
+  dl380-case_psu-strap.stl / .obj   x1   small snap-fit retaining strap
   dl380-case_all-parts.stl / .obj   x1   the same three solids in one file,
                                          already laid out side by side for the
                                          plate.  Use this if you prefer a single
@@ -48,8 +49,8 @@ SUGGESTED SETTINGS
                     three 0.4 mm lines, and a bigger nozzle would close them up.
 
 WEIGHT AND COST  (PETG at 1.27 g/cm3)
-  Solid (100% infill, upper bound)  :   765 g   Rp 573.672
-  Printed (3 perimeters, 15% infill):   574 g   Rp 430.254
+  Solid (100% infill, upper bound)  :   786 g   Rp 589.384
+  Printed (3 perimeters, 15% infill):   589 g   Rp 442.038
 
   Please quote from your own slice of these files.  The solid figure is the CAD
   volume and is the absolute ceiling; the printed figure assumes 3 perimeters and

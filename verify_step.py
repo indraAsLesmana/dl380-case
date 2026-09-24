@@ -30,7 +30,7 @@ STEP = _arg if _arg.lower().endswith((".step", ".stp")) else _DEFAULT
 # ---- geometry constants, mirrored from dl380_cage_case.py -------------------
 INT_H, INT_W = 87.8, 145.8
 FLOOR_T, WALL = 4.0, 2.8
-CAGE_D, PLENUM_D, REAR_WALL_T = 165.0, 108.0, 8.4
+CAGE_D, PLENUM_D, REAR_WALL_T = 165.0, 80.0, 8.4
 
 FAN_SIZE, FAN_APERTURE, FAN_PATTERN, FAN_INNER_CLEAR = 92.0, 86.0, 82.5, 2.0
 INT_H_PLEN = max(INT_H, FAN_SIZE + 2 * FAN_INNER_CLEAR)
@@ -50,37 +50,42 @@ LID_FIN_Y0 = FAN_TOP + FAN_LID_GAP                        # 97.0 fin bottom
 
 XW = (INT_W + 2 * WALL) / 2.0                             # 75.7
 XI = INT_W / 2.0                                          # 72.9
+PLEN_INT_W = 200.0
+PLEN_OUT_W = PLEN_INT_W + 2 * WALL                        # 205.6
+PLEN_XI = PLEN_INT_W / 2.0                                # 100.0
+PLEN_XW = PLEN_OUT_W / 2.0                                # 102.8
+
 Z_BAY = CAGE_D                                            # 165.0
-Z_RIN = CAGE_D + PLENUM_D                                 # 273.0
-Z_OUT = Z_RIN + REAR_WALL_T                               # 281.4
+Z_RIN = CAGE_D + PLENUM_D                                 # 245.0
+Z_OUT = Z_RIN + REAR_WALL_T                               # 253.4
 ZW = Z_RIN + REAR_WALL_T / 2.0                            # mid rear-wall
 
 GRILLE_CELL, GRILLE_WEB, GRILLE_RIM = 9.0, 1.2, 2.0
 GRILLE_POCKET_R = FAN_R + GRILLE_RIM                      # 45.0
 FILLET_R = 1.4
 GUSSET_H = 18.0
-SVC_HALF = XI - GUSSET_H                                  # 54.9
-LID_SCREW_X, LID_SCREW_Z = 70.0, 185.0
-REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y = -60.0, (33.0, 50.0)
+SVC_HALF = PLEN_XI - GUSSET_H                             # 82.0
+REAR_CABLE_SLOT_X, REAR_CABLE_SLOT_Y = -70.0, (33.0, 50.0)
 REAR_CABLE_SLOT_W, REAR_CABLE_SLOT_H = 17.0, 12.0
 
-# PicoPSU cradle
+# PicoPSU cradle (transverse orientation, shifted right)
 PSU_W, PSU_L, PSU_H = 31.0, 44.0, 21.0
-PSU_CLEAR, PSU_BOOT, PSU_PLINTH_T = 0.8, 20.0, 3.0
+PSU_CLEAR, PSU_BOOT, PSU_PLINTH_T = 0.8, 12.0, 3.0
 PSU_WALL_H, PSU_FRONT_LIP = 24.0, 6.0
 PSU_BOSS_W, PSU_BOSS_L = 6.0, 14.0
 PSU_TOOTH_W = 0.8
-PSU_XH = (PSU_W + 2 * PSU_CLEAR) / 2.0                    # 16.3
-PSU_ZH = (PSU_L + 2 * PSU_CLEAR) / 2.0                    # 22.8
-PSU_Z0 = Z_BAY + PSU_BOOT                                 # 185.0
-PSU_Z1 = PSU_Z0 + 2 * PSU_ZH                              # 230.6
-PSU_TRAY_OH = PSU_XH + WALL                               # 19.1
+PSU_CX = 40.0
+PSU_XH = (PSU_L + 2 * PSU_CLEAR) / 2.0                    # 22.8
+PSU_ZH = (PSU_W + 2 * PSU_CLEAR) / 2.0                    # 16.3
+PSU_Z0 = Z_BAY + PSU_BOOT                                 # 177.0
+PSU_Z1 = PSU_Z0 + 2 * PSU_ZH                              # 209.6
+PSU_TRAY_OH = PSU_XH + WALL                               # 25.6
 PSU_TOP = FLOOR_T + PSU_PLINTH_T + PSU_H + 0.4            # 28.4
-PSU_BOSS_X = PSU_XH + (WALL + PSU_BOSS_W) / 2.0           # 20.7
-PSU_BORE_Z = PSU_Z0 + PSU_BOSS_L / 2.0                    # 192.0
+PSU_BOSS_X = PSU_XH + (WALL + PSU_BOSS_W) / 2.0           # 27.2
+PSU_BORE_Z = (PSU_Z0 + PSU_Z1) / 2.0                      # 193.3
 
 # DC input jack
-DC_JACK_X, DC_JACK_Y = 60.0, 52.0
+DC_JACK_X, DC_JACK_Y = 70.0, 52.0
 DC_JACK_DIA, DC_JACK_PAD, DC_JACK_DEPTH = 8.0, 16.0, 5.0
 
 # slide-and-click housing lid
@@ -89,12 +94,12 @@ RAIL_W, RAIL_H, RAIL_YC = 1.4, 2.4, 98.0
 SKIRT_T, SKIRT_D = 2.8, 10.0
 LID_T = 3.0
 FAN_INSET = 25.0
-FAN_Z0 = Z_RIN - FAN_INSET                                # 248.0
+FAN_Z0 = Z_RIN - FAN_INSET                                # 220.0
 FAN_TOP = FAN_CY + FAN_SIZE / 2.0                         # 96.0
 LID_FRONT_T = 2.4
 LID_Z0 = Z_BAY - LID_FRONT_T                              # 162.6
-LID_Z1 = Z_OUT                                            # 281.4
-LID_OX = XW + SLIDE_CLEAR + SKIRT_T                       # 78.75
+LID_Z1 = Z_OUT                                            # 253.4
+LID_OX = PLEN_XW + SLIDE_CLEAR + SKIRT_T                  # 105.85
 RAIL_Z0 = Z_BAY + 1.5
 
 # the first honeycomb cell sits on the fan axis; the next column is offset
@@ -112,31 +117,31 @@ CASES = [
     ("fan hole  top-left",        (-FAN_OFF, FAN_CY + FAN_OFF, ZW), "void"),
     ("fan hole  bottom-left",     (-FAN_OFF, FAN_CY - FAN_OFF, ZW), "void"),
     ("plenum  fan bay",           (0.0, FAN_CY, 230.0),             "void"),
-    ("plenum  clear volume",      (0.0, 60.0, 220.0),               "void"),
+    ("plenum  clear volume",      (0.0, 60.0, 200.0),               "void"),
     ("fan housing, rail right",   (GUIDE_XC, 20.0, FAN_Z0 + 12.0),  "solid"),
     ("fan housing, rail left",    (-GUIDE_XC, 20.0, FAN_Z0 + 12.0), "solid"),
     ("fan housing, front tab",    (GUIDE_XC, 10.0, FAN_Z0 - 1.5),   "solid"),
     ("fan housing, slot is clear", (0.0, FAN_CY, FAN_Z0 + 12.0),    "void"),
-    ("in front of the housing",   (0.0, FAN_CY, FAN_Z0 - 10.0),     "void"),
-    ("cradle interior",           (0.0, FLOOR_T + 11.0, 200.0),     "void"),
-    ("cradle interior  corner",   (13.0, PSU_TOP - 2.0, PSU_Z1 - 2.0), "void"),
-    ("cradle plinth",             (0.0, FLOOR_T + 1.5, 200.0),      "solid"),
-    ("cradle side wall",          (PSU_XH + WALL / 2.0, 15.0, 200.0), "solid"),
-    ("cradle rear wall",          (0.0, 15.0, PSU_Z1 + WALL / 2.0), "solid"),
-    ("cradle front lip",          (0.0, FLOOR_T + 1.0, PSU_Z0 - WALL / 2.0),
+    ("in front of the housing",   (0.0, FAN_CY, FAN_Z0 - 5.0),      "void"),
+    ("cradle interior",           (PSU_CX, FLOOR_T + 11.0, PSU_BORE_Z), "void"),
+    ("cradle interior  corner",   (PSU_CX + PSU_XH - 3.0, PSU_TOP - 2.0, PSU_Z1 - 2.0), "void"),
+    ("cradle plinth",             (PSU_CX, FLOOR_T + 1.5, PSU_BORE_Z), "solid"),
+    ("cradle side wall",          (PSU_CX + PSU_XH + WALL / 2.0, 15.0, PSU_BORE_Z), "solid"),
+    ("cradle rear wall",          (PSU_CX, 15.0, PSU_Z1 + WALL / 2.0), "solid"),
+    ("cradle front lip",          (PSU_CX, FLOOR_T + 1.0, PSU_Z0 - WALL / 2.0),
                                                                      "solid"),
-    ("strap boss ridge",          (PSU_TRAY_OH + PSU_BOSS_W + PSU_TOOTH_W / 2.0,
+    ("strap boss ridge",          (PSU_CX + PSU_TRAY_OH + PSU_BOSS_W + PSU_TOOTH_W / 2.0,
                                    PSU_TOP - 1.8, PSU_BORE_Z),       "solid", 0.3),
-    ("strap boss material",       (PSU_BOSS_X, FLOOR_T + 2.0, PSU_BORE_Z),
+    ("strap boss material",       (PSU_CX + PSU_BOSS_X, FLOOR_T + 2.0, PSU_BORE_Z),
                                                                      "solid"),
     ("DC jack hole",              (DC_JACK_X, DC_JACK_Y, ZW),       "void"),
     ("DC jack counterbore",       (DC_JACK_X, DC_JACK_Y, Z_OUT - DC_JACK_DEPTH / 2.0),
                                                                      "void"),
     ("rear wall beside jack",     (GRILLE_POCKET_R + 3.0, FAN_CY, ZW), "solid"),
-    ("roof material  (gusset)",   (71.5, PLEN_Y1 + 1.5, 200.0),     "solid"),
-    ("top service opening",       (0.0, REAR_H - 1.0, 215.0),       "void"),
-    ("slide rail right",          (XW + RAIL_W / 2.0, RAIL_YC, 220.0), "solid", 0.4),
-    ("slide rail left",           (-(XW + RAIL_W / 2.0), RAIL_YC, 220.0), "solid", 0.4),
+    ("roof material  (gusset)",   (PLEN_XI - 1.5, PLEN_Y1 + 1.5, 200.0), "solid"),
+    ("top service opening",       (0.0, REAR_H - 1.0, 200.0),       "void"),
+    ("slide rail right",          (PLEN_XW + RAIL_W / 2.0, RAIL_YC, 200.0), "solid", 0.4),
+    ("slide rail left",           (-(PLEN_XW + RAIL_W / 2.0), RAIL_YC, 200.0), "solid", 0.4),
     ("catch pocket",              (0.0, RAIL_YC, Z_BAY + 0.5),      "void"),
     ("bay interior",              (0.0, FLOOR_T + INT_H / 2.0, 100.0), "void"),
     ("bay side wall",             (XI + WALL / 2.0, FLOOR_T + INT_H / 2.0, 100.0),
@@ -154,28 +159,28 @@ CASES = [
     ("rubber foot recess",        (61.0, 1.0, 14.0),                 "void"),
     # edge rounding: a point 0.35 mm in from the sharp corner along the diagonal
     # is removed by a R1.4 round, and would be solid without one
-    ("fillets  corner removed",   (XW - 0.35 / math.sqrt(2.0),
+    ("fillets  corner removed",   (PLEN_XW - 0.35 / math.sqrt(2.0),
                                    FAN_CY, Z_OUT - 0.35 / math.sqrt(2.0)),
                                                                      "void", 0.15),
-    ("fillets  wall kept",        (XW - 1.7, FAN_CY, Z_OUT - 2.4),   "solid"),
+    ("fillets  wall kept",        (PLEN_XW - 1.7, FAN_CY, Z_OUT - 2.4), "solid"),
 ]
 
 # ---- probes against the LID (loaded as the second-largest solid) -------------
 #  Probe radii matter here: the lip is only 1.5 mm deep and the skirt 2.8 mm
 #  thick, so the default 1.0 mm sphere will not fit in either.
 LID_CASES = [
-    ("plate material",            (0.0, REAR_H + LID_T / 2.0, 220.0), "solid"),
-    ("skirt, right wall",         (XW + SLIDE_CLEAR + SKIRT_T / 2.0, 95.0, 220.0),
+    ("plate material",            (0.0, REAR_H + LID_T / 2.0, 200.0), "solid"),
+    ("skirt, right wall",         (PLEN_XW + SLIDE_CLEAR + SKIRT_T / 2.0, 95.0, 200.0),
                                                                      "solid"),
-    ("skirt, left wall",          (-(XW + SLIDE_CLEAR + SKIRT_T / 2.0), 95.0, 220.0),
+    ("skirt, left wall",          (-(PLEN_XW + SLIDE_CLEAR + SKIRT_T / 2.0), 95.0, 200.0),
                                                                      "solid"),
-    ("runner, right skirt",       (XW + SLIDE_CLEAR + 0.6, 94.2, 220.0), "solid", 0.4),
-    ("runner, left skirt",        (-(XW + SLIDE_CLEAR + 0.6), 94.2, 220.0), "solid", 0.4),
+    ("runner, right skirt",       (PLEN_XW + SLIDE_CLEAR + 0.6, 94.2, 200.0), "solid", 0.4),
+    ("runner, left skirt",        (-(PLEN_XW + SLIDE_CLEAR + 0.6), 94.2, 200.0), "solid", 0.4),
     ("skirt, front wall",         (0.0, 98.0, LID_Z0 + 1.0),         "solid"),
-    ("lid clear of the case wall", (XW - 1.2, 95.0, 220.0),          "void"),
+    ("lid clear of the case wall", (PLEN_XW - 1.2, 95.0, 200.0),    "void"),
     ("front skirt stops at roof", (0.0, 92.0, LID_Z0 + 1.0),         "void"),
     ("front cantilever latch",    (0.0, RAIL_YC, Z_BAY - 1.0),       "solid"),
-    ("lip ends before the fan",   (0.0, REAR_H - 1.0, 245.0),        "void", 0.5),
+    ("lip ends before the fan",   (0.0, REAR_H - 1.0, 230.0),        "void", 0.5),
     ("open over the fan",         (0.0, REAR_H - 1.0, FAN_Z0 + 10.0),
                                                                      "void", 0.5),
     ("fan retainer fin",          (GUIDE_XC, LID_FIN_Y0 + 2.0, FAN_Z0 + 12.0),

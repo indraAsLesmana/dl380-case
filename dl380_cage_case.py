@@ -87,10 +87,13 @@ STOP_RIB_D      = 3.0      # mm  how far the stop frame sticks into the bay
 REAR_WALL_LAYERS = 3       # rear wall in wall-units -> 8.4 mm
 GUSSET_H        = 18.0     # mm  45 deg gussets under the plenum roof
 
-# ---- wiring / airflow plenum -------------------------------------------------
-PLENUM_D      = 108.0    # mm  clear depth behind the backplane.  Holds, front to
-                         #     back: 20 mm of cable boot space, a 55 mm PicoPSU
-                         #     cradle and the 25 mm fan against the rear wall.
+# ---- wiring / airflow plenum (compact & wide) --------------------------------
+#  Widened to 200 mm inner (205.6 mm outer) to provide ~27.5 mm clearance on the
+#  left for the side-facing HP 10-pin backplane power harness to plug in and
+#  sweep naturally into the wiring chamber.
+#  Shortened to 80 mm depth for a compact, rigid enclosure (Z_OUT ~ 253.4 mm).
+PLEN_INT_W    = 200.0    # mm  internal width of the plenum chamber
+PLENUM_D      =  80.0    # mm  clear depth behind the backplane (holds PicoPSU + fan)
 
 # ---- fan ---------------------------------------------------------------------
 #  92 mm (default): frame 92 -> rear section becomes 102.8 mm tall
@@ -107,10 +110,6 @@ FAN_INSET     =  25.0    # mm  fan depth; it hugs the inside of the rear wall
 #  The fan slides straight DOWN into a slot from the top and seats on the plenum
 #  floor.  It is held by geometry on four sides and by the lid on the fifth, so
 #  it sets tight with no screws at all.
-#
-#  Note there is deliberately NO interference on the guides.  A rigid rail
-#  cannot give a press fit: a slot narrower than the fan frame simply cannot be
-#  inserted into, so the only workable snug fit is a small positive clearance.
 FAN_GUIDE_CLEAR = 0.2    # mm  clearance per side between fan frame and rail
 FAN_GUIDE_T     = 3.0    # mm  rail thickness
 FAN_GUIDE_H     = 42.0   # mm  rail height above the plenum floor
@@ -126,28 +125,27 @@ GRILLE_RIM    =   2.0    # mm  solid ring between the cells and the pocket wall
 GRILLE_DEPTH  =   3.0    # mm  membrane thickness the cells are punched through
 
 # ---- cable egress (rear wall, beside the grille pocket) ----------------------
-#  The SFF-8087 -> SFF-8088 leads now leave through the BACK, in two separate
-#  slots so each cable keeps its own strain relief and they stay clear of the
-#  fan.  X is negative - they exit on the left, where the cabling already runs.
-REAR_CABLE_SLOT_X = -60.0          # mm  slot centre X
+#  The SFF-8087 -> SFF-8088 leads leave through the BACK at X = -70.0.
+REAR_CABLE_SLOT_X = -70.0          # mm  slot centre X
 REAR_CABLE_SLOT_Y = (33.0, 50.0)   # mm  slot centre heights
 REAR_CABLE_SLOT_W =  17.0          # mm  slot width in X
 REAR_CABLE_SLOT_H =  12.0          # mm  slot height in Y
 
-# ---- PicoPSU cradle ----------------------------------------------------------
+# ---- PicoPSU cradle (transverse orientation, shifted right) ------------------
 #  mini-box picoPSU-120 measured 31 x 44 x 21 mm (1U), 57 g with its harness.
-#  It sits in a cradle on the plenum floor 20 mm behind the backplane so it can
-#  never be pushed back onto the backplane PCB, and a strap over the top stops
-#  it lifting out.
-PSU_W, PSU_L, PSU_H = 31.0, 44.0, 21.0   # mm  board envelope
+#  Oriented transversely (44 mm across X, 31 mm along Z) to save depth, and
+#  shifted right to X = +40.0 mm to leave the left plenum wide open for the
+#  backplane power harness and Wago 221 lever blocks.
+PSU_W, PSU_L, PSU_H = 31.0, 44.0, 21.0   # mm  board envelope (31 mm W along Z, 44 mm L across X)
 PSU_CLEAR     =   0.8    # mm  clearance per side in the cradle
-PSU_BOOT      =  20.0    # mm  gap between the backplane and the cradle mouth
+PSU_CX        =  40.0    # mm  cradle centre X (shifted to right)
+PSU_BOOT      =  12.0    # mm  gap between the backplane and the cradle mouth
 PSU_PLINTH_T  =   3.0    # mm  the board sits on this, off the floor
 PSU_WALL_H    =  24.0    # mm  cradle wall height above the floor
 PSU_FRONT_LIP =   6.0    # mm  front wall height; the 3 mm above the plinth is
                          #     what stops the board sliding forward
 PSU_STRAP_H   =   4.0    # mm  retaining strap thickness
-PSU_STRAP_L   =  20.0    # mm  retaining strap length in Z
+PSU_STRAP_L   =  14.0    # mm  retaining strap length in Z
 PSU_BOSS_W    =   6.0    # mm  boss sticking sideways past each cradle wall
 PSU_BOSS_L    =  14.0    # mm  boss length in Z
 PSU_LEG_T     =   2.0    # mm  toolless snap leg thickness
@@ -156,21 +154,15 @@ PSU_TOOTH_W   =   0.8    # mm  snap tooth undercut width
 PSU_TOOTH_H   =   1.6    # mm  snap tooth height
 
 # ---- DC input jack (rear wall) ----------------------------------------------
-#  For a panel-mount 5.5 x 2.5 mm barrel jack, matching the picoPSU-120's DC
-#  input.  The outer face is counterbored so the jack sees a 3.4 mm panel
-#  rather than the full 8.4 mm wall, which is thicker than most jacks accept.
-DC_JACK_X     =  60.0    # mm  centre X (right of the grille; cables exit left)
+DC_JACK_X     =  70.0    # mm  centre X (right of the grille; cables exit left)
 DC_JACK_Y     =  52.0    # mm  centre Y
 DC_JACK_DIA   =   8.0    # mm  jack body hole
 DC_JACK_PAD   =  16.0    # mm  counterbore diameter in the outer face
 DC_JACK_DEPTH =   5.0    # mm  counterbore depth
 
 # ---- service opening ---------------------------------------------------------
-SVC_Z0        = 172.0    # mm  front edge of the service opening
-SVC_Z1_BACKOFF=   0.0    # mm  how far short of the rear wall the opening stops.
-                         #     Keep it <= FAN_INSET - 2 or the fan can no longer
-                         #     be lowered into place behind the PSU cradle; the
-                         #     report prints the resulting drop-in window.
+SVC_Z0        = 165.0    # mm  front edge of opening (starts at backplane for easy connector access)
+SVC_Z1_BACKOFF=   0.0    # mm  how far short of the rear wall the opening stops
 SVC_R         =  12.0    # mm  corner radius of the opening
 LID_SCREW_Z   = ()       # no screws - 100% toolless slide-and-click
 
@@ -182,7 +174,6 @@ CAGE_SCREW_DIA= 3.4      # mm  M3 clearance through the 2.8 side wall
 FOOT_DIA      = 12.0     # mm  rubber foot recess
 FOOT_DEEP     = 2.0      # mm
 FOOT_X        = 61.0     # mm  +/- X of the foot centres
-FOOT_Z        = (14.0, 260.0)
 
 # ---- entry lead-in -----------------------------------------------------------
 #  Deliberately small: the lead-in and the outer corner rounds both take material
@@ -253,32 +244,36 @@ GRILLE_RP       = GRILLE_R - GRILLE_WEB / math.sqrt(3.0)
 GRILLE_OPEN_R   = FAN_R - GRILLE_RP        # only centres inside this get a cell
 GRILLE_POCKET_R = FAN_R + GRILLE_RIM       # recess radius in the outer face
 
-XW       = OUT_W / 2.0                     # outer half width
-XI       = INT_W / 2.0                     # inner half width
-SVC_HALF = XI - GUSSET_H                   # service opening half width
+XW       = OUT_W / 2.0                     # bay outer half width
+XI       = INT_W / 2.0                     # bay inner half width
 
-# ---- PicoPSU cradle placement ------------------------------------------------
-PSU_XH      = (PSU_W + 2 * PSU_CLEAR) / 2.0    # cradle inner half width  16.3
-PSU_ZH      = (PSU_L + 2 * PSU_CLEAR) / 2.0    # cradle inner half length 22.8
-PSU_Z0      = Z_BAY + PSU_BOOT                 # cradle mouth            185.0
-PSU_Z1      = PSU_Z0 + 2 * PSU_ZH              # cradle inner rear       230.6
-PSU_TRAY_OH = PSU_XH + WALL                    # cradle outer half width  19.1
-PSU_TOP     = FLOOR_T + PSU_PLINTH_T + PSU_H + 0.4   # board top + clearance 28.4
-PSU_BOSS_X  = PSU_XH + (WALL + PSU_BOSS_W) / 2.0     # insert centre        20.7
-PSU_BORE_Z  = PSU_Z0 + PSU_BOSS_L / 2.0 + 0.0        # strap screw Z        192.0
-PSU_STRAP_X = PSU_TRAY_OH + PSU_BOSS_W               # strap half width     25.1
+# ---- wider plenum dimensions -------------------------------------------------
+PLEN_OUT_W = PLEN_INT_W + 2 * WALL         # plenum outside width (205.6 mm)
+PLEN_XI    = PLEN_INT_W / 2.0              # plenum inside half width (100.0 mm)
+PLEN_XW    = PLEN_OUT_W / 2.0              # plenum outside half width (102.8 mm)
+SVC_HALF   = PLEN_XI - GUSSET_H            # service opening half width (82.0 mm)
+
+# ---- PicoPSU cradle placement (transverse, shifted right) -------------------
+PSU_XH      = (PSU_L + 2 * PSU_CLEAR) / 2.0    # cradle inner half width in X (22.8 mm)
+PSU_ZH      = (PSU_W + 2 * PSU_CLEAR) / 2.0    # cradle inner half length in Z (16.3 mm)
+PSU_Z0      = Z_BAY + PSU_BOOT                 # cradle mouth (177.0 mm)
+PSU_Z1      = PSU_Z0 + 2 * PSU_ZH              # cradle inner rear (209.6 mm)
+PSU_TRAY_OH = PSU_XH + WALL                    # cradle outer half width (25.6 mm)
+PSU_TOP     = FLOOR_T + PSU_PLINTH_T + PSU_H + 0.4   # board top + clearance (28.4 mm)
+PSU_BORE_Z  = (PSU_Z0 + PSU_Z1) / 2.0          # strap snap ridge Z (193.3 mm)
+PSU_STRAP_X = PSU_TRAY_OH + PSU_BOSS_W         # boss outer edge from cradle centre (31.6 mm)
+
+# ---- base rubber feet --------------------------------------------------------
+FOOT_Z      = (14.0, Z_OUT - 14.0)             # front and rear foot Z coordinates
 
 # ---- service opening, derived from the rear wall -----------------------------
 SVC_Z1 = Z_RIN - SVC_Z1_BACKOFF            # opening rear edge
-# The fan is inserted through this opening and can only descend BEHIND the
-# cradle, so these two numbers bound where it can drop in before being pushed
-# back against the rear wall.  If FAN_LO > FAN_HI the fan cannot be fitted.
 FAN_DROP_LO = PSU_Z1 + WALL + 2.0          # clear of the cradle's rear wall
 FAN_DROP_HI = SVC_Z1 - FAN_INSET           # its thickness must clear the roof
 
 # ---- slide-and-click housing lid ---------------------------------------------
 RAIL_Z0         = Z_BAY + 1.5                                   # start behind the 1.4 mm step fillet
-LID_OX          = XW + SLIDE_CLEAR + SKIRT_T                    # lid outer half width
+LID_OX          = PLEN_XW + SLIDE_CLEAR + SKIRT_T               # lid outer half width (105.85 mm)
 LID_Z0          = Z_BAY - LID_FRONT_T                           # lid front edge
 LID_Z1          = Z_OUT                                         # lid rear edge (flush with rear wall)
 LID_Y_FRONT_BOT = BAY_H + 1.8                                   # bottom of front face, clear of step fillet
@@ -446,7 +441,7 @@ def build():
 
     # ---------------------------------------------------------------- shell ---
     outer = box(OUT_W, BAY_H, Z_BAY, -XW, 0.0, 0.0)
-    outer = outer.fuse(box(OUT_W, REAR_H, Z_OUT - Z_BAY, -XW, 0.0, Z_BAY))
+    outer = outer.fuse(box(PLEN_OUT_W, REAR_H, Z_OUT - Z_BAY, -PLEN_XW, 0.0, Z_BAY))
     #  Round every outer edge here, while the shell is still just two boxes.
     #  _tidy() first, or the coplanar seams between the two boxes' faces would
     #  get filleted into grooves.
@@ -458,7 +453,7 @@ def build():
 
     # ---------------------------------------------------------------- voids ---
     bay_void = box(INT_W, INT_H, Z_BAY + 1.0, -XI, BAY_Y0, -1.0)
-    plen_void = box(INT_W, PLEN_Y1 - BAY_Y0, PLENUM_D, -XI, BAY_Y0, Z_BAY)
+    plen_void = box(PLEN_INT_W, PLEN_Y1 - BAY_Y0, PLENUM_D, -PLEN_XI, BAY_Y0, Z_BAY)
 
     body = outer.cut(bay_void.fuse(plen_void))
 
@@ -468,11 +463,16 @@ def build():
                         STOP_RIB_D + 2.0,
                         -(XI - STOP_RIB_W), BAY_Y0 + STOP_RIB_W,
                         Z_BAY - STOP_RIB_D - 1.0))
+    #  Relief notch on the left stop rib: provides clear, direct clearance for
+    #  the side-facing 10-pin power port on the left edge of the HP backplane.
+    pwr_notch = box(STOP_RIB_W + 2.0, 50.0, STOP_RIB_D + 2.0,
+                    -XI - 1.0, 35.0, Z_BAY - STOP_RIB_D - 1.0)
+    ring = ring.cut(pwr_notch)
     body = body.fuse(ring)
 
     # ------------------------------------------- roof gussets beside the lid ---
     for side in (1, -1):
-        body = body.fuse(gusset(XI, PLEN_Y1, GUSSET_H, Z_BAY, Z_RIN, side))
+        body = body.fuse(gusset(PLEN_XI, PLEN_Y1, GUSSET_H, Z_BAY, Z_RIN, side))
 
     # ------------------------------------------------ fan housing in plenum ---
     #  A slot the fan slides straight down into from the top.  It seats on the
@@ -493,25 +493,26 @@ def build():
                              tx, FLOOR_T, FAN_TAB_Z0))
 
     # ----------------------------------------------- PicoPSU cradle in plenum ---
+    #  Transverse orientation (44 mm across X, 31 mm along Z) shifted to X = +40.0 mm.
     #  plinth the board stands on
     body = body.fuse(box(2 * PSU_XH, PSU_PLINTH_T, 2 * PSU_ZH,
-                         -PSU_XH, FLOOR_T, PSU_Z0))
+                         PSU_CX - PSU_XH, FLOOR_T, PSU_Z0))
     #  side walls
     for sx in (1, -1):
-        x0 = PSU_XH if sx > 0 else -PSU_TRAY_OH
+        x0 = (PSU_CX + PSU_XH) if sx > 0 else (PSU_CX - PSU_TRAY_OH)
         body = body.fuse(box(WALL, PSU_WALL_H, 2 * PSU_ZH, x0, FLOOR_T, PSU_Z0))
     #  rear wall and the low lip across the mouth, which is what stops the
     #  board sliding forward onto the backplane
     body = body.fuse(box(2 * PSU_TRAY_OH, PSU_WALL_H, WALL,
-                         -PSU_TRAY_OH, FLOOR_T, PSU_Z1))
+                         PSU_CX - PSU_TRAY_OH, FLOOR_T, PSU_Z1))
     body = body.fuse(box(2 * PSU_TRAY_OH, PSU_FRONT_LIP, WALL,
-                         -PSU_TRAY_OH, FLOOR_T, PSU_Z0 - WALL))
+                         PSU_CX - PSU_TRAY_OH, FLOOR_T, PSU_Z0 - WALL))
     #  corner bosses that take the retaining-strap snap fit
     for sx in (1, -1):
-        bx = PSU_TRAY_OH if sx > 0 else -(PSU_TRAY_OH + PSU_BOSS_W)
+        bx = (PSU_CX + PSU_TRAY_OH) if sx > 0 else (PSU_CX - PSU_TRAY_OH - PSU_BOSS_W)
         body = body.fuse(box(PSU_BOSS_W, PSU_TOP - FLOOR_T, PSU_BOSS_L,
                              bx, FLOOR_T, PSU_BORE_Z - PSU_BOSS_L / 2.0))
-        rx = (PSU_TRAY_OH + PSU_BOSS_W) if sx > 0 else -(PSU_TRAY_OH + PSU_BOSS_W + PSU_TOOTH_W)
+        rx = (PSU_CX + PSU_TRAY_OH + PSU_BOSS_W) if sx > 0 else (PSU_CX - PSU_TRAY_OH - PSU_BOSS_W - PSU_TOOTH_W)
         body = body.fuse(box(PSU_TOOTH_W, 1.5, PSU_BOSS_L,
                              rx, PSU_TOP - 3.0,
                              PSU_BORE_Z - PSU_BOSS_L / 2.0))
@@ -524,16 +525,16 @@ def build():
     y_top = RAIL_YC + RAIL_H / 2.0 + RAIL_W
 
     p_right = [
-        (XW, y_bot),
-        (XW + RAIL_W, y_m1),
-        (XW + RAIL_W, y_m2),
-        (XW, y_top)
+        (PLEN_XW, y_bot),
+        (PLEN_XW + RAIL_W, y_m1),
+        (PLEN_XW + RAIL_W, y_m2),
+        (PLEN_XW, y_top)
     ]
     p_left = [
-        (-XW, y_bot),
-        (-XW, y_top),
-        (-(XW + RAIL_W), y_m2),
-        (-(XW + RAIL_W), y_m1)
+        (-PLEN_XW, y_bot),
+        (-PLEN_XW, y_top),
+        (-(PLEN_XW + RAIL_W), y_m2),
+        (-(PLEN_XW + RAIL_W), y_m1)
     ]
     body = body.fuse(prism(p_right, RAIL_Z0, Z_OUT - RAIL_Z0))
     body = body.fuse(prism(p_left, RAIL_Z0, Z_OUT - RAIL_Z0))
@@ -603,11 +604,13 @@ def build():
     for c in cuts:
         body = body.cut(c)
 
-    body = _tidy(body)    # ================================================= slide-and-click lid ---
+    body = _tidy(body)
+
+    # ================================================= slide-and-click lid ---
     #  Slides horizontally along +Z into 45 deg guide rails on the body's outer
     #  walls, and clicks shut with a compliant cantilever snap latch into a
     #  recessed pocket on the front vertical step.  100% screwless.
-    x_inner = XW + SLIDE_CLEAR
+    x_inner = PLEN_XW + SLIDE_CLEAR
     x_outer = LID_OX
     y_top = REAR_H + LID_T
     y_bot = REAR_H - SKIRT_D
@@ -620,7 +623,7 @@ def build():
     br_m1  = RAIL_YC - RAIL_H / 2.0
     br_m2  = RAIL_YC + RAIL_H / 2.0
     br_top = RAIL_YC + RAIL_H / 2.0 + RAIL_W
-    br_out = XW + RAIL_W
+    br_out = PLEN_XW + RAIL_W
 
     p_r_skirt = [
         (x_outer, REAR_H),
@@ -673,19 +676,19 @@ def build():
     #  Snap-on retaining strap that clips over the cradle corner bosses.
     #  No screws, no heat-set inserts.
     PSU_SNAP_CLEAR = 0.2
-    boss_outer_x   = PSU_TRAY_OH + PSU_BOSS_W        # 25.1
-    ridge_outer_x  = boss_outer_x + PSU_TOOTH_W      # 25.9
-    strap_inner_x  = ridge_outer_x + PSU_SNAP_CLEAR  # 26.1
-    strap_outer_x  = strap_inner_x + PSU_LEG_T       # 28.1
+    boss_outer_x   = PSU_TRAY_OH + PSU_BOSS_W        # 31.6
+    ridge_outer_x  = boss_outer_x + PSU_TOOTH_W      # 32.4
+    strap_inner_x  = ridge_outer_x + PSU_SNAP_CLEAR  # 32.6
+    strap_outer_x  = strap_inner_x + PSU_LEG_T       # 34.6
 
     strap = box(2 * strap_outer_x, PSU_STRAP_H, PSU_STRAP_L,
-                -strap_outer_x, PSU_TOP, PSU_BORE_Z - PSU_STRAP_L / 2.0)
+                PSU_CX - strap_outer_x, PSU_TOP, PSU_BORE_Z - PSU_STRAP_L / 2.0)
     for sx in (1, -1):
-        lx = strap_inner_x if sx > 0 else -strap_outer_x
+        lx = (PSU_CX + strap_inner_x) if sx > 0 else (PSU_CX - strap_outer_x)
         leg = box(PSU_LEG_T, PSU_LEG_H + PSU_STRAP_H, PSU_STRAP_L,
                   lx, PSU_TOP - PSU_LEG_H, PSU_BORE_Z - PSU_STRAP_L / 2.0)
         strap = strap.fuse(leg)
-        tx = (strap_inner_x - PSU_TOOTH_W) if sx > 0 else -strap_inner_x
+        tx = (PSU_CX + strap_inner_x - PSU_TOOTH_W) if sx > 0 else (PSU_CX - strap_inner_x)
         tooth = box(PSU_TOOTH_W, PSU_LEG_H - 3.5, PSU_BOSS_L,
                     tx, PSU_TOP - PSU_LEG_H, PSU_BORE_Z - PSU_BOSS_L / 2.0)
         strap = strap.fuse(tooth)
@@ -735,12 +738,12 @@ def report(body, lid, strap, log):
         % (INT_W, INT_H, FIT_CLEAR))
     add("")
     add(" ENCLOSURE  (body)")
-    add("   outside W x H x D       : %.1f x %.1f x %.1f mm"
-        % (OUT_W, REAR_H, Z_OUT))
+    add("   outside W x H x D       : %.1f (bay) / %.1f (plenum) x %.1f x %.1f mm"
+        % (OUT_W, PLEN_OUT_W, REAR_H, Z_OUT))
     add("   bay section             : %.1f (W) x %.1f (H) x %.1f (D) mm"
         % (OUT_W, BAY_H, Z_BAY))
     add("   fan/plenum section      : %.1f (W) x %.1f (H) x %.1f (D) mm"
-        % (OUT_W, REAR_H, Z_OUT - Z_BAY))
+        % (PLEN_OUT_W, REAR_H, Z_OUT - Z_BAY))
     add("   top profile             : %s"
         % ("FLAT - rear section is the same height as the bay"
            if FLAT_TOP else
@@ -749,7 +752,7 @@ def report(body, lid, strap, log):
     add("   wall / floor / rear wall: %.1f / %.1f / %.1f mm"
         % (WALL, FLOOR_T, REAR_WALL_T))
     add("   plenum clear depth      : %.1f mm" % PLENUM_D)
-    add("   roof gussets            : %.1f mm tall at 45 deg, carrying the lid screws"
+    add("   roof gussets            : %.1f mm tall at 45 deg, carrying the lid rails"
         % GUSSET_H)
     add("")
     add(" FAN  -  %s" % FAN_MODEL)
@@ -810,10 +813,10 @@ def report(body, lid, strap, log):
     add("   tightest edge margin    : %.2f mm (pocket to the top edge)"
         % (REAR_H - FAN_CY - GRILLE_POCKET_R))
     add("")
-    add(" PicoPSU CRADLE  (plenum floor, %.1f mm behind the backplane)"
-        % PSU_BOOT)
-    add("   board                   : %.1f (W) x %.1f (L) x %.1f (H) mm"
-        % (PSU_W, PSU_L, PSU_H))
+    add(" PicoPSU CRADLE  (transverse, shifted right X=%+.1f mm)"
+        % PSU_CX)
+    add("   board                   : %.1f (L, across X) x %.1f (W, along Z) x %.1f (H) mm"
+        % (PSU_L, PSU_W, PSU_H))
     add("   cradle inner            : %.1f x %.1f mm, %.1f mm clearance per side"
         % (2 * PSU_XH, 2 * PSU_ZH, PSU_CLEAR))
     add("   cradle Z                : %.1f .. %.1f  (mouth to rear wall)"
@@ -821,6 +824,9 @@ def report(body, lid, strap, log):
     add("   backplane clearance     : %.1f mm from the cradle mouth to the"
         % PSU_BOOT)
     add("                             backplane face - the board cannot reach it")
+    add("   lateral clearance       : %.1f mm open plenum floor on left (X=%.1f..%.1f)"
+        % (PSU_CX - PSU_XH - (-PLEN_XI), -PLEN_XI, PSU_CX - PSU_XH))
+    add("                             for backplane power cable and Wago 221 lever blocks")
     add("   plinth                  : %.1f mm, board sits clear of the floor"
         % PSU_PLINTH_T)
     add("   front lip               : %.1f mm tall (%.1f mm above the plinth),"
@@ -839,7 +845,7 @@ def report(body, lid, strap, log):
     add("                             thick panel for the jack nut")
     add("   jack hole               : O%.1f through" % DC_JACK_DIA)
     add("   edge margin             : %.2f mm outboard"
-        % (XW - DC_JACK_X - DC_JACK_PAD / 2.0))
+        % (PLEN_XW - DC_JACK_X - DC_JACK_PAD / 2.0))
     add("")
     add(" CABLE EGRESS  (rear wall, beside the grille)")
     add("   %d slots                : %.1f (X) x %.1f (Y) mm, rounded corners"
@@ -854,7 +860,7 @@ def report(body, lid, strap, log):
                          y - FAN_CY) - GRILLE_POCKET_R
               for y in REAR_CABLE_SLOT_Y))
     add("   clearance to the edge   : %.2f mm outboard"
-        % (XW - abs(REAR_CABLE_SLOT_X) - REAR_CABLE_SLOT_W / 2.0))
+        % (PLEN_XW - abs(REAR_CABLE_SLOT_X) - REAR_CABLE_SLOT_W / 2.0))
     add("")
     add(" SERVICE LID  (slide-and-click housing - 100% screwless)")
     add("   outside                 : %.1f (W) x %.1f (D) mm, %.1f mm plate"
@@ -885,7 +891,7 @@ def report(body, lid, strap, log):
     add("                             The front tabs and rails make that the only")
     add("                             way in, so there is nothing to slide or align")
     add("   roof left beside opening: %.1f mm each side, plus %.1f mm across"
-        % (XI - SVC_HALF, SVC_Z0 - Z_BAY))
+        % (PLEN_XI - SVC_HALF, SVC_Z0 - Z_BAY))
     add("                             the front")
     add("")
     add(" EDGE TREATMENT  (outside edges only, for handling and to stop chipping)")
@@ -936,13 +942,13 @@ def report(body, lid, strap, log):
         % (max(strap.BoundBox.XLength, strap.BoundBox.YLength,
                strap.BoundBox.ZLength) <= 340.0))
     add("   PicoPSU phantom fit (board pushed to the rear of the cradle):")
-    psu = box(PSU_W, PSU_H, PSU_L, -PSU_W / 2.0,
-              FLOOR_T + PSU_PLINTH_T, PSU_Z1 - PSU_L)
+    psu = box(PSU_L, PSU_H, PSU_W, PSU_CX - PSU_L / 2.0,
+              FLOOR_T + PSU_PLINTH_T, PSU_Z1 - PSU_W)
     inter = body.common(psu).Volume
     add("     board/body interference: %.4f mm3  -> %s"
         % (inter, "CLEAR" if inter < 1e-6 else "FOULING"))
     add("     board front to backplane: %.2f mm in the rearmost position"
-        % ((PSU_Z1 - PSU_L) - Z_BAY))
+        % ((PSU_Z1 - PSU_W) - Z_BAY))
     add("   slide rails on body     : length %.1f mm (Z %.1f..%.1f), height %.1f..%.1f mm"
         % (Z_OUT - RAIL_Z0, RAIL_Z0, Z_OUT,
            RAIL_YC - RAIL_H / 2.0 - RAIL_W, RAIL_YC + RAIL_H / 2.0 + RAIL_W))

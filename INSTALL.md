@@ -154,13 +154,13 @@ straight down into a slot and seats on the plenum floor, and **no screws are nee
 
 | | |
 |---|---|
-| Slot | Z 248 → 273, straight down from above |
+| Slot | Z 220 → 245, straight down from above |
 | Seat | the plenum floor — the frame's bottom edge rests on it |
 | Frame | X ±46, guided by two rails with 0.2 mm clearance per side |
 | Up | two fins on the lid later come down to 1 mm above its top edge |
 
-**How to get it in.** The service opening in the top runs Z 172 → 273. Lower the
-frame flat (hub up) into the **rear end** of that opening, over Z 248–273, and let
+**How to get it in.** The service opening in the top runs Z 165 → 245. Lower the
+frame flat (hub up) into the **rear end** of that opening, over Z 220–245, and let
 it drop.
 
 1. Line the frame up over the **rear end** of the opening. The two guide rails below
@@ -188,7 +188,7 @@ it drop.
 
 Same slide as step 2, but now you know it fits. Push it in square and straight until
 it stops on the frame. Nothing else changes — the fan is behind it and out of the
-way, at Z 248+, and the cage stops at Z 165.
+way, at Z 220+, and the cage stops at Z 165.
 
 ---
 
@@ -208,7 +208,7 @@ and lid hold the cage in place. If you wish to pin it:
 
 ## Step 6 — the DC jack
 
-The rear wall takes a panel-mount 5.5 × 2.5 mm barrel jack at **(+60, 52)**:
+The rear wall takes a panel-mount 5.5 × 2.5 mm barrel jack at **(+70, 52)**:
 
 | | |
 |---|---|
@@ -225,7 +225,7 @@ to the tags on the inside before you tighten it down.
 
 ## Step 7 — the SFF-8087 cables
 
-There are two slots in the rear wall, both at **X = −60**, at **Y = 33** and
+There are two slots in the rear wall, both at **X = −70**, at **Y = 33** and
 **Y = 50**, each 17 × 12 mm with rounded corners. Do these before the PicoPSU goes
 in — you need the cradle empty to get your hand in.
 
@@ -239,46 +239,56 @@ in — you need the cradle empty to get your hand in.
 
 ---
 
-## Step 8 — wiring
+## Step 8 — wiring & Wago layout
 
-This part is yours, not the model's: no wire routing or Wago mounts are modelled,
-because your backplane's power connector is whatever it is.
+The HP DL380 G6/G7 backplane features a 10-pin power socket that faces directly to
+the **left (-X)**.
 
-**Room you have**: about 47 mm of clear floor either side of the PSU cradle, plus a
-17 mm strip right behind the backplane. The Wagos sit on the floor there; cable-tie
-them to the harness if you want them fixed.
+**Plenum clearance**:
+- The plenum is **200 mm wide internally (205.6 mm outside)**, providing **27.5 mm of
+  clearance** to the left of the backplane PCB ($X = -72.5\text{ mm}$ to $-100.0\text{ mm}$).
+- An internal stop rib notch at $X = -72.9 \to -68.9\text{ mm}$ ($Y = 35 \to 85\text{ mm}$)
+  ensures the connector housing seats cleanly without obstruction.
+- The 10-pin cable plugs in from the left and bends backward into the plenum.
 
-**Two things that will catch you out**
+**Wago lever block placement**:
+- The transverse PicoPSU cradle is shifted to the right ($X = +40.0\text{ mm}$),
+  leaving **117.2 mm of wide, open floor on the left (X = -100.0 to +17.2 mm)**.
+- Place three Wago 221 lever connectors (12 V, 5 V, Ground) on the open floor on the
+  left side.
+- Connect the 10-pin backplane power leads and PicoPSU outputs into the Wago blocks:
+  - Yellow: 12 V (from PicoPSU 12 V rail & external DC input)
+  - Red: 5 V (from PicoPSU 5 V rail)
+  - Black: Ground (common ground for backplane, PicoPSU, and DC jack)
 
-1. **There is no motherboard in this box**, so a PicoPSU will not start on its own.
-   Its **PS_ON# pin must be tied to ground** for it to run as a standalone
-   12 V → 5 V / 3.3 V supply. Without that jumper you get nothing on the rails.
-2. The PicoPSU's output harness is 24-pin ATX plus a SATA/Molex string, and none of
-   that mates with an HP backplane. You're cutting it down and landing 12 V / 5 V /
-   3.3 V / ground on the Wagos, then out to the backplane's own power input.
+**Crucial PicoPSU configuration**:
+- **There is no motherboard in this box**, so a PicoPSU will not start on its own.
+  Its **PS_ON# pin (green wire on 24-pin ATX) must be tied to ground** (black wire)
+  for it to turn on as a standalone power supply.
+- Connect the ARCTIC P9 fan (12 V and Ground) to the corresponding Wago blocks.
 
 ---
 
 ## Step 9 — the PicoPSU into the cradle + snap-fit strap
 
-The cradle is sized for the **bare picoPSU-120 board, 31 × 44 × 21 mm**.
+The cradle is sized for the **bare picoPSU-120 board, 31 × 44 × 21 mm**, oriented
+**transversely (44 mm across X, 31 mm along Z)** at $X = +40.0\text{ mm}$.
 
 | | |
 |---|---|
-| Cradle bore | 32.6 × 45.6 mm (0.8 mm clearance per side) |
-| Cradle Z | 185 → 230.6 |
+| Cradle bore | 45.6 (across X) × 32.6 (along Z) mm (0.8 mm clearance per side) |
+| Cradle Z | 177.0 → 209.6 mm |
 | Board sits on | a 3 mm plinth, so the solder side never touches the floor |
 | Front lip | 6 mm tall — 3 mm above the plinth |
-| Backplane gap | the mouth is 20 mm behind the backplane; the board stops 21.6 mm short of it |
-| Snap strap | 56.2 × 10 × 20 mm snap-fit clip with 0.8 mm undercut catch teeth |
+| Backplane gap | the mouth is 12 mm behind the backplane; the board stops 13.6 mm short of it |
+| Snap strap | 67.2 × 4 × 14 mm snap-fit clip with 0.8 mm undercut catch teeth |
 
-1. Route the output harness and the DC input leads **out of the cradle toward the
-   front** before you drop the board in, or you will not get them past the lip.
-2. Lower the board into the cradle, connectors facing whichever way leaves the
-   harness room.
-3. The 6 mm front lip holds it from sliding forward onto the backplane.
+1. Route the output harness and the DC input leads out of the cradle toward the
+   left/front before dropping the board in.
+2. Lower the board into the cradle at $X = +40.0\text{ mm}$.
+3. The 6 mm front lip prevents the board from sliding forward.
 4. Take the **snap-fit strap** and press it down over the cradle corner bosses.
-   The compliant legs will flex outward over the retention ledges and click
+   The compliant legs flex outward over the retention ledges and click
    firmly into place. **No screws, no tools.**
 
 ---
@@ -312,18 +322,18 @@ lid backward (-Z).
 
 ## Step 11 — rubber feet
 
-Four Ø12 × 2 mm recesses in the base at (±61, Z 14) and (±61, Z 260). Push-fit; a
+Four Ø12 × 2 mm recesses in the base at (±61, Z 14) and (±61, Z 239.4). Push-fit; a
 dab of cyanoacrylate if they're loose.
 
 ---
 
-## Step 13 — first power-up
+## Step 12 — first power-up
 
-1. Before applying power: **no screw tips protruding into the plenum**, no wire
-   trapped between the lid and the body, no bare conductor touching the backplane.
+1. Before applying power: **no loose wires trapped between lid and body**, no bare
+   conductor touching the backplane or sheet metal cage.
 2. Power up and confirm the fan spins and pushes air **out of the back**. Hold a
    tissue near the grille — it should be pushed away, not sucked in.
-3. If the fan doesn't run, check the PS_ON# jumper first (step 9).
+3. If the fan doesn't run, check the PS_ON# jumper first (step 8).
 4. Run it for ten minutes and feel the rear wall and the grille. If the plenum is
    uncomfortably hot, the fan is restricted or running too slow — the P9 is PWM and
    idles quietly, so give it some duty cycle.
@@ -337,17 +347,15 @@ dab of cyanoacrylate if they're loose.
 | Cage won't start into the mouth | the lead-in is only 0.8 mm and printing blobs or elephant-footing make it worse; scrape the sleeve and start it squarer. Don't force it — 0.4 mm/side is not a clearance you can bully |
 | Something on the outside feels sharp | a print defect, not the design — every outer edge is R1.4 / R1.0. Deburr it |
 | Cage stops short of the front face | something in the bay behind it, or it's wedged; lift out and look |
-| Fan won't drop into the plenum | you're forward of the housing — the two front corner tabs at Z 244.7–247.7 will stop the frame. Lower it over Z 248–273 |
+| Fan won't drop into the plenum | you're forward of the housing — lower it directly over Z 220–245 |
 | Fan fits but rattles | the housing fit is 0.2 mm per side; lower `FAN_GUIDE_CLEAR` and rebuild |
 | Fan won't go into the housing | raise `FAN_GUIDE_CLEAR`, or scrape the two rails |
 | Fan lifts when I turn the case over | the lid is what holds it down — its two fins sit 1 mm above the frame. With the lid off, the fan is only held by gravity. Reduce `FAN_LID_GAP` if you want it clamped tighter |
-| PicoPSU won't start | PS_ON# isn't grounded (step 9) |
+| PicoPSU won't start | PS_ON# isn't grounded (step 8) |
 | Strap won't sit down | the 24-pin ATX connector is standing up under it — move the strap along the cradle |
 | DC jack won't clamp | your jack's neck is shorter than 3.4 mm; reduce `DC_JACK_DEPTH` and rebuild |
-| Lid won't settle | a cable or Wago is proud of the top face, or the skirt is catching on the case's outer wall — check the bead is not snagging on a proud fan insert |
-| Lid won't go on at all | the skirt bead is too proud for your printer; scrape the bead or rebuild with `SKIRT_BEAD = SKIRT_CLEAR` |
-| Lid drops on but is loose | raise `SKIRT_BEAD` above `SKIRT_CLEAR` and rebuild |
-| Lid pulls the fan cable | it can't — the lip stops 6 mm short of the fan and the skirt is outside the case. If you feel resistance, it's the bead on a fan insert, not a cable |
+| Lid won't slide smoothly | rail tolerance or print artifacts; gently deburr the 45° runner grooves or rails |
+| Lid won't click shut | check that the catch pocket at Z=165 is clear of debris or wires |
 
 ---
 

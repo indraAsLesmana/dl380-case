@@ -47,10 +47,10 @@ RATE = 750.0      # Rp per gram of filament
 DENS = 1.27       # PETG, g/cm3
 PROFILE = 0.75    # printed mass / solid mass at 3 perimeters and 15% infill
 
-#        name          step file                        up
-PARTS = [("body",      "dl380_cage_case_body.step",      +1),
-         ("lid",       "dl380_cage_case_lid.step",       -1),
-         ("psu-strap", "dl380_cage_case_strap.step",     +1)]
+#        name          step file                        up   rot_z
+PARTS = [("body",      "dl380_cage_case_body.step",      +1,    0.0),
+         ("lid",       "dl380_cage_case_lid.step",       -1,   90.0),
+         ("psu-strap", "dl380_cage_case_strap.step",     +1,    0.0)]
 
 PLATE = (340.0, 320.0)   # Bambu Lab H2S; the combined file is laid out to fit it
 GAP = 10.0
@@ -62,14 +62,15 @@ WHAT THIS IS
   Three printed parts for an external enclosure that turns an HP ProLiant DL380
   G6/G7 8-bay 2.5" SFF drive cage (with backplane) into a standalone, fan-cooled
   JBOD box.  Fan, PicoPSU, grille, cable exits and DC jack all live in the body.
+  Slide-and-click lid and snap-fit PSU strap mean 100% screwless enclosure assembly.
 
 UNITS
   Millimetres.  STL and OBJ carry no units, so please import as mm.
 
 FILES
   dl380-case_body.stl / .obj        x1   the main part
-  dl380-case_lid.stl  / .obj        x1   drop-on cover for the body
-  dl380-case_psu-strap.stl / .obj   x1   small retaining strap
+  dl380-case_lid.stl  / .obj        x1   toolless slide-and-click cover
+  dl380-case_psu-strap.stl / .obj   x1   small snap-fit retaining strap
   dl380-case_all-parts.stl / .obj   x1   the same three solids in one file,
                                          already laid out side by side for the
                                          plate.  Use this if you prefer a single
@@ -121,9 +122,11 @@ def load(step):
     return max(found.values(), key=lambda s: s.Volume)
 
 
-def orient(shape, up):
+def orient(shape, up, rot_z=0.0):
     """Rotate so the print-up face points along +Z, then sit it on Z = 0."""
     rotated = shape.rotate(Vector(0, 0, 0), Vector(1, 0, 0), 90.0 if up > 0 else -90.0)
+    if rot_z:
+        rotated = rotated.rotate(Vector(0, 0, 0), Vector(0, 0, 1), rot_z)
     bb = rotated.BoundBox
     return rotated.translate(Vector(-bb.XMin, -bb.YMin, -bb.ZMin))
 
@@ -151,8 +154,8 @@ def main():
         return written
 
     oriented, rows, out = {}, [], []
-    for name, step, up in PARTS:
-        shape = orient(load(os.path.join(SRC, step)), up)
+    for name, step, up, rot_z in PARTS:
+        shape = orient(load(os.path.join(SRC, step)), up, rot_z)
         oriented[name] = shape
         bb = shape.BoundBox
         v = shape.Volume / 1000.0
@@ -161,15 +164,15 @@ def main():
         out.extend(emit(shape, name))
 
     # Everything in one file: the body down the left, the lid and the strap
-    # stacked to its right.  Laid out as two columns because a single row comes
-    # to 379 mm - it would not fit the plate.
+    # stacked to its right.  The lid is rotated 90 deg so its long dimension (211.7 mm)
+    # runs along Y, fitting alongside the body (208.4 mm X + 10 mm GAP + 92.2 mm X = 310.6 mm <= 340 mm).
     bw = oriented["body"].BoundBox.XLength
     lh = oriented["lid"].BoundBox.YLength
     offsets = {"body": (0.0, 0.0),
                "lid": (bw + GAP, 0.0),
                "psu-strap": (bw + GAP, lh + GAP)}
     combo = None
-    for name, step, up in PARTS:
+    for name, step, up, rot_z in PARTS:
         s = place(oriented[name], offsets[name][0], offsets[name][1])
         combo = s if combo is None else combo.fuse(s)
     out.extend(emit(combo, "all-parts"))
