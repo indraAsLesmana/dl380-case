@@ -124,7 +124,27 @@ check("Vertical 10-pin power pass-through slot open", len(slot_pts) > 10, f"Foun
 rear_fan = body_tris[(body_tris[:, :, 2].mean(axis=1) > 210.0) & (body_tris[:, :, 1].mean(axis=1) > 55.0)]
 check("Rear 92mm fan honeycomb exhaust grille present", len(rear_fan) > 100, f"Found {len(rear_fan)} rear 92mm grille facets")
 
-# 7. Service Lid
+# 7. Dual-Cradle Fan Stand System (Bottom Shelf Cradle + Lid Top Stand)
+lip_tris = body_tris[(body_tris[:, :, 2].mean(axis=1) >= 181.5) & (body_tris[:, :, 2].mean(axis=1) <= 185.0) & 
+                     (body_tris[:, :, 1].mean(axis=1) >= 51.5) & (body_tris[:, :, 1].mean(axis=1) <= 61.0)]
+check("Bottom fan stand front retaining lip present", len(lip_tris) > 20, f"Found {len(lip_tris)} front lip facets")
+
+sh_tris = body_tris[(body_tris[:, :, 2].mean(axis=1) >= 184.0) & (body_tris[:, :, 2].mean(axis=1) <= 196.0) & 
+                    (body_tris[:, :, 1].mean(axis=1) >= 51.5) & (body_tris[:, :, 1].mean(axis=1) <= 63.0) &
+                    ((body_tris[:, :, 0].mean(axis=1) <= 30.0) | (body_tris[:, :, 0].mean(axis=1) >= 122.0))]
+check("Bottom fan stand corner locator shoulders present", len(sh_tris) > 15, f"Found {len(sh_tris)} corner shoulder facets")
+
+wall_tris = body_tris[(body_tris[:, :, 2].mean(axis=1) >= 185.0) & (body_tris[:, :, 2].mean(axis=1) <= 205.0) &
+                      (body_tris[:, :, 1].mean(axis=1) >= 70.0) & (body_tris[:, :, 1].mean(axis=1) <= 130.0) &
+                      (((body_tris[:, :, 0].mean(axis=1) >= 20.0) & (body_tris[:, :, 0].mean(axis=1) <= 30.0)) |
+                       ((body_tris[:, :, 0].mean(axis=1) >= 122.0) & (body_tris[:, :, 0].mean(axis=1) <= 132.0)))]
+check("Plenum side corridors 100% unobstructed (no vertical rails)", len(wall_tris) == 0, f"Found {len(wall_tris)} obstructive rail facets")
+
+top_lip_tris = lid_tris[(lid_tris[:, :, 1].mean(axis=1) <= 143.0) & 
+                        (lid_tris[:, :, 2].mean(axis=1) >= 181.5) & (lid_tris[:, :, 2].mean(axis=1) <= 186.0)]
+check("Matching Top Fan Stand integrated into Service Lid", len(top_lip_tris) > 4, f"Found {len(top_lip_tris)} lid top stand facets")
+
+# 8. Service Lid Geometry
 l_verts = lid_tris.reshape(-1, 3)
 lid_w = l_verts[:, 0].max() - l_verts[:, 0].min()
 lid_d = l_verts[:, 2].max() - l_verts[:, 2].min()
@@ -135,7 +155,7 @@ lid_bottom = l_verts[:, 1].min()
 lid_top = l_verts[:, 1].max()
 check("Lid is solid with blind thumb rebate (thickness > 2.0 mm everywhere)", (lid_top - lid_bottom) >= 3.4, f"Thickness = {lid_top - lid_bottom:.2f} mm")
 
-# 8. Mesh Quality & Resolution
+# 9. Mesh Quality & Resolution
 check("Body mesh resolution >= 3,000 facets", body_count >= 3_000, f"Total facets = {body_count:,}")
 check("Lid mesh resolution >= 150 facets", lid_count >= 150, f"Total facets = {lid_count:,}")
 

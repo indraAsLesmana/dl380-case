@@ -33,6 +33,13 @@ Smooth-Slide Architecture & Hardware Accommodations:
   - Mid-Deck Shelf:
       * Direct vertical 32 x 24 mm 10-pin power pass-through slot aligned directly beneath
         the backplane power socket for a direct ~35 mm vertical wire run.
+  - Integrated Dual-Cradle Fan Stand System (No Obstructive Side Rails):
+      * Eliminates the full-height 92mm side rails, opening up the entire 146.0 mm internal width
+        for effortless SAS cable routing, 10-pin power connection, and hand access.
+      * Bottom Fan Stand (Shelf-Level): Integrated low-profile cradle with front retaining lip,
+        aerodynamic center scoop matching the rotor arc, 4-pin PWM wire notch, and corner locator shoulders.
+      * Top Fan Stand (Service Lid): Matching inverted capture lip with 45° self-centering lead-in
+        chamfer and top clamping pads, securing the fan rigidly without requiring tools.
   - Solid Top Service Lid (Y = 145.5 to 149.0 mm):
       * Stepped perimeter drop-in lid covering the 45 mm rear plenum.
       * 100% solid top surface (zero through-holes) with shallow blind tactile thumb dimple
@@ -248,18 +255,36 @@ power_slot = Part.makeBox(32.0, MID_DECK_T + 4.0, 24.0,
 body = body.cut(power_slot)
 
 # ------------------------------------------------------------------------------
-# 9. 92mm Cooling Fan Mount & Honeycomb Exhaust Grille
+# 9. 92mm Cooling Fan Mount: Bottom Cradle Stand & Honeycomb Exhaust Grille
 # ------------------------------------------------------------------------------
-print("9. Modeling 92mm rear fan mounting, side rails, and honeycomb exhaust grille...", flush=True)
+print("9. Modeling 92mm rear fan mounting, bottom cradle stand, and honeycomb exhaust grille...", flush=True)
 
 fan_cx = WALL + INT_W / 2.0                    # 76.00 mm (centered)
 fan_cy = Y_UPPER_FLOOR + UPPER_H / 2.0         # 98.50 mm (centered in 94mm clear height)
 fan_cz = Z_PLEN_END - FAN_D                    # 185.00 mm
 
-# 92mm Side Guide Rails (width = 92.0 mm centered)
-fan_rail_l = Part.makeBox(3.0, FAN_SIZE, FAN_D, Vector(fan_cx - FAN_SIZE/2.0 - 3.0, Y_UPPER_FLOOR, fan_cz))
-fan_rail_r = Part.makeBox(3.0, FAN_SIZE, FAN_D, Vector(fan_cx + FAN_SIZE/2.0, Y_UPPER_FLOOR, fan_cz))
-body = body.fuse(fan_rail_l).fuse(fan_rail_r)
+# Integrated Bottom Fan Stand (inspired by Arctic PC fan cradle stand)
+# Base corner rest plinths (elevate fan 1.0 mm to Y = 52.5 mm, centered with 86mm grille at Y=98.5)
+b_pad_l = Part.makeBox(15.4, 1.0, 24.5, Vector(29.6, Y_UPPER_FLOOR, 184.6))
+b_pad_r = Part.makeBox(15.4, 1.0, 24.5, Vector(107.0, Y_UPPER_FLOOR, 184.6))
+
+# Front Retaining Lip (Z = 182.2 to 184.6 mm, thickness 2.4 mm, height 9.0 mm up to Y = 60.5 mm)
+b_lip = Part.makeBox(95.6, 9.0, 2.4, Vector(28.2, Y_UPPER_FLOOR, 182.2))
+
+# Aerodynamic Center Scoop (width = 56.0 mm, centered at fan_cx = 76.0 mm)
+scoop = Part.makeBox(56.0, 6.0, 3.0, Vector(fan_cx - 28.0, Y_UPPER_FLOOR + 3.5, 182.0))
+b_lip = b_lip.cut(scoop)
+
+# Fan 4-pin PWM Cable Exit Notch at lower-left corner
+cable_notch = Part.makeBox(6.5, 4.0, 3.0, Vector(30.0, Y_UPPER_FLOOR, 182.0))
+b_lip = b_lip.cut(cable_notch)
+
+# Low-Profile Corner Locator Shoulders (10.5 mm tall, NOT 92 mm tall!)
+b_sh_l = Part.makeBox(2.8, 10.5, 11.4, Vector(26.8, Y_UPPER_FLOOR, 184.6))
+b_sh_r = Part.makeBox(2.8, 10.5, 11.4, Vector(122.4, Y_UPPER_FLOOR, 184.6))
+
+# Fuse bottom stand components to enclosure body
+body = body.fuse(b_pad_l).fuse(b_pad_r).fuse(b_lip).fuse(b_sh_l).fuse(b_sh_r)
 
 # Rear Honeycomb Exhaust Grille (86 mm diameter)
 grille_cell = 9.5
@@ -370,6 +395,25 @@ plug   = Part.makeBox(135.0, 1.7, 41.2, Vector(8.4, OUT_H - ROOF_T, 166.4))
 flange = Part.makeBox(143.0, 1.8, 45.7, Vector(4.4, roof_shelf_y, 163.4))
 lid = plug.fuse(flange)
 
+# Integrated Matching Top Fan Stand on Service Lid
+# Top front retaining lip extending down from lid plug (captures top front rim of fan)
+t_lip = Part.makeBox(86.0, 5.0, 2.4, Vector(33.0, 140.5, 182.2))
+
+# 45° self-centering lead-in ramp along rear-bottom edge of top lip
+cut_wire = Part.Wire([
+    Part.makeLine(Vector(0, 140.4, 183.0), Vector(0, 140.4, 184.7)),
+    Part.makeLine(Vector(0, 140.4, 184.7), Vector(0, 142.1, 184.7)),
+    Part.makeLine(Vector(0, 142.1, 184.7), Vector(0, 140.4, 183.0))
+])
+cut_prism = Part.Face(cut_wire).extrude(Vector(90.0, 0, 0)).translate(Vector(31.0, 0, 0))
+t_lip = t_lip.cut(cut_prism)
+
+# Top clamping rest pads (1.0 mm thick down to Y = 144.5 mm)
+t_pad_l = Part.makeBox(14.0, 1.0, 20.0, Vector(32.0, 144.5, 186.0))
+t_pad_r = Part.makeBox(14.0, 1.0, 20.0, Vector(106.0, 144.5, 186.0))
+top_stand = t_lip.fuse(t_pad_l).fuse(t_pad_r)
+lid = lid.fuse(top_stand)
+
 # Blind tactile circular thumb dimple on top of lid (1.0 mm deep, completely solid bottom)
 thumb = Part.makeCylinder(12.0, 1.2, Vector(OUT_W / 2.0, OUT_H - 1.0, 186.0), Vector(0, 1, 0))
 lid = lid.cut(thumb)
@@ -443,7 +487,9 @@ with open(report_path, "w") as f:
     f.write(f"Power Routing:    Vertical 32x24 mm mid-deck slot directly under backplane 10-pin port\n")
     f.write(f"Basement Wiring:  Dedicated 62.5 mm wide wiring corridor beside PSU\n")
     f.write(f"Fan Grille:       86.0 mm diameter hexagonal honeycomb rear exhaust (82.5 mm pitch)\n")
-    f.write(f"Service Lid:      Stepped perimeter drop-in lid, 100% solid top (no through-holes)\n")
+    f.write(f"Fan Stand:        Integrated dual-cradle system (bottom shelf cradle + lid top stand)\n")
+    f.write(f"Plenum Clearance: Full 146.0 mm unobstructed lateral width (no vertical side walls)\n")
+    f.write(f"Service Lid:      Stepped perimeter drop-in lid with integrated top fan stand\n")
     f.write("=" * 80 + "\n")
 
 print("=" * 80)

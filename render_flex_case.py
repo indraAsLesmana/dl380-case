@@ -57,7 +57,7 @@ ax1.set_ylabel('Z (Depth: 215.0 mm)', color=COLOR_TEXT, labelpad=8)
 ax1.set_zlabel('Y (Height: 149.0 mm)', color=COLOR_TEXT, labelpad=8)
 ax1.tick_params(colors=COLOR_TEXT)
 ax1.view_init(elev=28, azim=-55)
-ax1.set_title('Isometric View: Ultra-Smooth Double-Decker Architecture\nStud Channels + Low-Friction Runners + Tab Pockets + 92mm Fan',
+ax1.set_title('Isometric View: Ultra-Smooth Double-Decker Architecture\nDual-Cradle Fan Stand (Shelf Cradle + Lid Top Stand) | 92mm Fan + Flex-ATX PSU',
               color='#ffffff', fontsize=12, fontweight='bold', pad=12)
 
 # ------------------------------------------------------------------------------
@@ -127,10 +127,10 @@ ax4.plot([185, 185], [51.5, 145.5], color='#f78166', lw=1.5, linestyle='-.', lab
 
 # Annotations
 ax4.text(82.5, 98.5, 'HP DL380 8-Bay Cage\n(165 mm deep on runners)', color='#79c0ff', fontsize=8.5, ha='center', va='center')
-ax4.text(175.0, 105.0, '20mm Plenum Gap\n(M3 Tabs / SAS)', color='#ffa657', fontsize=8, ha='center', va='center')
-ax4.text(200.0, 98.5, '92mm\nFan', color='#f78166', fontsize=8, ha='center', va='center')
+ax4.text(175.0, 105.0, '20mm Plenum Gap\n(Open 146mm Width)', color='#ffa657', fontsize=8, ha='center', va='center')
+ax4.text(198.0, 98.5, '92mm Fan in\nDual Cradle', color='#f78166', fontsize=8, ha='center', va='center')
 ax4.text(105.0, 26.0, 'Lower Basement: Flex-ATX PSU (150 mm) & Wiring Corridor', color='#e3b341', fontsize=8.5, ha='center', va='center')
-ax4.text(187.0, 147.2, 'Service Lid', color='#58a6ff', fontsize=8, ha='center', va='bottom')
+ax4.text(187.0, 147.2, 'Lid + Top Stand', color='#58a6ff', fontsize=8, ha='center', va='bottom')
 
 ax4.set_xlim([-5, 225])
 ax4.set_ylim([-5, 155])
