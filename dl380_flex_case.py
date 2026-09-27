@@ -2,7 +2,7 @@
 """
 dl380_flex_case.py - Parametric FreeCAD Model of a Double-Decker Desktop Enclosure
 for an HP ProLiant DL380 G6/G7 8-bay 2.5" SFF Drive Cage, Enhance ENP-2320 Flex-ATX
-Power Supply, and a High-Flow 120mm Rear Exhaust Fan.
+Power Supply, and a Compact 92mm Rear Exhaust Fan.
 
 Double-Decker Architecture:
   - Lower Basement (Y = 0.0 to 51.5 mm):
@@ -21,27 +21,27 @@ Double-Decker Architecture:
       * 3.0 mm structural floor separating basement from upper chamber.
       * Direct vertical 10-pin power pass-through slot (32.0 x 24.0 mm) positioned
         directly below the DL380 backplane's lower-right power socket.
-  - Upper Story (Y = 51.5 to 173.5 mm):
+  - Upper Story (Y = 51.5 to 145.5 mm):
       * HP DL380 8-bay 2.5" SFF Drive Cage chamber (145.0 x 87.0 x 165.0 mm).
       * Internal bottom slider rails (14.0 x 3.5 mm) & ceiling guide ribs (5.0 x 3.5 mm).
       * Rear stop frame at Z = 162.0 to 165.0 mm to lock cage depth.
-      * Forward upper aerodynamic transition shroud (34.2 mm tall, 12.0 mm deep)
+      * Forward upper aerodynamic transition shroud (6.2 mm tall, 12.0 mm deep)
         above the cage mouth to prevent front air short-circuiting.
-      * Rear 120mm Fan Plenum (Z = 165.0 to 200.0 mm, 35.0 mm deep):
-          - Accommodates standard 120 x 120 x 25 mm fans (e.g. Arctic P12, Noctua NF-A12x25).
+      * Rear 92mm Fan Plenum (Z = 165.0 to 200.0 mm, 35.0 mm deep):
+          - Accommodates standard 92 x 92 x 25 mm fans (e.g. Arctic P9 PWM PST, Noctua NF-A9).
           - Side guide rails for smooth drop-in fan alignment.
-          - Large 115.0 mm diameter hexagonal honeycomb exhaust grille.
-          - Standard 105.0 x 105.0 mm M4 fan screw mounting pattern.
-          - Dual rear SAS cable pass-through ports (18.0 x 14.0 mm) for external HBA runs.
-  - Service Lid & Roof (Y = 173.5 to 177.0 mm):
+          - High-flow 86.0 mm diameter hexagonal honeycomb exhaust grille.
+          - Standard 82.5 x 82.5 mm M4 fan screw mounting pattern.
+          - Dual rear SAS cable pass-through ports (18.0 x 14.0 mm) flanking the fan.
+  - Service Lid & Roof (Y = 145.5 to 149.0 mm):
       * Recessed stepped perimeter ledge over the fan plenum (Z = 162.0 to 199.5 mm).
       * Matching drop-in service lid with 0.4 mm clearance.
       * Solid top surface with zero through-holes.
-      * Ergonomic shallow blind thumb grip rebate on top (1.0 mm deep) for easy removal.
+      * Ergonomic shallow blind thumb grip rebate on top (1.0 mm deep) with tactile ridges.
 
 Enclosure Dimensions:
-  - Width:  151.80 mm (fits standard 256 x 256 mm build plates)
-  - Height: 177.00 mm (well within 256 mm Z build volume)
+  - Width:  151.80 mm (fits standard 256 x 256 mm build plates with 104 mm margin)
+  - Height: 149.00 mm (ultra-compact desktop profile)
   - Depth:  205.00 mm
 """
 
@@ -85,18 +85,18 @@ BASEMENT_H      =  45.0    # mm  clear internal height of basement
 
 SWITCH_DIA      =  16.2    # mm  standard 16 mm metal push-button switch
 
-# ---- 120mm Cooling Fan & Rear Plenum -----------------------------------------
-FAN_SIZE        = 120.0    # mm  nominal 120 mm fan (Arctic P12, Noctua NF-A12)
+# ---- 92mm Cooling Fan & Rear Plenum ------------------------------------------
+FAN_SIZE        =  92.0    # mm  nominal 92 mm fan (Arctic P9, Noctua NF-A9)
 FAN_D           =  25.0    # mm  fan depth
 PLENUM_D        =  35.0    # mm  depth behind cage (Z = 165 to 200 mm)
-FAN_APERTURE    = 115.0    # mm  grille bore diameter
-FAN_PITCH       = 105.0    # mm  fan screw hole square pitch
-UPPER_H         = FAN_SIZE + 2.0  # 122.0 mm clear internal height
+FAN_APERTURE    =  86.0    # mm  grille bore diameter
+FAN_PITCH       =  82.5    # mm  fan screw hole square pitch
+UPPER_H         = FAN_SIZE + 2.0  # 94.0 mm clear internal height
 
 # ---- Overall Dimensions ------------------------------------------------------
 OUT_W           = WALL + INT_W + WALL                              # 151.80 mm
 OUT_D           = CAGE_D + PLENUM_D + REAR_WALL_T                 # 205.00 mm
-OUT_H           = FLOOR_T + BASEMENT_H + MID_DECK_T + UPPER_H + ROOF_T # 177.00 mm
+OUT_H           = FLOOR_T + BASEMENT_H + MID_DECK_T + UPPER_H + ROOF_T # 149.00 mm
 
 # Key Coordinate Planes:
 # X: [0, OUT_W] = [0.0, 151.8]
@@ -104,8 +104,8 @@ OUT_H           = FLOOR_T + BASEMENT_H + MID_DECK_T + UPPER_H + ROOF_T # 177.00 
 #    Y_BASE_FLOOR = FLOOR_T = 3.5
 #    Y_MID_DECK   = FLOOR_T + BASEMENT_H = 48.5
 #    Y_UPPER_FLOOR= FLOOR_T + BASEMENT_H + MID_DECK_T = 51.5
-#    Y_ROOF_LOWER = OUT_H - ROOF_T = 173.5
-#    Y_ROOF_TOP   = OUT_H = 177.0
+#    Y_ROOF_LOWER = OUT_H - ROOF_T = 145.5
+#    Y_ROOF_TOP   = OUT_H = 149.0
 # Z: 0.0 at front mouth
 #    Z_CAGE_STOP  = CAGE_D = 165.0
 #    Z_PLEN_END   = CAGE_D + PLENUM_D = 200.0
@@ -125,7 +125,7 @@ os.makedirs(OUT_DIR, exist_ok=True)
 os.makedirs(PRINT_DIR, exist_ok=True)
 
 print("=" * 80)
-print("DL380 DOUBLE-DECKER FLEX-ATX ENCLOSURE GENERATOR (120MM FAN)")
+print("DL380 DOUBLE-DECKER FLEX-ATX ENCLOSURE GENERATOR (92MM FAN)")
 print(f"Chassis Envelope: {OUT_W:.2f} mm (W) x {OUT_H:.2f} mm (H) x {OUT_D:.2f} mm (D)")
 print(f"Print Bed Footprint: {OUT_W:.1f} x {OUT_D:.1f} mm (fits 256x256 mm beds easily!)")
 print("=" * 80, flush=True)
@@ -159,7 +159,7 @@ print("2. Hollowing lower basement void (PSU & wiring corridor)...", flush=True)
 base_void = Part.makeBox(INT_W, BASEMENT_H, Z_PLEN_END - 3.5 + 0.1,
                          Vector(WALL, Y_BASE_FLOOR, 3.5))
 
-print("3. Hollowing upper chamber void (drive cage bay & 120mm plenum)...", flush=True)
+print("3. Hollowing upper chamber void (drive cage bay & 92mm plenum)...", flush=True)
 upper_void = Part.makeBox(INT_W, UPPER_H, Z_PLEN_END + 2.0,
                           Vector(WALL, Y_UPPER_FLOOR, -2.0))
 
@@ -208,20 +208,20 @@ shroud_lip = Part.makeBox(INT_W, UPPER_H - (CAGE_H + 2 * FIT_CLEAR), 12.0,
 body = body.fuse(shroud_lip)
 
 # ------------------------------------------------------------------------------
-# 7. 120mm Cooling Fan Mount & Honeycomb Exhaust Grille
+# 7. 92mm Cooling Fan Mount & Honeycomb Exhaust Grille
 # ------------------------------------------------------------------------------
-print("7. Modeling 120mm rear fan mounting, side rails, and honeycomb exhaust grille...", flush=True)
+print("7. Modeling 92mm rear fan mounting, side rails, and honeycomb exhaust grille...", flush=True)
 
 fan_cx = WALL + INT_W / 2.0                    # 75.90 mm (centered)
-fan_cy = Y_UPPER_FLOOR + FAN_SIZE / 2.0 + 1.0  # 112.50 mm (centered in 122mm clear height)
+fan_cy = Y_UPPER_FLOOR + UPPER_H / 2.0         # 98.50 mm (centered in 94mm clear height)
 fan_cz = Z_PLEN_END - FAN_D                    # 175.00 mm
 
-# 120mm Side Guide Rails (width = 120.0 mm centered)
+# 92mm Side Guide Rails (width = 92.0 mm centered)
 fan_rail_l = Part.makeBox(3.0, FAN_SIZE, FAN_D, Vector(fan_cx - FAN_SIZE/2.0 - 3.0, Y_UPPER_FLOOR, fan_cz))
 fan_rail_r = Part.makeBox(3.0, FAN_SIZE, FAN_D, Vector(fan_cx + FAN_SIZE/2.0, Y_UPPER_FLOOR, fan_cz))
 body = body.fuse(fan_rail_l).fuse(fan_rail_r)
 
-# Rear Honeycomb Exhaust Grille (115 mm diameter)
+# Rear Honeycomb Exhaust Grille (86 mm diameter)
 grille_cell = 9.5
 grille_web  = 1.5
 step_x = (grille_cell + grille_web) * math.sqrt(3.0) / 2.0
@@ -229,10 +229,10 @@ step_y = (grille_cell + grille_web) * 1.5
 r_max  = (FAN_APERTURE / 2.0) - 2.0
 
 hex_cuts = []
-for row in range(-8, 9):
+for row in range(-6, 7):
     cy = fan_cy + row * step_y * 0.5
     row_offset = (step_x * 0.5) if (row % 2 != 0) else 0.0
-    for col in range(-8, 9):
+    for col in range(-6, 7):
         cx = fan_cx + col * step_x + row_offset
         dist = math.hypot(cx - fan_cx, cy - fan_cy)
         if dist + grille_cell / 2.0 < r_max:
@@ -244,7 +244,7 @@ if hex_cuts:
         all_hex = all_hex.fuse(h)
     body = body.cut(all_hex)
 
-# 4x 120mm Fan Mounting Screw Holes (105.0 mm square pattern, M4 / 4.2 mm)
+# 4x 92mm Fan Mounting Screw Holes (82.5 mm square pattern, M4 / 4.2 mm)
 for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
     for dy in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
         hole = Part.makeCylinder(2.1, REAR_WALL_T + 4.0,
@@ -301,11 +301,11 @@ for row in range(-1, 3):
 # ------------------------------------------------------------------------------
 # 10. Rear SAS Cable Egress Ports
 # ------------------------------------------------------------------------------
-print("10. Cutting dual rear SAS cable pass-through ports...", flush=True)
+print("10. Cutting dual rear SAS cable pass-through ports flanking the fan...", flush=True)
 sas_slot1 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
-                         Vector(fan_cx - 45.0, Y_UPPER_FLOOR + UPPER_H - 18.0, Z_PLEN_END - 2.0))
+                         Vector(8.0, Y_UPPER_FLOOR + UPPER_H - 22.0, Z_PLEN_END - 2.0))
 sas_slot2 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
-                         Vector(fan_cx + 27.0, Y_UPPER_FLOOR + UPPER_H - 18.0, Z_PLEN_END - 2.0))
+                         Vector(WALL + INT_W - 26.0, Y_UPPER_FLOOR + UPPER_H - 22.0, Z_PLEN_END - 2.0))
 body = body.cut(sas_slot1).cut(sas_slot2)
 
 # ------------------------------------------------------------------------------
@@ -313,7 +313,7 @@ body = body.cut(sas_slot1).cut(sas_slot2)
 # ------------------------------------------------------------------------------
 print("11. Creating recessed stepped perimeter roof aperture and solid matching lid...", flush=True)
 
-roof_shelf_y = OUT_H - ROOF_T + 1.7 # 175.2 mm
+roof_shelf_y = OUT_H - ROOF_T + 1.7 # 147.2 mm
 
 # Lower through-cut in roof (Z = 165.0 to 198.0 mm)
 aperture = Part.makeBox(135.8, ROOF_T + 2.0, 33.0,
@@ -382,11 +382,11 @@ mesh_all.write(stl_print)
 report_path = os.path.join(OUT_DIR, "dl380_flex_case_report.txt")
 with open(report_path, "w") as f:
     f.write("=" * 80 + "\n")
-    f.write("DL380 DOUBLE-DECKER FLEX-ATX ENCLOSURE - BUILD REPORT\n")
+    f.write("DL380 DOUBLE-DECKER FLEX-ATX ENCLOSURE (92MM FAN) - BUILD REPORT\n")
     f.write("=" * 80 + "\n\n")
     f.write(f"Target Cage:      HP ProLiant DL380 G6/G7 8-bay 2.5\" SFF (145 x 87 x 165 mm)\n")
     f.write(f"Target PSU:       Enhance ENP-2320 (Flex-ATX 200W, 150 x 81.5 x 40.5 mm)\n")
-    f.write(f"Target Fan:       120 mm Arctic P12 PWM PST / Noctua NF-A12 (120 x 120 x 25 mm)\n\n")
+    f.write(f"Target Fan:       92 mm Arctic P9 PWM PST / Noctua NF-A9 (92 x 92 x 25 mm)\n\n")
     f.write(f"Outer Dimensions: {OUT_W:.2f} mm (W) x {OUT_H:.2f} mm (H) x {OUT_D:.2f} mm (D)\n")
     f.write(f"Body Volume:      {body.Volume:.2f} mm3 (isClosed: {body.isClosed()})\n")
     f.write(f"Lid Volume:       {lid.Volume:.2f} mm3 (isClosed: {lid.isClosed()})\n")
@@ -397,12 +397,12 @@ with open(report_path, "w") as f:
     f.write(f"Switch Port:      16.2 mm illuminated push-button switch in lower front bezel\n")
     f.write(f"Power Routing:    Vertical 32x24 mm mid-deck slot directly under backplane 10-pin port\n")
     f.write(f"Basement Wiring:  Dedicated 62.3 mm wide wiring corridor beside PSU\n")
-    f.write(f"Fan Grille:       115.0 mm diameter hexagonal honeycomb rear exhaust\n")
+    f.write(f"Fan Grille:       86.0 mm diameter hexagonal honeycomb rear exhaust (82.5 mm pitch)\n")
     f.write(f"Service Lid:      Stepped perimeter drop-in lid, 100% solid top (no through-holes)\n")
     f.write("=" * 80 + "\n")
 
 print("=" * 80)
-print(f"SUCCESS: DL380 Double-Decker Flex-ATX Enclosure Generated Successfully!")
+print(f"SUCCESS: DL380 Double-Decker Flex-ATX Enclosure (92mm Fan) Generated Successfully!")
 print(f"  STEP Body:   {step_body}")
 print(f"  STEP Lid:    {step_lid}")
 print(f"  Print STL:   {stl_print}")

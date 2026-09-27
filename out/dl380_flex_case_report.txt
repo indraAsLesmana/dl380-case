@@ -1,15 +1,15 @@
 ================================================================================
-DL380 DOUBLE-DECKER FLEX-ATX ENCLOSURE - BUILD REPORT
+DL380 DOUBLE-DECKER FLEX-ATX ENCLOSURE (92MM FAN) - BUILD REPORT
 ================================================================================
 
 Target Cage:      HP ProLiant DL380 G6/G7 8-bay 2.5" SFF (145 x 87 x 165 mm)
 Target PSU:       Enhance ENP-2320 (Flex-ATX 200W, 150 x 81.5 x 40.5 mm)
-Target Fan:       120 mm Arctic P12 PWM PST / Noctua NF-A12 (120 x 120 x 25 mm)
+Target Fan:       92 mm Arctic P9 PWM PST / Noctua NF-A9 (92 x 92 x 25 mm)
 
-Outer Dimensions: 151.80 mm (W) x 177.00 mm (H) x 205.00 mm (D)
-Body Volume:      701284.48 mm3 (isClosed: True)
+Outer Dimensions: 151.80 mm (W) x 149.00 mm (H) x 205.00 mm (D)
+Body Volume:      612249.14 mm3 (isClosed: True)
 Lid Volume:       16470.49 mm3 (isClosed: True)
-Body Facets:      5,240
+Body Facets:      3,744
 Lid Facets:       280
 
 Print Bed Size:   Fits standard 256 x 256 mm build plates (Bambu Lab X1C/P1S/A1)
@@ -17,6 +17,6 @@ Bed Footprint:    151.80 mm (W) x 205.00 mm (D), Margin X = 104.2 mm, Margin Y =
 Switch Port:      16.2 mm illuminated push-button switch in lower front bezel
 Power Routing:    Vertical 32x24 mm mid-deck slot directly under backplane 10-pin port
 Basement Wiring:  Dedicated 62.3 mm wide wiring corridor beside PSU
-Fan Grille:       115.0 mm diameter hexagonal honeycomb rear exhaust
+Fan Grille:       86.0 mm diameter hexagonal honeycomb rear exhaust (82.5 mm pitch)
 Service Lid:      Stepped perimeter drop-in lid, 100% solid top (no through-holes)
 ================================================================================

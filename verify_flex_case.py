@@ -46,7 +46,7 @@ check("Body STL exists", os.path.isfile(STL_BODY), f"Path: {STL_BODY}")
 check("Lid STL exists", os.path.isfile(STL_LID), f"Path: {STL_LID}")
 check("Print kit STL exists", os.path.isfile(STL_PRINT), f"Path: {STL_PRINT}")
 
-check("Body STL size > 200 KB", os.path.getsize(STL_BODY) > 200_000, f"{os.path.getsize(STL_BODY):,} bytes")
+check("Body STL size > 150 KB", os.path.getsize(STL_BODY) > 150_000, f"{os.path.getsize(STL_BODY):,} bytes")
 check("Lid STL size > 5 KB", os.path.getsize(STL_LID) > 5_000, f"{os.path.getsize(STL_LID):,} bytes")
 
 def read_stl(path):
@@ -73,7 +73,7 @@ check("Width within 151.0 - 153.0 mm", 151.0 <= (max_x - min_x) <= 153.0, f"Span
 check("Width fits standard 256 mm build plate (< 256.0 mm)", (max_x - min_x) < 256.0, f"Margin = {256.0 - (max_x - min_x):.2f} mm")
 check("Depth within 204.0 - 206.0 mm", 204.0 <= (max_z - min_z) <= 206.0, f"Span = {max_z - min_z:.2f} mm")
 check("Depth fits standard 256 mm build plate (< 256.0 mm)", (max_z - min_z) < 256.0, f"Margin = {256.0 - (max_z - min_z):.2f} mm")
-check("Height within 176.0 - 178.0 mm", 176.0 <= (max_y - min_y) <= 178.0, f"Span = {max_y - min_y:.2f} mm (Z limit 256mm)")
+check("Height within 148.0 - 150.0 mm", 148.0 <= (max_y - min_y) <= 150.0, f"Span = {max_y - min_y:.2f} mm (Z limit 256mm)")
 
 # 3. Upper Story: HP DL380 Drive Cage Bay
 mouth_pts = b_verts[(b_verts[:, 2] < 1.0) & (abs(b_verts[:, 0] - 3.0) < 0.2) & (b_verts[:, 1] > 50.0)]
@@ -105,9 +105,9 @@ check("Mid-deck shelf present", len(mid_deck_pts) > 200, f"Found {len(mid_deck_p
 slot_pts = b_verts[(b_verts[:, 0] >= 112.0) & (b_verts[:, 0] <= 146.0) & (b_verts[:, 2] >= 150.0) & (b_verts[:, 2] <= 178.0) & (b_verts[:, 1] >= 47.0) & (b_verts[:, 1] <= 53.0)]
 check("Vertical 10-pin power pass-through slot open", len(slot_pts) > 10, f"Found {len(slot_pts)} power slot edge vertices")
 
-# 6. Rear 120mm Fan Exhaust & Grille (Upper Story)
+# 6. Rear 92mm Fan Exhaust & Grille (Upper Story)
 rear_fan = body_tris[(body_tris[:, :, 2].mean(axis=1) > 200.0) & (body_tris[:, :, 1].mean(axis=1) > 55.0)]
-check("Rear 120mm fan honeycomb exhaust grille present", len(rear_fan) > 150, f"Found {len(rear_fan)} rear 120mm grille facets")
+check("Rear 92mm fan honeycomb exhaust grille present", len(rear_fan) > 100, f"Found {len(rear_fan)} rear 92mm grille facets")
 
 # 7. Service Lid
 l_verts = lid_tris.reshape(-1, 3)
@@ -122,7 +122,7 @@ lid_top = l_verts[:, 1].max()
 check("Lid is solid with blind thumb rebate (thickness > 2.0 mm everywhere)", (lid_top - lid_bottom) >= 3.4, f"Thickness = {lid_top - lid_bottom:.2f} mm")
 
 # 8. Mesh Quality & Resolution
-check("Body mesh resolution >= 4,000 facets", body_count >= 4_000, f"Total facets = {body_count:,}")
+check("Body mesh resolution >= 3,000 facets", body_count >= 3_000, f"Total facets = {body_count:,}")
 check("Lid mesh resolution >= 150 facets", lid_count >= 150, f"Total facets = {lid_count:,}")
 
 print("=" * 80)
