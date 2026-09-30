@@ -1,0 +1,36 @@
+PETUNJUK CETAK 3D / 3D PRINTING INSTRUCTIONS
+Proyek: DL380 Modular 2-Piece Desktop Enclosure with Diamond Mesh
+Target Printer: Elegoo Centauri Carbon (Bed 256 x 256 x 256 mm)
+Dimensi Rakitan Total: 186.0 mm (W) x 215.0 mm (D) x 151.5 mm (H)
+
+FILE YANG DICETAK (PRINT FILES):
+  1. 01_dl380_front_case.stl (Bodi Depan / Front Disc Cage Case) - 1 pcs
+     - Dimensi: 186.0 x 138.0 x 151.5 mm
+     - Fitur: Diamond mesh atap & samping, runner rails, slot switch 16mm, vents PSU
+     - Estimasi berat: ~260 - 280 gram (PETG @ 15% infill)
+  2. 02_dl380_back_case.stl  (Bodi Belakang / Rear Cooling & Power Backcase) - 1 pcs
+     - Dimensi: 186.0 x 79.2 x 151.5 mm
+     - Fitur: Dudukan fan 92mm, dudukan PSU Flex-ATX C14, port SAS, slot power 10-pin
+     - Estimasi berat: ~180 - 200 gram (PETG @ 15% infill)
+  3. 03_dl380_service_lid.stl (Tutup Servis Atas / Service Lid) - 1 pcs
+     - Dimensi: 143.0 x 43.7 x 9.1 mm
+     - Estimasi berat: ~15 gram
+
+  Total Estimasi Berat Keseluruhan: ~460 - 490 gram (Sangat hemat, jauh di bawah 1 kg spool!)
+
+REKOMENDASI PARAMETER SLICING:
+  - Material: PETG (Direkomendasikan karena tahan panas server ~80C) atau PLA+
+  - Layer Height: 0.20 mm
+  - Wall Loops / Perimeters: 3 wall (1.2 mm solid)
+  - Top / Bottom Solid Layers: 4 layers
+  - Infill: 15% (Gyroid / Cross-Hatch)
+
+ORIENTASI CETAK:
+  - Part 01 (Front Case): Letakkan bagian bawah menempel di bed (Z-up), atau rebahkan pada sisi belakang rata.
+  - Part 02 (Backcase): Letakkan bagian bawah menempel di bed (Z-up).
+  - Part 03 (Lid): Balik 180 derajat (sisi atas rata/thumb dimple menempel ke bed PEI bertekstur).
+
+PERAKITAN (ASSEMBLY):
+  - Pasang drive cage ke Bodi Depan dan hubungkan kabel SAS/Power.
+  - Sambungkan Bodi Depan dan Bodi Belakang melalui sambungan bibir presisi (lap-joint).
+  - Kunci dengan 4x baut M3 (M3 x 10 mm) pada lubang lug internal.
