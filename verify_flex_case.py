@@ -91,7 +91,7 @@ check("Backcase fits Elegoo Centauri Carbon (< 256 mm all axes)", b_w <= 256.0 a
 
 check("Front Case width within 185.0 - 187.0 mm", 185.0 <= f_w <= 187.0, f"Span = {f_w:.2f} mm")
 check("Front Case depth within 137.0 - 139.0 mm", 137.0 <= f_d <= 139.0, f"Span = {f_d:.2f} mm")
-check("Backcase depth within 76.0 - 79.5 mm", 76.0 <= b_d <= 79.5, f"Span = {b_d:.2f} mm")
+check("Backcase depth within 76.0 - 102.0 mm (including snap-fit cantilever arms)", 76.0 <= b_d <= 102.0, f"Span = {b_d:.2f} mm")
 check("Chassis height within 150.0 - 153.0 mm", 150.0 <= f_h <= 153.0, f"Span = {f_h:.2f} mm")
 
 # 3. Front Disc Cage Case Features
@@ -123,9 +123,15 @@ check("Front 16mm illuminated switch port present", len(front_sw) > 15, f"Found 
 front_vents = f_tris[(f_tris[:, :, 2].mean(axis=1) < 2.0) & (f_tris[:, :, 0].mean(axis=1) < 80.0) & (f_tris[:, :, 1].mean(axis=1) < 45.0)]
 check("Front basement honeycomb intake vents present", len(front_vents) > 30, f"Found {len(front_vents)} facets in PSU intake area")
 
-# 6. Interlocking Lap-Joint & M3 Fastener Verification
-f_lugs = f_verts[(f_verts[:, 2] >= 125.0) & (f_verts[:, 2] <= 138.0) & ((f_verts[:, 1] >= 135.0) | (f_verts[:, 1] <= 16.0))]
-check("Front Case interlocking M3 fastening lugs present", len(f_lugs) > 100, f"Found {len(f_lugs)} lug vertices")
+# 6. Tool-Free Snap-Fit & Interlocking Joint Verification
+b_snap_arms = b_verts[(b_verts[:, 2] < 125.0) & (b_verts[:, 1] >= 94.0) & (b_verts[:, 1] <= 106.0)]
+check("Tool-free Cantilever Snap Arms present on Backcase (Z < 125 mm)", len(b_snap_arms) >= 40, f"Found {len(b_snap_arms)} snap arm vertices")
+
+f_snap_windows = f_verts[(f_verts[:, 2] >= 114.0) & (f_verts[:, 2] <= 128.0) & ((f_verts[:, 0] <= 1.0) | (f_verts[:, 0] >= 185.0)) & (f_verts[:, 1] >= 93.0) & (f_verts[:, 1] <= 107.0)]
+check("Tool-free Snap Detent Windows open on Front Case outer walls", len(f_snap_windows) >= 12, f"Found {len(f_snap_windows)} snap window edge vertices")
+
+f_lugs = f_verts[(f_verts[:, 2] >= 125.0) & (f_verts[:, 2] <= 138.0) & (f_verts[:, 1] <= 16.0)]
+check("Optional lower M3 transport screw lugs present in basement", len(f_lugs) > 50, f"Found {len(f_lugs)} lower lug vertices")
 
 b_tongue = b_verts[(b_verts[:, 2] < 138.0)]
 check("Backcase male interlocking tongue flange present (Z < 138 mm)", len(b_tongue) >= 30, f"Found {len(b_tongue)} tongue flange vertices")

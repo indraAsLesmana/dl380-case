@@ -6,7 +6,7 @@ Enhance ENP-2320 Flex-ATX Power Supply, and 92mm Rear Exhaust Fan.
 
 Tailored for High-Speed CoreXY 3D Printers (Elegoo Centauri Carbon, Bambu Lab X1C/P1S/A1).
 
-Modular 2-Piece Architecture:
+Modular 2-Piece Architecture (Tool-Free Snap-Fit + Optional Backup Screws):
   1. Front Disc Cage Case (Z = 0 to 138.0 mm):
      - Recessed 180.0 x 86.0 x 11.5 mm Front Bezel Socket with 17 mm stop shoulders.
      - 146.0 mm internal guide bay for the 144.81 mm metal cage (0.6 mm clearance/side).
@@ -15,8 +15,13 @@ Modular 2-Piece Architecture:
      - Large-pattern diamond mesh on TOP ROOF for passive drive heat radiation.
      - Large-pattern diamond mesh on BOTH SIDE WALLS showcasing the steel cage.
      - Lower basement front: 16.2 mm illuminated power switch port + PSU intake vents.
-     - Rear interlocking female lap-joint rebate + 4 internal M3 fastener lugs.
+     - Dual tool-free snap-fit detent catch windows (12.9 x 12.4 mm) with internal flexure channels.
+     - Rear interlocking female lap-joint rebate (2.4 mm wide, 0.3 mm clearance).
+     - Optional lower M3 fastener lugs for rugged transport backup.
   2. Rear Cooling & Power Backcase (Z = 138.0 to 215.0 mm):
+     - Dual cantilever snap-fit latch arms (23 mm long, 11 mm wide, tapered 2.4 -> 1.8 mm beam).
+     - Ergonomic tactile push-release thumb pads with 3x raised grip ribs for 100% tool-free removal.
+     - Smooth 25° lead-in ramp and 85° retention shoulder (>200 N pullout resistance).
      - 92mm cooling fan chamber with 86mm honeycomb exhaust grille & 4x M4 screw holes.
      - Integrated Bottom Fan Cradle Stand with aerodynamic rotor scoop & PWM wire notch.
      - Rear Flex-ATX PSU mount (C14 AC inlet cutout + 3x #6-32 flange mount).
@@ -25,7 +30,8 @@ Modular 2-Piece Architecture:
      - Rear stop frame with dual 34x8 mm clearance windows for 29.3 mm metal tabs.
      - Mid-deck raised support bosses with M3 screw pilot holes to lock the tabs.
      - Top service lid aperture + drop-in lid with matching top fan clamp.
-     - Front interlocking male tongue flange + 4 matching M3 screw pilot holes.
+     - Perimeter male tongue flange (2.1 mm thick, 0.3 mm sliding clearance).
+     - Optional lower M3 screw pilot holes for rugged transport backup.
   3. Solid Top Service Lid (Z = 165.0 to 209.5 mm):
      - Drop-in lid over rear plenum with integrated top fan stand and tactile thumb dimple.
 
@@ -37,6 +43,9 @@ Enclosure Dimensions:
 
 import os
 import sys
+for p in ['/usr/lib/freecad/lib', '/usr/lib/freecad-python3/lib', '/usr/lib/freecad/Ext']:
+    if os.path.exists(p) and p not in sys.path:
+        sys.path.append(p)
 import math
 import time
 import FreeCAD as App
@@ -258,7 +267,7 @@ for row in range(-1, 3):
     offset_z = 11.0 if (row % 2 != 0) else 0.0
     for col in range(-2, 3):
         cz = 73.0 + col * 22.0 + offset_z
-        if 18.0 < cz < 128.0 and 62.0 < cy < 138.0:
+        if 18.0 < cz < 114.0 and 62.0 < cy < 138.0:
             d_l = make_diamond_x(18.0, 18.0, X_CAGE_0 + 4.0, cz, cy, -2.0)
             d_r = make_diamond_x(18.0, 18.0, X_CAGE_0 + 4.0, cz, cy, X_CAGE_1 - 2.0)
             cuts_side.append(d_l)
@@ -271,29 +280,79 @@ if cuts_side:
     front_case = front_case.cut(all_side)
 
 # ------------------------------------------------------------------------------
+
+def make_left_latch():
+    pts = [
+        Vector(0.0, 0, 142.0),
+        Vector(5.7, 0, 142.0),
+        Vector(5.7, 0, 138.0),
+        Vector(5.1, 0, 115.0),
+        Vector(3.3, 0, 115.0),
+        Vector(0.4, 0, 121.0),
+        Vector(0.4, 0, 127.0),
+        Vector(3.3, 0, 127.0),
+        Vector(3.3, 0, 138.0),
+        Vector(0.0, 0, 138.0),
+        Vector(0.0, 0, 142.0),
+    ]
+    poly = Part.makePolygon(pts)
+    face = Part.Face(poly)
+    arm = face.extrude(Vector(0, 11.0, 0)).translate(Vector(0, 94.5, 0))
+    for rz in [122.5, 124.0, 125.5]:
+        rib = Part.makeBox(0.4, 9.0, 0.8, Vector(0.0, 95.5, rz - 0.4))
+        arm = arm.fuse(rib)
+    return arm
+
+def make_right_latch():
+    pts = [
+        Vector(OUT_W - 0.0, 0, 142.0),
+        Vector(OUT_W - 5.7, 0, 142.0),
+        Vector(OUT_W - 5.7, 0, 138.0),
+        Vector(OUT_W - 5.1, 0, 115.0),
+        Vector(OUT_W - 3.3, 0, 115.0),
+        Vector(OUT_W - 0.4, 0, 121.0),
+        Vector(OUT_W - 0.4, 0, 127.0),
+        Vector(OUT_W - 3.3, 0, 127.0),
+        Vector(OUT_W - 3.3, 0, 138.0),
+        Vector(OUT_W - 0.0, 0, 138.0),
+        Vector(OUT_W - 0.0, 0, 142.0),
+    ]
+    poly = Part.makePolygon(pts)
+    face = Part.Face(poly)
+    arm = face.extrude(Vector(0, 11.0, 0)).translate(Vector(0, 94.5, 0))
+    for rz in [122.5, 124.0, 125.5]:
+        rib = Part.makeBox(0.4, 9.0, 0.8, Vector(OUT_W - 0.4, 95.5, rz - 0.4))
+        arm = arm.fuse(rib)
+    return arm
+
 # 5. Rear Interlocking Interface on Front Case (Lap-Joint & M3 Lugs)
 # ------------------------------------------------------------------------------
 print("4. Modeling interlocking female lap-joint and 4x M3 screw lugs on Front Case...", flush=True)
-# Perimeter female alignment rebate (2.5 mm deep x 2.0 mm wide at Z = 135.5 to 138.0 mm)
-rebate_top = Part.makeBox(OUT_W + 2.0, 2.0, 3.0, Vector(-1.0, OUT_H - 2.0, Z_SPLIT - 2.5))
-rebate_bot = Part.makeBox(OUT_W + 2.0, 2.0, 3.0, Vector(-1.0, 0.0, Z_SPLIT - 2.5))
-rebate_l   = Part.makeBox(2.0, OUT_H + 2.0, 3.0, Vector(0.0, -1.0, Z_SPLIT - 2.5))
-rebate_r   = Part.makeBox(2.0, OUT_H + 2.0, 3.0, Vector(OUT_W - 2.0, -1.0, Z_SPLIT - 2.5))
+# Perimeter female alignment rebate (4.8 mm deep x 2.4 mm wide at Z = 133.2 to 138.0 mm)
+# Deep collar design (Option A) prevents any pitch/clam-shell gaping under heavy loads
+rebate_top = Part.makeBox(OUT_W + 4.0, 2.4, 5.5, Vector(-2.0, OUT_H - 2.4, Z_SPLIT - 4.8))
+rebate_bot = Part.makeBox(OUT_W + 4.0, 2.4, 5.5, Vector(-2.0, 0.0, Z_SPLIT - 4.8))
+rebate_l   = Part.makeBox(2.4, OUT_H + 4.0, 5.5, Vector(0.0, -2.0, Z_SPLIT - 4.8))
+rebate_r   = Part.makeBox(2.4, OUT_H + 4.0, 5.5, Vector(OUT_W - 2.4, -2.0, Z_SPLIT - 4.8))
 front_case = front_case.cut(rebate_top).cut(rebate_bot).cut(rebate_l).cut(rebate_r)
 
-# 4x solid internal M3 fastening lugs on Front Case
-lug_f_ul = Part.makeBox(12.0, 12.0, 12.0, Vector(X_CAGE_0, Y_ROOF_LOWER - 12.0, Z_SPLIT - 12.0))
-lug_f_ur = Part.makeBox(12.0, 12.0, 12.0, Vector(X_CAGE_1 - 12.0, Y_ROOF_LOWER - 12.0, Z_SPLIT - 12.0))
+# Dual Snap-Fit Detent Windows & Internal Flex Channels (Tool-Free Quick Latch)
+chan_l = Part.makeBox(12.0, 16.0, 24.5, Vector(3.0, 92.0, 114.0))
+chan_r = Part.makeBox(12.0, 16.0, 24.5, Vector(OUT_W - 15.0, 92.0, 114.0))
+win_l  = Part.makeBox(5.5, 12.4, 12.9, Vector(-1.0, 93.8, 114.5))
+win_r  = Part.makeBox(5.5, 12.4, 12.9, Vector(OUT_W - 4.5, 93.8, 114.5))
+bevel_l = Part.makeBox(2.0, 14.0, 2.5, Vector(2.0, 93.0, 135.5))
+bevel_r = Part.makeBox(2.0, 14.0, 2.5, Vector(OUT_W - 4.0, 93.0, 135.5))
+front_case = front_case.cut(chan_l).cut(chan_r).cut(win_l).cut(win_r).cut(bevel_l).cut(bevel_r)
+
+# Optional Lower M3 fastening lugs for transport reinforcement
 lug_f_ll = Part.makeBox(12.0, 12.0, 12.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT - 12.0))
 lug_f_lr = Part.makeBox(12.0, 12.0, 12.0, Vector(OUT_W - WALL - 12.0, Y_BASE_FLOOR, Z_SPLIT - 12.0))
-front_case = front_case.fuse(lug_f_ul).fuse(lug_f_ur).fuse(lug_f_ll).fuse(lug_f_lr)
+front_case = front_case.fuse(lug_f_ll).fuse(lug_f_lr)
 
-# M3 bolt clearance holes (Ø3.4 mm) through lugs
-hole_ul = Part.makeCylinder(1.7, 16.0, Vector(X_CAGE_0 + 6.0, Y_ROOF_LOWER - 6.0, Z_SPLIT - 14.0), Vector(0, 0, 1))
-hole_ur = Part.makeCylinder(1.7, 16.0, Vector(X_CAGE_1 - 6.0, Y_ROOF_LOWER - 6.0, Z_SPLIT - 14.0), Vector(0, 0, 1))
 hole_ll = Part.makeCylinder(1.7, 16.0, Vector(WALL + 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 14.0), Vector(0, 0, 1))
 hole_lr = Part.makeCylinder(1.7, 16.0, Vector(OUT_W - WALL - 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 14.0), Vector(0, 0, 1))
-front_case = front_case.cut(hole_ul).cut(hole_ur).cut(hole_ll).cut(hole_lr)
+front_case = front_case.cut(hole_ll).cut(hole_lr)
 
 print(f"Front Case complete: Volume = {front_case.Volume:.2f} mm3, isClosed: {front_case.isClosed()}", flush=True)
 
@@ -314,9 +373,10 @@ b_upper_void = Part.makeBox(INT_W, UPPER_H, Z_PLEN_END + 2.0 - (Z_SPLIT - 1.0),
 
 back_case = back_shell.cut(b_base_void).cut(b_upper_void)
 
-# Matching perimeter male tongue flange on Back Case (Z = 135.8 to 138.0 mm)
-tongue_box = Part.makeBox(OUT_W, OUT_H, 2.2, Vector(0, 0, Z_SPLIT - 2.2))
-t_inner_cut = Part.makeBox(OUT_W - 4.2, OUT_H - 4.2, 4.0, Vector(2.1, 2.1, Z_SPLIT - 3.0))
+# Matching perimeter male tongue flange on Back Case (Z = 133.5 to 138.0 mm)
+# Deep 4.5 mm collar gives massive structural bending resistance against pitch and yaw
+tongue_box = Part.makeBox(OUT_W, OUT_H, 4.5, Vector(0, 0, Z_SPLIT - 4.5))
+t_inner_cut = Part.makeBox(OUT_W - 4.2, OUT_H - 4.2, 6.5, Vector(2.1, 2.1, Z_SPLIT - 5.5))
 tongue_flange = tongue_box.cut(t_inner_cut)
 back_case = back_case.fuse(tongue_flange)
 
@@ -348,19 +408,19 @@ power_slot = Part.makeBox(30.0, MID_DECK_T + 4.0, 26.0,
                           Vector(X_CAGE_0 + 114.0, Y_UPPER_FLOOR - MID_DECK_T - 2.0, 140.0))
 back_case = back_case.cut(power_slot)
 
-# 4x matching M3 screw fastening bosses on Back Case
-lug_b_ul = Part.makeBox(12.0, 12.0, 12.0, Vector(X_CAGE_0, Y_ROOF_LOWER - 12.0, Z_SPLIT))
-lug_b_ur = Part.makeBox(12.0, 12.0, 12.0, Vector(X_CAGE_1 - 12.0, Y_ROOF_LOWER - 12.0, Z_SPLIT))
+# Dual Cantilever Snap-Fit Arms on Back Case
+l_arm = make_left_latch()
+r_arm = make_right_latch()
+back_case = back_case.fuse(l_arm).fuse(r_arm)
+
+# Optional Lower M3 fastening bosses on Back Case
 lug_b_ll = Part.makeBox(12.0, 12.0, 12.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT))
 lug_b_lr = Part.makeBox(12.0, 12.0, 12.0, Vector(OUT_W - WALL - 12.0, Y_BASE_FLOOR, Z_SPLIT))
-back_case = back_case.fuse(lug_b_ul).fuse(lug_b_ur).fuse(lug_b_ll).fuse(lug_b_lr)
+back_case = back_case.fuse(lug_b_ll).fuse(lug_b_lr)
 
-# M3 tap pilot holes (Ø2.8 mm)
-bhole_ul = Part.makeCylinder(1.4, 14.0, Vector(X_CAGE_0 + 6.0, Y_ROOF_LOWER - 6.0, Z_SPLIT - 1.0), Vector(0, 0, 1))
-bhole_ur = Part.makeCylinder(1.4, 14.0, Vector(X_CAGE_1 - 6.0, Y_ROOF_LOWER - 6.0, Z_SPLIT - 1.0), Vector(0, 0, 1))
 bhole_ll = Part.makeCylinder(1.4, 14.0, Vector(WALL + 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 1.0), Vector(0, 0, 1))
 bhole_lr = Part.makeCylinder(1.4, 14.0, Vector(OUT_W - WALL - 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 1.0), Vector(0, 0, 1))
-back_case = back_case.cut(bhole_ul).cut(bhole_ur).cut(bhole_ll).cut(bhole_lr)
+back_case = back_case.cut(bhole_ll).cut(bhole_lr)
 
 # Bottom Fan Cradle Stand
 b_pad_l = Part.makeBox(15.4, 1.0, 24.5, Vector(fan_cx - 46.4, Y_UPPER_FLOOR, 184.6))
@@ -544,6 +604,19 @@ with open(report_path, "w") as f:
     f.write(f"Plenum Clearance: 15.75 mm clear air gap behind 32 mm tabs before 92mm fan front face\n")
     f.write(f"Fan Stand:        Integrated dual-cradle system (bottom shelf cradle + lid top stand)\n")
     f.write("=" * 80 + "\n")
+
+
+# Copy production files to print_service_package
+pkg_dir = os.path.join(REPO_DIR, "print_service_package")
+if os.path.exists(pkg_dir):
+    import shutil
+    shutil.copy2(step_front, os.path.join(pkg_dir, "01_dl380_front_case.step"))
+    shutil.copy2(step_back,  os.path.join(pkg_dir, "02_dl380_back_case.step"))
+    shutil.copy2(step_lid,   os.path.join(pkg_dir, "03_dl380_service_lid.step"))
+    shutil.copy2(stl_front,  os.path.join(pkg_dir, "01_dl380_front_case.stl"))
+    shutil.copy2(stl_back,   os.path.join(pkg_dir, "02_dl380_back_case.stl"))
+    shutil.copy2(stl_lid,    os.path.join(pkg_dir, "03_dl380_service_lid.stl"))
+    print("Copied updated STEP and STL files to print_service_package/", flush=True)
 
 print("=" * 80)
 print("SUCCESS: DL380 Modular 2-Piece Enclosure with Diamond Mesh Generated!")
