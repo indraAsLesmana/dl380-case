@@ -147,19 +147,20 @@ ax4.plot([185.0, 185.0], [54.0, 148.0], color='#f78166', lw=1.5, linestyle='-.',
 
 # Annotations
 ax4.text(70.0, 101.0, 'HP DL380 8-Bay Cage\n(Diamond Mesh Top & Sides)', color='#79c0ff', fontsize=8.5, ha='center', va='center')
-ax4.text(121.0, 100.0, 'Tool-Free Snap Latch\n(Push-to-Release Button)', color='#7ee787', fontsize=8.5, ha='center', va='center', bbox=dict(boxstyle='round,pad=0.3', facecolor='#0d1117', edgecolor='#7ee787', alpha=0.85))
+ax4.text(121.0, 100.0, 'Tool-Free Side Snap\n(Push-to-Release)', color='#7ee787', fontsize=8.5, ha='center', va='center', bbox=dict(boxstyle='round,pad=0.3', facecolor='#0d1117', edgecolor='#7ee787', alpha=0.85))
+ax4.text(188.0, 153.0, 'Battery-Door Snap Lid (Push-to-Pull)', color='#58a6ff', fontsize=8.0, ha='center', va='bottom', bbox=dict(boxstyle='round,pad=0.2', facecolor='#0d1117', edgecolor='#58a6ff', alpha=0.8))
 ax4.text(177.0, 115.0, '15.75mm Air Gap', color='#ffa657', fontsize=8, ha='center', va='center')
 ax4.text(198.0, 101.0, '92mm Fan in\nDual Cradle', color='#f78166', fontsize=8, ha='center', va='center')
 ax4.text(105.0, 26.0, 'Flex-ATX PSU (150 mm) & 96.5mm Wiring Corridor', color='#e3b341', fontsize=8.5, ha='center', va='center')
 
 ax4.set_xlim([-5, 225])
-ax4.set_ylim([-5, 158])
+ax4.set_ylim([-5, 162])
 ax4.set_xlabel('Z (Depth from front mouth to rear, mm)', color=COLOR_TEXT, fontsize=10)
 ax4.set_ylabel('Y (Height from desk, mm)', color=COLOR_TEXT, fontsize=10)
 ax4.set_aspect('equal')
 ax4.tick_params(colors=COLOR_TEXT)
 ax4.grid(True, linestyle='--', color=COLOR_GRID, alpha=0.7)
-ax4.set_title('Side Profile & Split Architecture (Z vs Y)\nFront Disc Cage Case (Blue) + Rear Backcase (Orange) with Tool-Free Snap-Fit Latches',
+ax4.set_title('Side Profile & Split Architecture (Z vs Y)\n100% Screwless Tool-Free Enclosure (Zero Screws, Zero Nuts, Zero Tools Needed)',
               color='#ffffff', fontsize=11, fontweight='bold', pad=10)
 ax4.legend(loc='lower left', facecolor='#0d1117', edgecolor='#30363d', labelcolor=COLOR_TEXT, fontsize=8)
 

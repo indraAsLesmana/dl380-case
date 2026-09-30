@@ -12,9 +12,10 @@ FILE YANG DICETAK (PRINT FILES):
      - Dimensi: 186.0 x 100.0 x 151.5 mm (termasuk lengan pengait snap-fit 23 mm)
      - Fitur: Dual cantilever snap-fit arms dengan push-release thumb pads, dudukan fan 92mm, dudukan PSU Flex-ATX C14, port SAS, slot power 10-pin
      - Estimasi berat: ~180 - 200 gram (PETG @ 15% infill)
-  3. 03_dl380_service_lid.stl (Tutup Servis Atas / Service Lid) - 1 pcs
-     - Dimensi: 143.0 x 43.7 x 9.1 mm
-     - Estimasi berat: ~15 gram
+  3. 03_dl380_service_lid.stl (Tutup Servis Atas / Snap-Fit Service Lid) - 1 pcs
+     - Dimensi: 143.0 x 49.0 x 10.4 mm (termasuk front locating tabs & rear push-to-pull latch)
+     - Fitur: Mekanisme snap gaya tutup baterai mainan (2x front slide tabs, cantilever hook, push-to-release tab dengan grip ribs), penjepit fan 92mm otomatis
+     - Estimasi berat: ~18 gram
 
   Total Estimasi Berat Keseluruhan: ~460 - 490 gram (Sangat hemat, jauh di bawah 1 kg spool!)
 
@@ -28,10 +29,13 @@ REKOMENDASI PARAMETER SLICING:
 ORIENTASI CETAK:
   - Part 01 (Front Case): Letakkan lantai bawah menempel di bed (Z-up printer).
   - Part 02 (Backcase): Letakkan lantai bawah menempel di bed (Z-up printer). Lengan snap-fit akan tercetak horizontal di bidang XY, memberikan kekuatan tarik maksimal tanpa risiko delaminasi layer.
-  - Part 03 (Lid): Balik 180 derajat (sisi atas rata/thumb dimple menempel ke bed PEI bertekstur).
+  - Part 03 (Lid): Balik 180 derajat (sisi atas rata menempel ke bed PEI bertekstur).
 
-PERAKITAN (ASSEMBLY):
-  - Pasang drive cage ke Bodi Depan dan hubungkan kabel SAS/Power.
-  - Dorong Bodi Belakang ke Bodi Depan melalui sambungan bibir presisi (lap-joint) hingga kedua pengait snap-fit samping berbunyi 'KLIK' terkunci rapat (100% Tool-Free!).
-  - Untuk membongkar / servis: Tekan kedua tombol push-button di sisi samping kiri dan kanan secara bersamaan ke dalam, lalu tarik Bodi Belakang mundur.
-  - Opsional: Tersedia 2 lubang baut M3 (M3 x 10 mm) di sudut bawah basement jika pengguna menginginkan penguncian baut ekstra untuk transportasi bergerak.
+PERAKITAN (100% TOOL-FREE & SCREWLESS - TANPA BAUT SAMA SEKALI!):
+  - Pasang drive cage ke Bodi Depan dan hubungkan kabel SAS/Power. Drive cage tertahan kokoh oleh socket bezel depan dan frame stop belakang tanpa baut!
+  - Dorong Bodi Belakang ke Bodi Depan melalui kerah teleskopik 4.5 mm dan kunci sudut presisi hingga kedua pengait snap-fit samping berbunyi 'KLIK' terkunci rapat (100% Tool-Free!).
+  - Masukkan fan 92mm ke dalam cradle dudukan belakang.
+  - Pasang Tutup Servis (Lid): Masukkan 2 lidah depan lid ke dalam celah atap, lalu tekan bagian belakang lid ke bawah hingga berbunyi 'KLIK' terkunci rapat (seperti tutup baterai mainan / remote control). Penjepit fan atas akan otomatis mengunci fan 92mm tanpa baut!
+  - Untuk membuka Tutup Servis (Lid): Dorong push-tab jempol di bagian belakang lid ke arah depan, lalu angkat lid ke atas.
+  - Untuk memisahkan Bodi: Tekan kedua tombol push-button di sisi samping kiri dan kanan secara bersamaan ke dalam, lalu tarik Bodi Belakang mundur.
+  - ZERO SCREWS, ZERO NUTS, ZERO TOOLS NEEDED!

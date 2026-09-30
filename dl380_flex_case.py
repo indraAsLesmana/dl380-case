@@ -345,14 +345,15 @@ bevel_l = Part.makeBox(2.0, 14.0, 2.5, Vector(2.0, 93.0, 135.5))
 bevel_r = Part.makeBox(2.0, 14.0, 2.5, Vector(OUT_W - 4.0, 93.0, 135.5))
 front_case = front_case.cut(chan_l).cut(chan_r).cut(win_l).cut(win_r).cut(bevel_l).cut(bevel_r)
 
-# Optional Lower M3 fastening lugs for transport reinforcement
-lug_f_ll = Part.makeBox(12.0, 12.0, 12.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT - 12.0))
-lug_f_lr = Part.makeBox(12.0, 12.0, 12.0, Vector(OUT_W - WALL - 12.0, Y_BASE_FLOOR, Z_SPLIT - 12.0))
+# Tool-Free Solid Corner Guide Sockets (100% Screwless Alignment)
+# Lower corner sockets receive Backcase guide keys (8.0 mm deep with 0.35 mm clearance)
+lug_f_ll = Part.makeBox(13.0, 11.0, 10.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT - 10.0))
+lug_f_lr = Part.makeBox(13.0, 11.0, 10.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT - 10.0))
 front_case = front_case.fuse(lug_f_ll).fuse(lug_f_lr)
 
-hole_ll = Part.makeCylinder(1.7, 16.0, Vector(WALL + 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 14.0), Vector(0, 0, 1))
-hole_lr = Part.makeCylinder(1.7, 16.0, Vector(OUT_W - WALL - 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 14.0), Vector(0, 0, 1))
-front_case = front_case.cut(hole_ll).cut(hole_lr)
+sock_ll = Part.makeBox(10.0, 8.5, 9.0, Vector(WALL + 1.2, Y_BASE_FLOOR + 1.2, Z_SPLIT - 8.5))
+sock_lr = Part.makeBox(10.0, 8.5, 9.0, Vector(OUT_W - WALL - 11.2, Y_BASE_FLOOR + 1.2, Z_SPLIT - 8.5))
+front_case = front_case.cut(sock_ll).cut(sock_lr)
 
 print(f"Front Case complete: Volume = {front_case.Volume:.2f} mm3, isClosed: {front_case.isClosed()}", flush=True)
 
@@ -397,11 +398,8 @@ boss1 = Part.makeBox(30.0, RUNNER_H, 24.0, Vector(X_CAGE_0 + 35.0, Y_UPPER_FLOOR
 boss2 = Part.makeBox(30.0, RUNNER_H, 24.0, Vector(X_CAGE_0 + 80.5, Y_UPPER_FLOOR, 142.0))
 back_case = back_case.fuse(boss1).fuse(boss2)
 
-hole1 = Part.makeCylinder(1.4, MID_DECK_T + RUNNER_H + 2.0,
-                          Vector(X_CAGE_0 + 49.65, Y_UPPER_FLOOR + RUNNER_H + 1.0, 153.0), Vector(0, -1, 0))
-hole2 = Part.makeCylinder(1.4, MID_DECK_T + RUNNER_H + 2.0,
-                          Vector(X_CAGE_0 + 95.15, Y_UPPER_FLOOR + RUNNER_H + 1.0, 153.0), Vector(0, -1, 0))
-back_case = back_case.cut(hole1).cut(hole2)
+# Mid-deck bosses support the cage rear tabs securely without screws (zero tools needed)
+# (Cage is trapped in all 6 DoF by front bezel socket, stop frame, runners and roof)
 
 # 10-pin power pass-through slot on right side
 power_slot = Part.makeBox(30.0, MID_DECK_T + 4.0, 26.0,
@@ -413,14 +411,14 @@ l_arm = make_left_latch()
 r_arm = make_right_latch()
 back_case = back_case.fuse(l_arm).fuse(r_arm)
 
-# Optional Lower M3 fastening bosses on Back Case
-lug_b_ll = Part.makeBox(12.0, 12.0, 12.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT))
-lug_b_lr = Part.makeBox(12.0, 12.0, 12.0, Vector(OUT_W - WALL - 12.0, Y_BASE_FLOOR, Z_SPLIT))
-back_case = back_case.fuse(lug_b_ll).fuse(lug_b_lr)
-
-bhole_ll = Part.makeCylinder(1.4, 14.0, Vector(WALL + 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 1.0), Vector(0, 0, 1))
-bhole_lr = Part.makeCylinder(1.4, 14.0, Vector(OUT_W - WALL - 6.0, Y_BASE_FLOOR + 6.0, Z_SPLIT - 1.0), Vector(0, 0, 1))
-back_case = back_case.cut(bhole_ll).cut(bhole_lr)
+# Tool-Free Solid Corner Guide Keys on Backcase (100% Screwless Alignment)
+# Solid corner guide tongues slide 8.0 mm forward into Front Case sockets
+key_b_ll = Part.makeBox(9.2, 7.8, 8.0, Vector(WALL + 1.6, Y_BASE_FLOOR + 1.6, Z_SPLIT - 8.0))
+key_b_lr = Part.makeBox(9.2, 7.8, 8.0, Vector(OUT_W - WALL - 10.8, Y_BASE_FLOOR + 1.6, Z_SPLIT - 8.0))
+# Corner base anchors
+anchor_ll = Part.makeBox(13.0, 11.0, 8.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT))
+anchor_lr = Part.makeBox(13.0, 11.0, 8.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT))
+back_case = back_case.fuse(key_b_ll).fuse(key_b_lr).fuse(anchor_ll).fuse(anchor_lr)
 
 # Bottom Fan Cradle Stand
 b_pad_l = Part.makeBox(15.4, 1.0, 24.5, Vector(fan_cx - 46.4, Y_UPPER_FLOOR, 184.6))
@@ -487,11 +485,20 @@ sas_slot2 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
                          Vector(X_CAGE_1 - 24.0, Y_UPPER_FLOOR + UPPER_H - 22.0, Z_PLEN_END - 2.0))
 back_case = back_case.cut(sas_slot1).cut(sas_slot2)
 
-# Top Service Aperture in Back Case
+# Top Service Aperture in Back Case (with Battery-Door Snap Receptors)
 roof_shelf_y = OUT_H - ROOF_T + 1.7 # 149.7 mm
 aperture = Part.makeBox(135.8, ROOF_T + 2.0, 40.5, Vector(fan_cx - 67.9, OUT_H - ROOF_T - 1.0, 168.0))
 rebate   = Part.makeBox(143.8, 2.0, 44.5, Vector(fan_cx - 71.9, roof_shelf_y, 165.0))
-back_case = back_case.cut(aperture).cut(rebate)
+
+# Front capture slots for Lid front locating tabs
+slot_l = Part.makeBox(19.0, 1.8, 4.2, Vector(fan_cx - 50.5, roof_shelf_y - 1.7, 161.5))
+slot_r = Part.makeBox(19.0, 1.8, 4.2, Vector(fan_cx + 31.5, roof_shelf_y - 1.7, 161.5))
+
+# Rear detent notch for Lid cantilever snap hook
+rear_notch = Part.makeBox(15.0, 3.0, 2.5, Vector(fan_cx - 7.5, roof_shelf_y - 1.2, 209.0))
+thumb_clearance = Part.makeBox(16.0, 2.0, 3.5, Vector(fan_cx - 8.0, OUT_H - 1.0, 208.5))
+
+back_case = back_case.cut(aperture).cut(rebate).cut(slot_l).cut(slot_r).cut(rear_notch).cut(thumb_clearance)
 
 print(f"Back Case complete:  Volume = {back_case.Volume:.2f} mm3, isClosed: {back_case.isClosed()}", flush=True)
 
@@ -499,12 +506,39 @@ print(f"Back Case complete:  Volume = {back_case.Volume:.2f} mm3, isClosed: {bac
 # 7. BUILD PART 3: SERVICE LID WITH TOP FAN CLAMP
 # ==============================================================================
 
-print("6. Modeling Service Lid...", flush=True)
+print("6. Modeling Battery-Door Style Snap-Fit Service Lid...", flush=True)
 plug   = Part.makeBox(135.0, 1.7, 39.7, Vector(fan_cx - 67.5, OUT_H - ROOF_T, 168.4))
 flange = Part.makeBox(143.0, 1.8, 43.7, Vector(fan_cx - 71.5, roof_shelf_y, 165.4))
 lid = plug.fuse(flange)
 
-# Integrated Top Fan Stand on Service Lid
+# 1. Front Locating Tabs (2x) that slide forward into the Backcase roof capture slots
+tab_l = Part.makeBox(18.0, 1.5, 3.5, Vector(fan_cx - 50.0, roof_shelf_y - 1.5, 161.9))
+tab_r = Part.makeBox(18.0, 1.5, 3.5, Vector(fan_cx + 32.0, roof_shelf_y - 1.5, 161.9))
+lid = lid.fuse(tab_l).fuse(tab_r)
+
+# 2. Rear Cantilever Snap Latch (Battery-Door Style with Push-to-Pull Tab)
+slit_l = Part.makeBox(1.5, 4.0, 16.0, Vector(fan_cx - 9.5, roof_shelf_y - 1.0, 193.0))
+slit_r = Part.makeBox(1.5, 4.0, 16.0, Vector(fan_cx + 8.0, roof_shelf_y - 1.0, 193.0))
+lid = lid.cut(slit_l).cut(slit_r)
+
+# Rear Hook / Catch Tab projecting past Z = 209.1 mm into rear notch
+hook = Part.makeBox(14.0, 2.2, 1.8, Vector(fan_cx - 7.0, roof_shelf_y - 1.0, 209.1))
+p1 = Vector(0, roof_shelf_y - 1.0, 209.1)
+p2 = Vector(0, roof_shelf_y - 1.0, 210.9)
+p3 = Vector(0, roof_shelf_y + 0.5, 210.9)
+wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p1)])
+wedge = Part.Face(wire).extrude(Vector(16.0, 0, 0)).translate(Vector(fan_cx - 8.0, 0, 0))
+hook = hook.cut(wedge)
+
+# Push-to-release thumb pad with 3x raised non-slip grip ridges
+push_tab = Part.makeBox(14.0, 1.4, 4.5, Vector(fan_cx - 7.0, OUT_H, 203.5))
+for rz in [204.5, 206.0, 207.5]:
+    rib = Part.makeBox(12.0, 0.5, 0.7, Vector(fan_cx - 6.0, OUT_H + 1.4, rz - 0.35))
+    push_tab = push_tab.fuse(rib)
+
+lid = lid.fuse(hook).fuse(push_tab)
+
+# 3. Integrated Top Fan Stand on Service Lid (Clamps 92mm fan automatically!)
 t_lip = Part.makeBox(86.0, 5.0, 2.4, Vector(fan_cx - 43.0, OUT_H - ROOF_T - 5.0, 182.2))
 cut_wire = Part.Wire([
     Part.makeLine(Vector(0, OUT_H - ROOF_T - 5.1, 183.0), Vector(0, OUT_H - ROOF_T - 5.1, 184.7)),
@@ -519,14 +553,10 @@ t_pad_r = Part.makeBox(14.0, 1.0, 20.0, Vector(fan_cx + 30.0, OUT_H - ROOF_T - 1
 top_stand = t_lip.fuse(t_pad_l).fuse(t_pad_r)
 lid = lid.fuse(top_stand)
 
-# Blind tactile thumb dimple (1.0 mm deep, solid floor)
-thumb = Part.makeCylinder(12.0, 1.2, Vector(fan_cx, OUT_H - 1.0, 186.0), Vector(0, 1, 0))
-lid = lid.cut(thumb)
-
-# Tactile grip ridges
-for dx in (-28.0, -22.0, -16.0, 16.0, 22.0, 28.0):
-    ridge = Part.makeBox(2.0, 0.6, 12.0, Vector(fan_cx + dx - 1.0, OUT_H, 186.0 - 6.0))
-    lid = lid.fuse(ridge)
+# Side grip pull-grooves for effortless two-finger lifting
+for dx in (-45.0, -38.0, 38.0, 45.0):
+    g_rib = Part.makeBox(2.0, 0.6, 12.0, Vector(fan_cx + dx - 1.0, OUT_H, 186.0 - 6.0))
+    lid = lid.fuse(g_rib)
 
 print(f"Service Lid complete: Volume = {lid.Volume:.2f} mm3, isClosed: {lid.isClosed()}", flush=True)
 

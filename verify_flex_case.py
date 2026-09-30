@@ -131,7 +131,7 @@ f_snap_windows = f_verts[(f_verts[:, 2] >= 114.0) & (f_verts[:, 2] <= 128.0) & (
 check("Tool-free Snap Detent Windows open on Front Case outer walls", len(f_snap_windows) >= 12, f"Found {len(f_snap_windows)} snap window edge vertices")
 
 f_lugs = f_verts[(f_verts[:, 2] >= 125.0) & (f_verts[:, 2] <= 138.0) & (f_verts[:, 1] <= 16.0)]
-check("Optional lower M3 transport screw lugs present in basement", len(f_lugs) > 50, f"Found {len(f_lugs)} lower lug vertices")
+check("Tool-free bottom corner alignment guide sockets & keys present", len(f_lugs) > 50, f"Found {len(f_lugs)} lower socket/key vertices")
 
 b_tongue = b_verts[(b_verts[:, 2] < 138.0)]
 check("Backcase male interlocking tongue flange present (Z < 138 mm)", len(b_tongue) >= 30, f"Found {len(b_tongue)} tongue flange vertices")
@@ -140,8 +140,8 @@ check("Backcase male interlocking tongue flange present (Z < 138 mm)", len(b_ton
 tab_win_facets = b_tris[(b_tris[:, :, 2].mean(axis=1) >= 137.0) & (b_tris[:, :, 2].mean(axis=1) <= 142.0) & (b_tris[:, :, 1].mean(axis=1) <= 62.0)]
 check("Rear stop frame & dual tab windows present in Backcase", len(tab_win_facets) > 20, f"Found {len(tab_win_facets)} stop/tab window facets")
 
-boss_pts = b_verts[(b_verts[:, 2] >= 150.0) & (b_verts[:, 2] <= 156.0) & (b_verts[:, 1] >= 53.0) & (b_verts[:, 1] <= 57.0)]
-check("Mid-deck tab support bosses with M3 screw holes present", len(boss_pts) > 20, f"Found {len(boss_pts)} boss/hole vertices")
+boss_pts = b_verts[(b_verts[:, 2] >= 142.0) & (b_verts[:, 2] <= 166.0) & (b_verts[:, 1] >= 54.0) & (b_verts[:, 1] <= 56.5)]
+check("Mid-deck tab support plinths present (screwless cage support)", len(boss_pts) > 20, f"Found {len(boss_pts)} boss plinth vertices")
 
 slot_pts = b_verts[(b_verts[:, 0] >= 134.0) & (b_verts[:, 0] <= 165.0) & (b_verts[:, 2] >= 138.0) & (b_verts[:, 2] <= 168.0) & (b_verts[:, 1] >= 48.0) & (b_verts[:, 1] <= 55.0)]
 check("Vertical 10-pin power pass-through slot open", len(slot_pts) > 10, f"Found {len(slot_pts)} power slot edge vertices")
@@ -155,7 +155,7 @@ check("Bottom fan cradle front retaining lip present", len(b_lip) > 20, f"Found 
 rear_c14 = b_tris[(b_tris[:, :, 2].mean(axis=1) > 210.0) & (b_tris[:, :, 1].mean(axis=1) < 48.0) & (b_tris[:, :, 0].mean(axis=1) < 90.0)]
 check("Rear Flex-ATX C14 / 40mm fan window present", len(rear_c14) > 30, f"Found {len(rear_c14)} facets near rear PSU face")
 
-# 8. Service Lid Geometry
+# 8. Battery-Door Style Snap-Fit Service Lid
 lid_w = l_verts[:, 0].max() - l_verts[:, 0].min()
 lid_d = l_verts[:, 2].max() - l_verts[:, 2].min()
 lid_h = l_verts[:, 1].max() - l_verts[:, 1].min()
@@ -163,6 +163,15 @@ check("Lid dimensions valid and non-zero", lid_w > 130.0 and lid_d > 35.0 and li
 
 top_lip_tris = l_tris[(l_tris[:, :, 1].mean(axis=1) <= 146.0) & (l_tris[:, :, 2].mean(axis=1) >= 181.5) & (l_tris[:, :, 2].mean(axis=1) <= 186.0)]
 check("Matching Top Fan Stand integrated into Service Lid", len(top_lip_tris) > 4, f"Found {len(top_lip_tris)} lid top stand facets")
+
+lid_front_tabs = l_verts[l_verts[:, 2] < 165.0]
+check("Battery-door front locating slide tabs present on Lid (Z < 165 mm)", len(lid_front_tabs) >= 16, f"Found {len(lid_front_tabs)} front tab vertices")
+
+lid_push_tab = l_verts[(l_verts[:, 2] >= 203.0) & (l_verts[:, 1] >= 151.0)]
+check("Battery-door rear cantilever push-to-release tab with ribs present", len(lid_push_tab) >= 20, f"Found {len(lid_push_tab)} push-tab vertices")
+
+back_roof_slots = b_verts[(b_verts[:, 2] >= 161.0) & (b_verts[:, 2] <= 165.0) & (b_verts[:, 1] >= 148.0) & (b_verts[:, 1] <= 150.0)]
+check("Backcase roof front tab capture slots present", len(back_roof_slots) >= 16, f"Found {len(back_roof_slots)} roof slot vertices")
 
 # 9. Mesh Resolution
 check("Front Case mesh resolution >= 2,000 facets", f_count >= 2_000, f"Total facets = {f_count:,}")
