@@ -10,26 +10,45 @@ FILE YANG DICETAK (PRINT FILES):
      - Estimasi berat: ~260 - 280 gram (PETG @ 15% infill)
   2. 02_dl380_back_case.stl  (Bodi Belakang / Rear Cooling & Power Backcase) - 1 pcs
      - Dimensi: 186.0 x 100.0 x 151.5 mm (termasuk lengan pengait snap-fit 23 mm)
-     - Fitur: Dual cantilever snap-fit arms dengan push-release thumb pads, dudukan fan 92mm, dudukan PSU Flex-ATX C14, port SAS, slot power 10-pin
+     - Fitur: Dual cantilever snap-fit arms dengan push-release thumb pads, kisi exhaust fan 92mm pola 45° Diamond Mesh (100% self-supporting, bebas sagging & stringing), dudukan fan 92mm, dudukan PSU Flex-ATX C14, port SAS, slot power 10-pin
      - Estimasi berat: ~180 - 200 gram (PETG @ 15% infill)
   3. 03_dl380_service_lid.stl (Tutup Servis Atas / Snap-Fit Service Lid) - 1 pcs
      - Dimensi: 143.0 x 49.0 x 10.4 mm (termasuk front locating tabs & rear push-to-pull latch)
      - Fitur: Mekanisme snap gaya tutup baterai mainan (2x front slide tabs, cantilever hook, push-to-release tab dengan grip ribs), penjepit fan 92mm otomatis
      - Estimasi berat: ~18 gram
 
-  Total Estimasi Berat Keseluruhan: ~460 - 490 gram (Sangat hemat, jauh di bawah 1 kg spool!)
+   Total Estimasi Berat Keseluruhan: ~460 - 490 gram (Sangat hemat, jauh di bawah 1 kg spool!)
 
-REKOMENDASI PARAMETER SLICING:
-  - Material: PETG (Sangat direkomendasikan karena elastisitas snap-fit & tahan panas server ~80C) atau PLA+
-  - Layer Height: 0.20 mm
-  - Wall Loops / Perimeters: 3 wall (1.2 mm solid, penting untuk kekuatan lengan snap-fit)
+FILE PROYEK SIAP CETAK (ELEGOO SLICER 3MF - 1-CLICK SLICING):
+  Telah disediakan file proyek .3mf yang sudah terkonfigurasi otomatis dengan profil Elegoo Centauri Carbon 2, filamen Elegoo Rapid PETG, dan Textured PEI Plate (Suhu Bed 70°C, Nozzle 250°C):
+  1. 01_dl380_front_case.3mf -> Bodi Depan (Support: OFF / Bebas Support)
+  2. 02_dl380_back_case.3mf  -> Bodi Belakang (Support: ON -> Tree Auto / On build plate only)
+  3. 03_dl380_service_lid.3mf -> Tutup Servis (Support: OFF / Bebas Support)
+
+PENJELASAN PERINGATAN ELEGOO SLICER & CARA MENGATASINYA:
+  1. "03_service_lid_bed.stl has floating regions":
+     - Penyebab: Tonjolan grip jempol sebelumnya terangkat di atas permukaan atap, sehingga saat dibalik menghadap bed, pelat melayang di udara.
+     - Solusi: Telah diperbarui! Tonjolan diubah menjadi celah bertekstur masuk ke dalam (recessed deboss -0.6 mm gaya tutup baterai remote/mainan). Kini seluruh permukaan tutup 100% rata menempel pada bed PEI dan dicetak 100% BEBAS SUPPORT tanpa peringatan apapun!
+  2. "02_back_case_bed.stl has floating cantilever":
+     - Penyebab: Lengan snap-fit sepanjang 23 mm berada pada ketinggian Z = 94.5 mm melayang horizontal di udara saat bodi belakang berdiri tegak di bed. Slicer mendeteksi ini menggantung jika Support dimatikan.
+     - Solusi (Cukup 1 Klik di Elegoo Slicer):
+       * Centang [x] Enable Support
+       * Type: Tree(auto) (atau Normal auto)
+       * Centang [x] On build plate only
+       Batang tree support kecil akan tumbuh dari bed menopang lengan snap-fit dan sangat mudah dilepas (snap-off) setelah selesai cetak!
+
+PARAMETER SLICING YANG SUDAH DITERAPKAN DI 3MF:
+  - Printer: Elegoo Centauri Carbon 2 0.4 nozzle
+  - Filament: Elegoo Rapid PETG @ECC2 (Nozzle 250°C, Bed 70°C)
+  - Bed Type: Textured PEI Plate
+  - Layer Height: 0.20 mm Standard
+  - Wall Loops: 3 walls (1.2 mm solid perimeter untuk ketahanan snap-fit)
   - Top / Bottom Solid Layers: 4 layers
-  - Infill: 15% (Gyroid / Cross-Hatch)
-
-ORIENTASI CETAK:
-  - Part 01 (Front Case): Letakkan lantai bawah menempel di bed (Z-up printer).
-  - Part 02 (Backcase): Letakkan lantai bawah menempel di bed (Z-up printer). Lengan snap-fit akan tercetak horizontal di bidang XY, memberikan kekuatan tarik maksimal tanpa risiko delaminasi layer.
-  - Part 03 (Lid): Balik 180 derajat (sisi atas rata menempel ke bed PEI bertekstur).
+  - Infill: 15% Gyroid
+  - Support:
+    * Front Case: OFF
+    * Back Case: Tree(auto) - On build plate only
+    * Service Lid: OFF
 
 PERAKITAN (100% TOOL-FREE & SCREWLESS - TANPA BAUT SAMA SEKALI!):
   - Pasang drive cage ke Bodi Depan dan hubungkan kabel SAS/Power. Drive cage tertahan kokoh oleh socket bezel depan dan frame stop belakang tanpa baut!
@@ -39,3 +58,4 @@ PERAKITAN (100% TOOL-FREE & SCREWLESS - TANPA BAUT SAMA SEKALI!):
   - Untuk membuka Tutup Servis (Lid): Dorong push-tab jempol di bagian belakang lid ke arah depan, lalu angkat lid ke atas.
   - Untuk memisahkan Bodi: Tekan kedua tombol push-button di sisi samping kiri dan kanan secara bersamaan ke dalam, lalu tarik Bodi Belakang mundur.
   - ZERO SCREWS, ZERO NUTS, ZERO TOOLS NEEDED!
+

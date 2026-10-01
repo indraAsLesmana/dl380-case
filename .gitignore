@@ -3,4 +3,7 @@ __pycache__/
 *.svg
 .venv/
 venv/
-.DS_Store
+*.gcode
+*.log
+result.json
+elegoo_slicer_project/

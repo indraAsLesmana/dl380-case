@@ -118,7 +118,7 @@ ax3.grid(True, linestyle='--', color=COLOR_GRID, alpha=0.7)
 ax3.set_title('Rear Panel (Z = 215 mm)\nUpper: 92mm Fan Exhaust & SAS Ports | Lower: Flex-ATX C14 & 40mm Fan',
               color='#ffffff', fontsize=11, fontweight='bold', pad=10)
 
-ax3.text(93.0, 101.0, '92mm Fan Grille\n(Ø86mm Honeycomb, 82.5mm pitch)',
+ax3.text(93.0, 101.0, '92mm Fan Grille\n(Ø86mm 45° Diamond Mesh, 82.5mm pitch)',
          color='#ffa657', fontsize=9, ha='center', va='center', bbox=dict(boxstyle='round,pad=0.3', facecolor='#0d1117', edgecolor='#f78166', alpha=0.8))
 ax3.text(45.7, 22.0, 'Flex-ATX C14 / Fan Cutout\n(3-hole flange mount)',
          color='#79c0ff', fontsize=8, ha='center', va='center')

@@ -172,6 +172,16 @@ def make_diamond_x(wz, wy, depth, cz, cy, x_start):
     wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p4), Part.makeLine(p4, p1)])
     return Part.Face(wire).extrude(Vector(depth, 0, 0))
 
+def make_diamond_z(wx, wy, depth, cx, cy, z_start):
+    """Diamond prism cutting horizontally through the rear wall (Z axis).
+    When printed vertically (Y-up), 45-degree struts require ZERO supports."""
+    p1 = Vector(cx, cy + wy / 2.0, z_start)
+    p2 = Vector(cx + wx / 2.0, cy, z_start)
+    p3 = Vector(cx, cy - wy / 2.0, z_start)
+    p4 = Vector(cx - wx / 2.0, cy, z_start)
+    wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p4), Part.makeLine(p4, p1)])
+    return Part.Face(wire).extrude(Vector(0, 0, depth))
+
 # ==============================================================================
 # 3. BUILD PART 1: FRONT DISC CAGE CASE (Z = 0 to 138.0 mm)
 # ==============================================================================
@@ -345,15 +355,14 @@ bevel_l = Part.makeBox(2.0, 14.0, 2.5, Vector(2.0, 93.0, 135.5))
 bevel_r = Part.makeBox(2.0, 14.0, 2.5, Vector(OUT_W - 4.0, 93.0, 135.5))
 front_case = front_case.cut(chan_l).cut(chan_r).cut(win_l).cut(win_r).cut(bevel_l).cut(bevel_r)
 
-# Tool-Free Solid Corner Guide Sockets (100% Screwless Alignment)
-# Lower corner sockets receive Backcase guide keys (8.0 mm deep with 0.35 mm clearance)
-lug_f_ll = Part.makeBox(13.0, 11.0, 10.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT - 10.0))
+# Tool-Free Solid Corner Guide Socket on Right Side (100% Clear of PSU)
+# Note: Lower-left corner has ZERO internal blocks to guarantee 100% clearance for Flex-ATX PSU (X=5.0 to 86.5 mm).
+# The continuous 4.5 mm deep perimeter collar provides full rigid alignment across the left wall and floor.
 lug_f_lr = Part.makeBox(13.0, 11.0, 10.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT - 10.0))
-front_case = front_case.fuse(lug_f_ll).fuse(lug_f_lr)
+front_case = front_case.fuse(lug_f_lr)
 
-sock_ll = Part.makeBox(10.0, 8.5, 9.0, Vector(WALL + 1.2, Y_BASE_FLOOR + 1.2, Z_SPLIT - 8.5))
 sock_lr = Part.makeBox(10.0, 8.5, 9.0, Vector(OUT_W - WALL - 11.2, Y_BASE_FLOOR + 1.2, Z_SPLIT - 8.5))
-front_case = front_case.cut(sock_ll).cut(sock_lr)
+front_case = front_case.cut(sock_lr)
 
 print(f"Front Case complete: Volume = {front_case.Volume:.2f} mm3, isClosed: {front_case.isClosed()}", flush=True)
 
@@ -364,8 +373,8 @@ print(f"Front Case complete: Volume = {front_case.Volume:.2f} mm3, isClosed: {fr
 print("5. Modeling Rear Cooling & Power Backcase...", flush=True)
 back_shell = Part.makeBox(OUT_W, OUT_H, OUT_D - Z_SPLIT, Vector(0, 0, Z_SPLIT))
 
-# Basement void in back case
-b_base_void = Part.makeBox(OUT_W - 2 * WALL, BASEMENT_H, Z_PLEN_END - Z_SPLIT + 0.1,
+# Basement void in back case (extends cleanly from Z_SPLIT - 1.0 to Z_PLEN_END)
+b_base_void = Part.makeBox(OUT_W - 2 * WALL, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
                            Vector(WALL, Y_BASE_FLOOR, Z_SPLIT - 1.0))
 
 # Upper plenum void (146 mm wide from Z = Z_SPLIT - 1.0 to Z_PLEN_END + 2.0 mm)
@@ -411,14 +420,11 @@ l_arm = make_left_latch()
 r_arm = make_right_latch()
 back_case = back_case.fuse(l_arm).fuse(r_arm)
 
-# Tool-Free Solid Corner Guide Keys on Backcase (100% Screwless Alignment)
-# Solid corner guide tongues slide 8.0 mm forward into Front Case sockets
-key_b_ll = Part.makeBox(9.2, 7.8, 8.0, Vector(WALL + 1.6, Y_BASE_FLOOR + 1.6, Z_SPLIT - 8.0))
+# Tool-Free Solid Corner Guide Key on Right Side (100% Clear of PSU)
+# Lower-left corner is completely flush (clear of PSU envelope X=5.0 to 86.5 mm).
 key_b_lr = Part.makeBox(9.2, 7.8, 8.0, Vector(OUT_W - WALL - 10.8, Y_BASE_FLOOR + 1.6, Z_SPLIT - 8.0))
-# Corner base anchors
-anchor_ll = Part.makeBox(13.0, 11.0, 8.0, Vector(WALL, Y_BASE_FLOOR, Z_SPLIT))
 anchor_lr = Part.makeBox(13.0, 11.0, 8.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT))
-back_case = back_case.fuse(key_b_ll).fuse(key_b_lr).fuse(anchor_ll).fuse(anchor_lr)
+back_case = back_case.fuse(key_b_lr).fuse(anchor_lr)
 
 # Bottom Fan Cradle Stand
 b_pad_l = Part.makeBox(15.4, 1.0, 24.5, Vector(fan_cx - 46.4, Y_UPPER_FLOOR, 184.6))
@@ -436,28 +442,28 @@ b_sh_r = Part.makeBox(2.8, 10.5, 11.4, Vector(fan_cx + 46.4, Y_UPPER_FLOOR, 184.
 
 back_case = back_case.fuse(b_pad_l).fuse(b_pad_r).fuse(b_lip).fuse(b_sh_l).fuse(b_sh_r)
 
-# Rear Honeycomb Fan Grille & M4 holes
-grille_cell = 9.5
-grille_web  = 1.5
-step_x = (grille_cell + grille_web) * math.sqrt(3.0) / 2.0
-step_y = (grille_cell + grille_web) * 1.5
-r_max  = (FAN_APERTURE / 2.0) - 2.0
+# Rear 45° Diamond Mesh Fan Grille & M4 holes (100% Self-Supporting, Zero Sagging)
+# Directly applies DfAM principles: 45° struts require ZERO support material when printed vertically (Y-up)
+# Matches the Large Diamond Mesh pattern on the top roof and both side walls
+d_cell  = 13.0
+d_pitch = 16.0
+r_max   = (FAN_APERTURE / 2.0) - 1.5
 
-hex_cuts = []
+diamond_cuts = []
 for row in range(-6, 7):
-    cy = fan_cy + row * step_y * 0.5
-    row_offset = (step_x * 0.5) if (row % 2 != 0) else 0.0
+    cy = fan_cy + row * (d_pitch / 2.0)
+    row_offset = (d_pitch / 2.0) if (row % 2 != 0) else 0.0
     for col in range(-6, 7):
-        cx = fan_cx + col * step_x + row_offset
+        cx = fan_cx + col * d_pitch + row_offset
         dist = math.hypot(cx - fan_cx, cy - fan_cy)
-        if dist + grille_cell / 2.0 < r_max:
-            hex_cuts.append(make_hex_prism(grille_cell, REAR_WALL_T + 4.0, cx, cy, Z_PLEN_END - 2.0))
+        if dist + d_cell / 2.0 < r_max + 1.0 and dist < r_max:
+            diamond_cuts.append(make_diamond_z(d_cell, d_cell, REAR_WALL_T + 4.0, cx, cy, Z_PLEN_END - 2.0))
 
-if hex_cuts:
-    all_hex = hex_cuts[0]
-    for h in hex_cuts[1:]:
-        all_hex = all_hex.fuse(h)
-    back_case = back_case.cut(all_hex)
+if diamond_cuts:
+    all_diamonds = diamond_cuts[0]
+    for d in diamond_cuts[1:]:
+        all_diamonds = all_diamonds.fuse(d)
+    back_case = back_case.cut(all_diamonds)
 
 for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
     for dy in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
@@ -530,13 +536,13 @@ wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3
 wedge = Part.Face(wire).extrude(Vector(16.0, 0, 0)).translate(Vector(fan_cx - 8.0, 0, 0))
 hook = hook.cut(wedge)
 
-# Push-to-release thumb pad with 3x raised non-slip grip ridges
-push_tab = Part.makeBox(14.0, 1.4, 4.5, Vector(fan_cx - 7.0, OUT_H, 203.5))
-for rz in [204.5, 206.0, 207.5]:
-    rib = Part.makeBox(12.0, 0.5, 0.7, Vector(fan_cx - 6.0, OUT_H + 1.4, rz - 0.35))
-    push_tab = push_tab.fuse(rib)
+lid = lid.fuse(hook)
 
-lid = lid.fuse(hook).fuse(push_tab)
+# Push-to-release thumb pad with recessed non-slip grip ridges (Battery-Door style)
+# Recessed ridges ensure top face of lid is 100% planar and rests flat on PEI bed with ZERO supports!
+for rz in [204.5, 206.0, 207.5]:
+    recess = Part.makeBox(12.0, 0.6, 0.7, Vector(fan_cx - 6.0, OUT_H - 0.6, rz - 0.35))
+    lid = lid.cut(recess)
 
 # 3. Integrated Top Fan Stand on Service Lid (Clamps 92mm fan automatically!)
 t_lip = Part.makeBox(86.0, 5.0, 2.4, Vector(fan_cx - 43.0, OUT_H - ROOF_T - 5.0, 182.2))
@@ -553,10 +559,10 @@ t_pad_r = Part.makeBox(14.0, 1.0, 20.0, Vector(fan_cx + 30.0, OUT_H - ROOF_T - 1
 top_stand = t_lip.fuse(t_pad_l).fuse(t_pad_r)
 lid = lid.fuse(top_stand)
 
-# Side grip pull-grooves for effortless two-finger lifting
+# Side grip pull-grooves for effortless two-finger lifting (recessed into top surface)
 for dx in (-45.0, -38.0, 38.0, 45.0):
-    g_rib = Part.makeBox(2.0, 0.6, 12.0, Vector(fan_cx + dx - 1.0, OUT_H, 186.0 - 6.0))
-    lid = lid.fuse(g_rib)
+    g_cut = Part.makeBox(2.0, 0.6, 12.0, Vector(fan_cx + dx - 1.0, OUT_H - 0.6, 186.0 - 6.0))
+    lid = lid.cut(g_cut)
 
 print(f"Service Lid complete: Volume = {lid.Volume:.2f} mm3, isClosed: {lid.isClosed()}", flush=True)
 

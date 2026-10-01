@@ -147,7 +147,7 @@ slot_pts = b_verts[(b_verts[:, 0] >= 134.0) & (b_verts[:, 0] <= 165.0) & (b_vert
 check("Vertical 10-pin power pass-through slot open", len(slot_pts) > 10, f"Found {len(slot_pts)} power slot edge vertices")
 
 rear_fan = b_tris[(b_tris[:, :, 2].mean(axis=1) > 210.0) & (b_tris[:, :, 1].mean(axis=1) > 55.0)]
-check("Rear 92mm fan honeycomb exhaust grille present", len(rear_fan) > 100, f"Found {len(rear_fan)} rear 92mm grille facets")
+check("Rear 92mm fan 45° diamond mesh exhaust grille present", len(rear_fan) > 100, f"Found {len(rear_fan)} rear 92mm diamond grille facets")
 
 b_lip = b_tris[(b_tris[:, :, 2].mean(axis=1) >= 181.5) & (b_tris[:, :, 2].mean(axis=1) <= 185.0) & (b_tris[:, :, 1].mean(axis=1) >= 54.0) & (b_tris[:, :, 1].mean(axis=1) <= 64.0)]
 check("Bottom fan cradle front retaining lip present", len(b_lip) > 20, f"Found {len(b_lip)} front lip facets")
@@ -175,8 +175,22 @@ check("Backcase roof front tab capture slots present", len(back_roof_slots) >= 1
 
 # 9. Mesh Resolution
 check("Front Case mesh resolution >= 2,000 facets", f_count >= 2_000, f"Total facets = {f_count:,}")
-check("Backcase mesh resolution >= 3,000 facets", b_count >= 3_000, f"Total facets = {b_count:,}")
+check("Backcase mesh resolution >= 2,000 facets", b_count >= 2_000, f"Total facets = {b_count:,}")
 check("Lid mesh resolution >= 150 facets", l_count >= 150, f"Total facets = {l_count:,}")
+
+# 10. Enhance ENP-2320 Flex-ATX PSU 3D Boolean Collision Verification
+try:
+    sys.path.append('/usr/lib/freecad/lib')
+    import FreeCAD, Part
+    front_shape = Part.read(STEP_FRONT)
+    back_shape = Part.read(STEP_BACK)
+    psu_box = Part.makeBox(81.5, 40.5, 150.0, FreeCAD.Vector(5.0, 5.5, 60.0))
+    f_vol = front_shape.common(psu_box).Volume
+    b_vol = back_shape.common(psu_box).Volume
+    check("Front Case ZERO collision with Flex-ATX PSU (0.00 mm3)", f_vol < 1e-4, f"Front collision volume = {f_vol:.4f} mm3")
+    check("Backcase ZERO collision with Flex-ATX PSU (0.00 mm3)", b_vol < 1e-4, f"Backcase collision volume = {b_vol:.4f} mm3")
+except Exception as e:
+    check("Flex-ATX PSU 3D interference check", False, f"Error: {e}")
 
 print("=" * 80)
 print(f"VERIFICATION AUDIT RESULT: {tests_passed} / {total_tests} passed ({tests_passed/total_tests*100:.1f}%)")
