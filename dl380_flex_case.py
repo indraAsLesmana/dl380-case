@@ -293,13 +293,13 @@ front_case = front_case.fuse(plinth1)
 f_divider = Part.makeBox(2.0, BASEMENT_H, Z_SPLIT - 20.0, Vector(87.5, Y_BASE_FLOOR, 20.0))
 front_case = front_case.fuse(f_divider)
 
-# DfAM sacrificial breakaway fins in Front Case basement (sparse, clean, tool-free snap-off)
-# 2 fins in PSU left bay (X=25.0, 56.0 mm) + 2 fins in right bay (X=120.0, 152.0 mm)
-# Spans are ~25-32 mm across, perfect for PETG bridging, snaps out in seconds with zero cross-fins
-f_fin1 = make_scored_breakaway_fin(25.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin2 = make_scored_breakaway_fin(56.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin4 = make_scored_breakaway_fin(152.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+# DfAM sacrificial breakaway fins in Front Case basement (aligned with vertical load columns)
+# Left bay: X=40.0, 64.0 mm | Right bay: X=116.0, 144.0 mm | Permanent divider at X=87.5 mm
+# Spans are ~24-39 mm across, snaps out in seconds with zero cross-fins
+f_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+f_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+f_fin3 = make_scored_breakaway_fin(116.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+f_fin4 = make_scored_breakaway_fin(144.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
 
 front_case = front_case.fuse(f_fin1).fuse(f_fin2).fuse(f_fin3).fuse(f_fin4)
 
@@ -447,21 +447,23 @@ b_divider = Part.makeBox(2.0, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
 back_case = back_case.fuse(b_divider)
 
 # DfAM sacrificial breakaway fins in Back Case first floor (basement: Y=3.5 to 48.5 mm)
-# 2 fins in PSU left bay (X=25.0, 56.0 mm) + 2 fins in right bay (X=120.0, 152.0 mm)
-# Spans are ~25-32 mm, zero cross-fins for effortless one-pull breakaway removal
-b_fin1 = make_scored_breakaway_fin(25.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin2 = make_scored_breakaway_fin(56.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin4 = make_scored_breakaway_fin(152.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+# Left bay: X=40.0, 64.0 mm | Right bay: X=116.0, 144.0 mm | Permanent divider at X=87.5 mm
+# Spans are ~24-39 mm, zero cross-fins for effortless one-pull breakaway removal
+b_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+b_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+b_fin3 = make_scored_breakaway_fin(116.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+b_fin4 = make_scored_breakaway_fin(144.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
 
 back_case = back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3).fuse(b_fin4)
 
 # DfAM sacrificial breakaway fins for Second Floor / Upper Chamber Top Roof Bridge (Y=54.0 to 148.0 mm)
-# Decreased to 3 clean, straight fins (X=45.0, 93.0, 141.0 mm) resting on flat floor clear of bosses
-# Divides the 146 mm upper chamber into ~36-48 mm spans with zero cross-fins
-u_fin1 = make_scored_breakaway_fin(45.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin2 = make_scored_breakaway_fin(93.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin3 = make_scored_breakaway_fin(141.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
+# Unified vertical columns directly aligned with first-floor supports through the mid-deck shelf:
+# 1. u_fin1 (X=40.0 mm) sits DIRECTLY on top of b_fin1 (X=40.0 mm) via mid-deck
+# 2. u_fin2 (X=88.5 mm) sits DIRECTLY on top of permanent central divider wall (X=87.5-89.5 mm)
+# 3. u_fin3 (X=144.0 mm) sits DIRECTLY on top of b_fin4 (X=144.0 mm) via mid-deck
+u_fin1 = make_scored_breakaway_fin(40.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
+u_fin2 = make_scored_breakaway_fin(88.5,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
+u_fin3 = make_scored_breakaway_fin(144.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
 
 back_case = back_case.fuse(u_fin1).fuse(u_fin2).fuse(u_fin3)
 
