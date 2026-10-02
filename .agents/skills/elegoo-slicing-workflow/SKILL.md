@@ -94,12 +94,14 @@ This guide documents verified configurations, common pitfalls, and resolution wo
 | Setting | Recommended Value | Reason |
 | :--- | :--- | :--- |
 | **Layer Height** | `0.20 mm` Standard | Optimal balance of layer adhesion and detail |
-| **Wall Loops** | `3` (1.2 mm solid perimeter) | Essential for snap-fit spring arm flexural strength |
+| **Wall Loops** | `4` (1.6 mm solid perimeter) | Optimal for load-bearing and snap-fit flexural fatigue life |
 | **Sparse Infill** | `15% Gyroid` | Isotropic load bearing; no crossing grid collisions |
 | **Top / Bottom Shells**| `4` solid layers | Prevents pillowing and ensures watertight roofs |
 | **Nozzle Temp** | `250°C` (Rapid PETG) | Maximum inter-layer bond strength |
 | **Bed Temp** | `70°C` (Textured PEI) | Reliable first layer adhesion without warping |
-| **Cooling Fan** | `20% - 50%` | Moderate cooling prevents PETG brittleness |
+| **Cooling Fan** | `20% - 40%` | Moderate cooling prevents PETG brittleness & layer delamination |
+| **X-Y Hole Comp** | `+0.10 mm` | Compensates internal diameter shrinkage for switches & screws |
+| **Elephant Foot** | `0.15 mm` | Prevents first-layer squish ridge from jamming slide fits |
 
 ---
 

@@ -33,21 +33,25 @@ PENJELASAN PERINGATAN ELEGOO SLICER & CARA MENGATASINYA:
      - Penyebab: Lengan snap-fit sepanjang 23 mm berada pada ketinggian Z = 94.5 mm melayang horizontal di udara saat bodi belakang berdiri tegak di bed. Slicer mendeteksi ini menggantung jika Support dimatikan.
      - Solusi (Cukup 1 Klik di Elegoo Slicer):
        * Centang [x] Enable Support
-       * Type: Tree(auto) (atau Normal auto)
+       * Type: Normal(auto) - Sangat hemat filamen (~8.8g vs >50g pada Tree) & tiang tegak kokoh
        * Centang [x] On build plate only
-       Batang tree support kecil akan tumbuh dari bed menopang lengan snap-fit dan sangat mudah dilepas (snap-off) setelah selesai cetak!
+       * Support Top Z Distance: 0.20 mm (agar mudah dilepas bersih dari bahan PETG)
 
 PARAMETER SLICING YANG SUDAH DITERAPKAN DI 3MF:
   - Printer: Elegoo Centauri Carbon 2 0.4 nozzle
-  - Filament: Elegoo Rapid PETG @ECC2 (Nozzle 250°C, Bed 70°C)
-  - Bed Type: Textured PEI Plate
+  - Filament: PETG (Elegoo Rapid PETG / Bambu Lab PETG Basic)
+  - Nozzle Temp: 250°C - 255°C
+  - Bed Temp: 70°C - 75°C (Textured PEI Plate)
+  - Cooling Fan: 20% - 40% (Mencegah delaminasi layer pada lengan snap-fit)
   - Layer Height: 0.20 mm Standard
-  - Wall Loops: 3 walls (1.2 mm solid perimeter untuk ketahanan snap-fit)
+  - Wall Loops: 4 walls (1.6 mm solid perimeter untuk ketahanan beban & snap-fit)
   - Top / Bottom Solid Layers: 4 layers
   - Infill: 15% Gyroid
+  - X-Y Hole Compensation: +0.10 mm (Mencegah lubang baut/switch undersized)
+  - Elephant Foot Compensation: 0.15 mm (Mencegah bibir bawah bengkak & seret)
   - Support:
     * Front Case: OFF
-    * Back Case: Tree(auto) - On build plate only
+    * Back Case: Normal(auto) - On build plate only (Top Z: 0.20 mm)
     * Service Lid: OFF
 
 PERAKITAN (100% TOOL-FREE & SCREWLESS - TANPA BAUT SAMA SEKALI!):
