@@ -293,28 +293,15 @@ front_case = front_case.fuse(plinth1)
 f_divider = Part.makeBox(2.0, BASEMENT_H, Z_SPLIT - 20.0, Vector(87.5, Y_BASE_FLOOR, 20.0))
 front_case = front_case.fuse(f_divider)
 
-# DfAM sacrificial breakaway fins in Front Case basement (shifted more left, dense ~13mm grid)
-f_fin1 = make_scored_breakaway_fin(12.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin2 = make_scored_breakaway_fin(25.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin3 = make_scored_breakaway_fin(38.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin4 = make_scored_breakaway_fin(51.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin5 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin6 = make_scored_breakaway_fin(76.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+# DfAM sacrificial breakaway fins in Front Case basement (sparse, clean, tool-free snap-off)
+# 2 fins in PSU left bay (X=25.0, 56.0 mm) + 2 fins in right bay (X=120.0, 152.0 mm)
+# Spans are ~25-32 mm across, perfect for PETG bridging, snaps out in seconds with zero cross-fins
+f_fin1 = make_scored_breakaway_fin(25.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+f_fin2 = make_scored_breakaway_fin(56.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+f_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+f_fin4 = make_scored_breakaway_fin(152.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
 
-f_fin7 = make_scored_breakaway_fin(102.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin8 = make_scored_breakaway_fin(118.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin9 = make_scored_breakaway_fin(138.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin10= make_scored_breakaway_fin(158.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin11= make_scored_breakaway_fin(173.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-
-f_cfin1 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 45.0)
-f_cfin2 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 75.0)
-f_cfin3 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 105.0)
-f_cfin4 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 125.0)
-
-front_case = (front_case.fuse(f_fin1).fuse(f_fin2).fuse(f_fin3).fuse(f_fin4).fuse(f_fin5).fuse(f_fin6)
-              .fuse(f_fin7).fuse(f_fin8).fuse(f_fin9).fuse(f_fin10).fuse(f_fin11)
-              .fuse(f_cfin1).fuse(f_cfin2).fuse(f_cfin3).fuse(f_cfin4))
+front_case = front_case.fuse(f_fin1).fuse(f_fin2).fuse(f_fin3).fuse(f_fin4)
 
 # ------------------------------------------------------------------------------
 # 4. Large-Pattern Diamond Mesh on Top Roof & Both Side Walls
@@ -459,40 +446,24 @@ b_divider = Part.makeBox(2.0, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
                          Vector(87.5, Y_BASE_FLOOR, Z_SPLIT - 1.0))
 back_case = back_case.fuse(b_divider)
 
-# DfAM sacrificial breakaway fins in Back Case basement (shifted more left, dense ~13mm grid)
-# Reaches all the way to X=12.0mm to eliminate any wide span on the left
-b_fin1 = make_scored_breakaway_fin(12.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin2 = make_scored_breakaway_fin(25.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin3 = make_scored_breakaway_fin(38.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin4 = make_scored_breakaway_fin(51.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin5 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin6 = make_scored_breakaway_fin(76.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+# DfAM sacrificial breakaway fins in Back Case first floor (basement: Y=3.5 to 48.5 mm)
+# 2 fins in PSU left bay (X=25.0, 56.0 mm) + 2 fins in right bay (X=120.0, 152.0 mm)
+# Spans are ~25-32 mm, zero cross-fins for effortless one-pull breakaway removal
+b_fin1 = make_scored_breakaway_fin(25.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+b_fin2 = make_scored_breakaway_fin(56.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+b_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+b_fin4 = make_scored_breakaway_fin(152.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
 
-b_fin7 = make_scored_breakaway_fin(102.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin8 = make_scored_breakaway_fin(118.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin9 = make_scored_breakaway_fin(138.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin10= make_scored_breakaway_fin(158.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin11= make_scored_breakaway_fin(173.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+back_case = back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3).fuse(b_fin4)
 
-b_cfin1 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 152.0)
-b_cfin2 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 172.0)
-b_cfin3 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 192.0)
-b_cfin4 = make_cross_breakaway_fin(WALL, OUT_W - WALL, Y_BASE_FLOOR, Y_MID_DECK, 204.0)
+# DfAM sacrificial breakaway fins for Second Floor / Upper Chamber Top Roof Bridge (Y=54.0 to 148.0 mm)
+# Decreased to 3 clean, straight fins (X=45.0, 93.0, 141.0 mm) resting on flat floor clear of bosses
+# Divides the 146 mm upper chamber into ~36-48 mm spans with zero cross-fins
+u_fin1 = make_scored_breakaway_fin(45.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
+u_fin2 = make_scored_breakaway_fin(93.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
+u_fin3 = make_scored_breakaway_fin(141.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
 
-back_case = (back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3).fuse(b_fin4).fuse(b_fin5).fuse(b_fin6)
-             .fuse(b_fin7).fuse(b_fin8).fuse(b_fin9).fuse(b_fin10).fuse(b_fin11)
-             .fuse(b_cfin1).fuse(b_cfin2).fuse(b_cfin3).fuse(b_cfin4))
-
-# DfAM sacrificial breakaway fins for the Upper Chamber Top Roof Bridge (Y=54.0 to 148.0 mm)
-# Supports the final top roof bridge from the first floor with 0.24mm scored breakaway necks
-u_fin1  = make_scored_breakaway_fin(45.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin2  = make_scored_breakaway_fin(70.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin3  = make_scored_breakaway_fin(93.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin4  = make_scored_breakaway_fin(116.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin5  = make_scored_breakaway_fin(141.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_cfin1 = make_cross_breakaway_fin(X_CAGE_0 + 2.0, X_CAGE_1 - 2.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 153.0)
-
-back_case = back_case.fuse(u_fin1).fuse(u_fin2).fuse(u_fin3).fuse(u_fin4).fuse(u_fin5).fuse(u_cfin1)
+back_case = back_case.fuse(u_fin1).fuse(u_fin2).fuse(u_fin3)
 
 # Matching perimeter male tongue flange on Back Case (Z = 133.5 to 138.0 mm)
 # Deep 4.5 mm collar gives massive structural bending resistance against pitch and yaw
