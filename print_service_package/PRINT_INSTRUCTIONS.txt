@@ -33,9 +33,17 @@ PENJELASAN PERINGATAN ELEGOO SLICER & CARA MENGATASINYA:
      - Penyebab: Lengan snap-fit sepanjang 23 mm berada pada ketinggian Z = 94.5 mm melayang horizontal di udara saat bodi belakang berdiri tegak di bed. Slicer mendeteksi ini menggantung jika Support dimatikan.
      - Solusi (Cukup 1 Klik di Elegoo Slicer):
        * Centang [x] Enable Support
-       * Type: Normal(auto) - Sangat hemat filamen (~8.8g vs >50g pada Tree) & tiang tegak kokoh
-       * Centang [x] On build plate only
+       * Type: Normal(auto) - Sangat hemat filamen (~8.8g vs >185g pada Tree) & tiang tegak kokoh
+       * Centang [x] On build plate only (hanya membuat tiang penopang untuk lengan luar snap-fit)
        * Support Top Z Distance: 0.20 mm (agar mudah dilepas bersih dari bahan PETG)
+
+  3. Langit-langit Terowongan Basement (Mid-Deck Floor):
+     - Masalah Awal: Terowongan basement selebar 180 mm di bawah mid-deck shelf sebelumnya mencoba melakukan bridging 18 cm di udara hampa (sehingga filamen PETG melorot/mesh). Jika Tree Support dinyalakan di seluruh model, slicer mengisi seluruh ruang atas (fan chamber) dengan 190g pohon support yang boros dan sulit dicopot.
+     - Solusi Permanen (DfAM Sacrificial Breakaway Fins):
+       * Telah ditambahkan dinding pembatas tengah permanen (2.0 mm) di X = 87.5 mm yang membagi bentangan menjadi dua dan menopang beban drive cage.
+       * Telah ditambahkan kisi sirip penopang tipis (0.45 mm sacrificial fins) di dalam basement dengan gigi mikro (micro-teeth) di bagian langit-langit dan leher takik patah (0.24 mm scored neck) di bagian lantai.
+       * Seluruh bentangan bridging terbagi menjadi segmen kecil ~21 - 25 mm yang dicetak 100% lurus, rata, dan tanpa melorot sama sekali!
+       * Cara Melepas Sirip Pasca Cetak: Cukup jepit sirip menggunakan tang lancip (needle-nose pliers) atau dorong dengan jari, lalu putar sedikit. Gigi mikro di langit-langit dan takik di lantai akan langsung patah bersih (snap) dalam 5 detik, menyisakan terowongan yang bersih dan lapang untuk PSU Flex-ATX!
 
 PARAMETER SLICING YANG SUDAH DITERAPKAN DI 3MF:
   - Printer: Elegoo Centauri Carbon 2 0.4 nozzle

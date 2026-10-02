@@ -147,20 +147,18 @@ def patch_3mf_metadata(file_path, enable_support=False):
         cfg["overhang_fan_speed"] = ["80"]
 
         # 3. Process settings (Fixes Issues #2, #3, #5)
-        if "process" in cfg and isinstance(cfg["process"], dict):
-            p = cfg["process"]
-            p["wall_loops"] = "4"
-            p["sparse_infill_density"] = "15%"
-            p["sparse_infill_pattern"] = "gyroid"
-            p["top_solid_layers"] = "4"
-            p["bottom_solid_layers"] = "4"
-            p["xy_hole_compensation"] = "0.1"
-            p["elefant_foot_compensation"] = "0.15"
-            p["enable_support"] = "1" if enable_support else "0"
-            if enable_support:
-                p["support_type"] = "normal(auto)"
-                p["support_on_build_plate_only"] = "1"
-                p["support_top_z_distance"] = "0.2"
+        cfg["wall_loops"] = "4"
+        cfg["sparse_infill_density"] = "15%"
+        cfg["sparse_infill_pattern"] = "gyroid"
+        cfg["top_solid_layers"] = "4"
+        cfg["bottom_solid_layers"] = "4"
+        cfg["xy_hole_compensation"] = "0.1"
+        cfg["elefant_foot_compensation"] = "0.15"
+        cfg["enable_support"] = "1" if enable_support else "0"
+        if enable_support:
+            cfg["support_type"] = "normal(auto)"
+            cfg["support_on_build_plate_only"] = "1"
+            cfg["support_top_z_distance"] = "0.2"
 
         with open(cfg_file, "w") as f:
             json.dump(cfg, f, indent=4)
