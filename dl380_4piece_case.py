@@ -83,7 +83,7 @@ Z_PLEN_END      = 210.0                 # 210.0 mm
 
 fan_cx          = OUT_W / 2.0           # 93.0 mm
 fan_cy          = Y_SPLIT + MID_DECK_T + UPPER_H / 2.0 # 101.0 mm
-psu_cx          = (WALL + 87.5) / 2.0   # 45.25 mm
+psu_cx          = 49.50                 # Shifted +4.25mm to center on new PSU bay (X in [8.0, 91.0])
 
 REPO_DIR        = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR         = os.path.join(REPO_DIR, "out", "4piece")
@@ -346,25 +346,25 @@ def build_4piece_system():
                 vent = make_hex_prism(6.5, WALL + 4.0, cx, cy, -2.0)
                 lower_front = lower_front.cut(vent)
 
-    # Permanent central vertical divider rib
-    f_divider = Part.makeBox(2.0, BASEMENT_H, Z_SPLIT - 20.0, Vector(87.5, FLOOR_T, 20.0))
+    # Permanent central vertical divider rib (shifted to X=91.8 to separate PSU from right cable plenum)
+    f_divider = Part.makeBox(2.0, BASEMENT_H, Z_SPLIT - 20.0, Vector(91.8, FLOOR_T, 20.0))
     lower_front = lower_front.fuse(f_divider)
 
-    # PSU pusher stops and lateral guide rails
-    f_push_l = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(3.0, FLOOR_T, 55.60))
-    f_push_r = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(76.5, FLOOR_T, 55.60))
-    f_rail_l = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(3.0, FLOOR_T, 59.60))
-    f_rail_r = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(86.70, FLOOR_T, 59.60))
+    # PSU pusher stops and lateral guide rails (shifted +4.2mm to clear left vertical snap tower)
+    f_push_l = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(8.00, FLOOR_T, 55.60))
+    f_push_r = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(80.00, FLOOR_T, 55.60))
+    f_rail_l = Part.makeBox(2.00, 16.5, 132.0 - 59.60, Vector(6.00, FLOOR_T, 59.60))
+    f_rail_r = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(91.00, FLOOR_T, 59.60))
 
-    p1_fl = Vector(3.80, 0, 132.0)
-    p2_fl = Vector(3.00, 0, 138.0)
-    p3_fl = Vector(3.00, 0, 132.0)
+    p1_fl = Vector(8.00, 0, 132.0)
+    p2_fl = Vector(6.00, 0, 138.0)
+    p3_fl = Vector(6.00, 0, 132.0)
     poly_fl = Part.makePolygon([p1_fl, p2_fl, p3_fl, p1_fl])
     wedge_fl = Part.Face(poly_fl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, FLOOR_T, 0))
 
-    p1_fr = Vector(86.70, 0, 132.0)
-    p2_fr = Vector(87.50, 0, 138.0)
-    p3_fr = Vector(87.50, 0, 132.0)
+    p1_fr = Vector(91.00, 0, 132.0)
+    p2_fr = Vector(91.80, 0, 138.0)
+    p3_fr = Vector(91.80, 0, 132.0)
     poly_fr = Part.makePolygon([p1_fr, p2_fr, p3_fr, p1_fr])
     wedge_fr = Part.Face(poly_fr).extrude(Vector(0, 16.5, 0)).translate(Vector(0, FLOOR_T, 0))
 
@@ -497,34 +497,34 @@ def build_4piece_system():
                             Vector(WALL, FLOOR_T, Z_SPLIT - 1.0))
     lower_back = lb_shell.cut(lb_void)
 
-    # PSU guide rails: 3.8mm heavy-duty right rail with base gusset + calibrated left wall rail
-    b_rail_l = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(3.0, FLOOR_T, 144.0))
-    p1_l = Vector(3.00, 0, 138.0)
-    p2_l = Vector(3.00, 0, 144.0)
-    p3_l = Vector(3.80, 0, 144.0)
+    # PSU guide rails: 3.8mm heavy-duty right rail with base gusset + calibrated left rail (shifted +4.2mm to clear snap tower)
+    b_rail_l = Part.makeBox(2.00, 16.5, Z_PLEN_END - 144.0, Vector(6.00, FLOOR_T, 144.0))
+    p1_l = Vector(6.00, 0, 138.0)
+    p2_l = Vector(6.00, 0, 144.0)
+    p3_l = Vector(8.00, 0, 144.0)
     poly_bl = Part.makePolygon([p1_l, p2_l, p3_l, p1_l])
     wedge_bl = Part.Face(poly_bl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, FLOOR_T, 0))
 
-    # Reinforced 3.80mm right guide rail (X in [86.70, 90.50], 16.5mm tall)
-    b_rail_r = Part.makeBox(3.80, 16.5, Z_PLEN_END - 144.0, Vector(86.70, FLOOR_T, 144.0))
+    # Reinforced 3.80mm right guide rail (X in [91.00, 94.80], 16.5mm tall)
+    b_rail_r = Part.makeBox(3.80, 16.5, Z_PLEN_END - 144.0, Vector(91.00, FLOOR_T, 144.0))
 
     # 45° triangular base gusset on open right side (4mm wide x 6mm tall foot)
-    p1_g = Vector(90.50, FLOOR_T + 6.0, 144.0)
-    p2_g = Vector(94.50, FLOOR_T,       144.0)
-    p3_g = Vector(90.50, FLOOR_T,       144.0)
+    p1_g = Vector(94.80, FLOOR_T + 6.0, 144.0)
+    p2_g = Vector(98.80, FLOOR_T,       144.0)
+    p3_g = Vector(94.80, FLOOR_T,       144.0)
     gusset_br = Part.Face(Part.makePolygon([p1_g, p2_g, p3_g, p1_g])).extrude(Vector(0, 0, Z_PLEN_END - 144.0))
 
     # Smooth front lead-in wedge (Z in [138.0, 144.0])
-    p1_r = Vector(87.50, FLOOR_T, 138.0)
-    p2_r = Vector(86.70, FLOOR_T, 144.0)
-    p3_r = Vector(90.50, FLOOR_T, 144.0)
-    p4_r = Vector(90.50, FLOOR_T, 138.0)
+    p1_r = Vector(91.80, FLOOR_T, 138.0)
+    p2_r = Vector(91.00, FLOOR_T, 144.0)
+    p3_r = Vector(94.80, FLOOR_T, 144.0)
+    p4_r = Vector(94.80, FLOOR_T, 138.0)
     wedge_br = Part.Face(Part.makePolygon([p1_r, p2_r, p3_r, p4_r, p1_r])).extrude(Vector(0, 16.5, 0))
 
     lower_back = lower_back.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(gusset_br).fuse(wedge_br)
 
-    # Rear PSU cutout (open U-channel to top of basement for 100% support-free print)
-    psu_window = Part.makeBox(74.0, BASEMENT_H + 5.0, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
+    # Rear PSU cutout (open U-channel to top of basement for 100% support-free print, shifted +4.0mm to center on PSU)
+    psu_window = Part.makeBox(78.0, BASEMENT_H + 5.0, REAR_WALL_T + 4.0, Vector(10.0, 5.5, Z_PLEN_END - 2.0))
     lower_back = lower_back.cut(psu_window)
 
     # Front male tongue flange on side walls only

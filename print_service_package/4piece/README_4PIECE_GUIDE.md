@@ -10,13 +10,13 @@ The **4-Piece Modular Architecture** separates the enclosure horizontally along 
 
 | Deliverable (.3mf) | Support Configuration | Filament Usage | Estimated Print Time |
 | :--- | :--- | :--- | :--- |
-| `01A_dl380_lower_front.3mf` | None (100% Support-Free) | **163.5 g** | **9h 46m 44s** |
-| `01B_dl380_upper_front.3mf` | None (100% Support-Free) | **364.4 g** | **1d 4h 34m 57s** |
-| `02A_dl380_lower_back.3mf` | None (100% Support-Free) | **98.0 g** | **6h 1m 8s** |
-| `02B_dl380_upper_back.3mf` | Normal Auto (Build Plate) | **308.9 g** | **1d 0h 14m 46s** |
+| `01A_dl380_lower_front.3mf` | None (100% Support-Free) | **166.1 g** | **9h 54m 47s** |
+| `01B_dl380_upper_front.3mf` | None (100% Support-Free) | **364.4 g** | **1d 4h 34m 43s** |
+| `02A_dl380_lower_back.3mf` | None (100% Support-Free) | **99.9 g** | **6h 10m 46s** |
+| `02B_dl380_upper_back.3mf` | Normal Auto (Build Plate) | **308.9 g** | **1d 0h 14m 37s** |
 | `03_dl380_service_lid.3mf` | None (100% Support-Free) | **17.0 g** | **1h 2m 10s** |
 | `04_dl380_cage_pins.3mf` | None (100% Support-Free) | **1.7 g** | **10m 27s** |
-| **TOTAL ASSEMBLY** | — | **953.7 g** | **~2.8 days total (spread over 6 fast plates)** |
+| **TOTAL ASSEMBLY** | — | **958.0 g** | **~2.8 days total (spread over 6 fast plates)** |
 
 ---
 
