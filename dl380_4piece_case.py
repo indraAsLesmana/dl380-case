@@ -125,6 +125,17 @@ def make_diamond_x(wz, wy, depth, cz, cy, x_start):
     face = Part.Face(poly)
     return face.extrude(Vector(depth, 0, 0))
 
+def make_diamond_z(wx, wy, depth, cx, cy, z_start):
+    """Diamond prism cutting horizontally through the rear wall (Z axis).
+    When printed vertically (Y-up), 45-degree struts require ZERO supports."""
+    p1 = Vector(cx, cy + wy / 2.0, z_start)
+    p2 = Vector(cx + wx / 2.0, cy, z_start)
+    p3 = Vector(cx, cy - wy / 2.0, z_start)
+    p4 = Vector(cx - wx / 2.0, cy, z_start)
+    poly = Part.makePolygon([p1, p2, p3, p4, p1])
+    face = Part.Face(poly)
+    return face.extrude(Vector(0, 0, depth))
+
 def make_left_latch():
     pts = [
         Vector(0.0, 0, 142.0),
@@ -460,34 +471,34 @@ def build_4piece_system():
     r_arm = make_right_latch()
     upper_back = upper_back.fuse(l_arm).fuse(r_arm)
 
-    # Fan exhaust grille
-    bore = Part.makeCylinder(FAN_APERTURE / 2.0, REAR_WALL_T + 4.0,
-                             Vector(fan_cx, fan_cy, Z_PLEN_END - 2.0), Vector(0, 0, 1))
-    upper_back = upper_back.cut(bore)
-
+    # Rear 45° Diamond Mesh Fan Grille & M4 screw holes (100% Self-Supporting, Zero Sagging)
+    # Directly applies DfAM principles: 45° struts require ZERO support material when printed vertically (Y-up)
+    # Matches the Diamond Mesh pattern on the top roof and both side walls
     for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
         for dy in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
             hole = Part.makeCylinder(4.2 / 2.0, REAR_WALL_T + 4.0,
                                      Vector(fan_cx + dx, fan_cy + dy, Z_PLEN_END - 2.0), Vector(0, 0, 1))
             upper_back = upper_back.cut(hole)
 
-    step_hc = 8.0
-    row_pitch = step_hc * math.cos(math.radians(30))
-    all_hexes = []
-    for row in range(-6, 7):
-        cy = fan_cy + row * row_pitch
-        row_off = (step_hc / 2.0) if (row % 2 != 0) else 0.0
-        for col in range(-6, 7):
-            cx = fan_cx + col * step_hc + row_off
-            if math.hypot(cx - fan_cx, cy - fan_cy) <= (FAN_APERTURE / 2.0 - 4.5):
-                h = make_hex_prism(6.5, REAR_WALL_T + 2.0, cx, cy, Z_PLEN_END - 1.0)
-                all_hexes.append(h)
+    d_cell  = 12.0
+    d_pitch = 15.0
+    r_max   = (FAN_APERTURE / 2.0) - 1.5
 
-    if all_hexes:
-        grille = all_hexes[0]
-        for h in all_hexes[1:]:
-            grille = grille.fuse(h)
-        upper_back = upper_back.fuse(grille)
+    diamond_cuts = []
+    for row in range(-6, 7):
+        cy = fan_cy + row * (d_pitch / 2.0)
+        row_offset = (d_pitch / 2.0) if (row % 2 != 0) else 0.0
+        for col in range(-6, 7):
+            cx = fan_cx + col * d_pitch + row_offset
+            dist = math.hypot(cx - fan_cx, cy - fan_cy)
+            if dist + d_cell / 2.0 < r_max + 1.0 and dist < r_max:
+                diamond_cuts.append(make_diamond_z(d_cell, d_cell, REAR_WALL_T + 4.0, cx, cy, Z_PLEN_END - 2.0))
+
+    if diamond_cuts:
+        all_diamonds = diamond_cuts[0]
+        for d in diamond_cuts[1:]:
+            all_diamonds = all_diamonds.fuse(d)
+        upper_back = upper_back.cut(all_diamonds)
 
     # Top service lid aperture
     roof_shelf_y = OUT_H - ROOF_T + 1.7
