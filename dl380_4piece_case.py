@@ -224,6 +224,54 @@ def make_vert_snap_socket(z, length=8.0, is_right=False):
         pocket = Part.makeBox(1.8, 5.5,  length + 1.0, Vector(OUT_W - WALL - 0.8, Y_SPLIT + 5.0, z - 0.5))
         return slot.fuse(pocket)
 
+def make_large_snap_pillar(z=165.0, length=20.0, is_right=False):
+    """
+    Heavy-duty vertical cantilever snap latch rising from Lower Back (02A) into Upper Back (02B) socket.
+    Length: 20.0mm (Z-span)
+    Tooth: 2.0mm deep with 45° self-supporting retention shoulder and 45° lead-in ramp.
+    Cantilever Beam: 2.2mm thickness.
+    Grounded pillar: 2.6mm thick bonded to wall/floor.
+    """
+    if not is_right:
+        x_base = WALL
+        x_arm  = WALL + 0.6
+        pillar = Part.makeBox(2.6, Y_SPLIT - (FLOOR_T + 12.0), length, Vector(x_base, FLOOR_T + 12.0, z))
+        arm_box = Part.makeBox(2.2, 14.0, length, Vector(x_arm, Y_SPLIT, z))
+        p1 = Vector(x_arm,       Y_SPLIT + 5.5, z)
+        p2 = Vector(x_arm - 2.0, Y_SPLIT + 7.5, z)  # 45 deg self-supporting ramp
+        p3 = Vector(x_arm - 2.0, Y_SPLIT + 10.5, z) # vertical detent face
+        p4 = Vector(x_arm,       Y_SPLIT + 13.0, z) # 45 deg lead-in
+        poly = Part.makePolygon([p1, p2, p3, p4, p1])
+        tooth = Part.Face(poly).extrude(Vector(0, 0, length))
+        return pillar.fuse(arm_box).fuse(tooth)
+    else:
+        x_base = OUT_W - WALL - 2.6
+        x_arm  = OUT_W - WALL - 2.8
+        pillar = Part.makeBox(2.6, Y_SPLIT - FLOOR_T, length, Vector(x_base, FLOOR_T, z))
+        arm_box = Part.makeBox(2.2, 14.0, length, Vector(x_arm, Y_SPLIT, z))
+        p1 = Vector(x_arm + 2.2,       Y_SPLIT + 5.5, z)
+        p2 = Vector(x_arm + 2.2 + 2.0, Y_SPLIT + 7.5, z)
+        p3 = Vector(x_arm + 2.2 + 2.0, Y_SPLIT + 10.5, z)
+        p4 = Vector(x_arm + 2.2,       Y_SPLIT + 13.0, z)
+        poly = Part.makePolygon([p1, p2, p3, p4, p1])
+        tooth = Part.Face(poly).extrude(Vector(0, 0, length))
+        return pillar.fuse(arm_box).fuse(tooth)
+
+def make_large_snap_socket(z=165.0, length=20.0, is_right=False):
+    """
+    Heavy-duty internal socket cut into Upper Back (02B) side wall to receive 02A large snap arm and tooth.
+    Pocket depth: 2.6mm for ample clearance with the 2.0mm tooth.
+    Slot width: 3.0mm for smooth insertion of the 2.2mm beam.
+    """
+    if not is_right:
+        slot   = Part.makeBox(3.0, 15.5, length + 1.0, Vector(WALL + 0.3, Y_SPLIT - 0.5, z - 0.5))
+        pocket = Part.makeBox(2.6, 6.5,  length + 1.0, Vector(WALL - 1.8, Y_SPLIT + 5.0, z - 0.5))
+        return slot.fuse(pocket)
+    else:
+        slot   = Part.makeBox(3.0, 15.5, length + 1.0, Vector(OUT_W - WALL - 3.3, Y_SPLIT - 0.5, z - 0.5))
+        pocket = Part.makeBox(2.6, 6.5,  length + 1.0, Vector(OUT_W - WALL - 0.8, Y_SPLIT + 5.0, z - 0.5))
+        return slot.fuse(pocket)
+
 # ------------------------------------------------------------------------------
 # 3. BUILD 4-PIECE MODULAR PARTS
 # ------------------------------------------------------------------------------
@@ -427,14 +475,14 @@ def build_4piece_system():
     t_box_r = Part.makeBox(2.1, Y_SPLIT, 4.5, Vector(OUT_W - 2.1, 0, Z_SPLIT - 4.5))
     lower_back = lower_back.fuse(t_box_l).fuse(t_box_r)
 
-    # 2 vertical cantilever snap pillars grounded to floor and side walls
-    p_rl = make_vert_snap_pillar(181.0, 8.0, is_right=False)
-    p_rr = make_vert_snap_pillar(181.0, 8.0, is_right=True)
+    # 2 large heavy-duty vertical cantilever snap pillars (20mm wide, 2.0mm locking tooth, 2.2mm beam)
+    p_rl = make_large_snap_pillar(165.0, 20.0, is_right=False)
+    p_rr = make_large_snap_pillar(165.0, 20.0, is_right=True)
     lower_back = lower_back.fuse(p_rl).fuse(p_rr)
 
-    # Top alignment tongue on lower back side walls
-    lip_bl = Part.makeBox(1.5, 2.0, OUT_D - Z_SPLIT - 1.5, Vector(1.5, Y_SPLIT, Z_SPLIT))
-    lip_br = Part.makeBox(1.5, 2.0, OUT_D - Z_SPLIT - 1.5, Vector(OUT_W - 3.0, Y_SPLIT, Z_SPLIT))
+    # Top alignment tongue on lower back side walls (enlarged to 3.0mm height)
+    lip_bl = Part.makeBox(1.5, 3.0, OUT_D - Z_SPLIT - 1.5, Vector(1.5, Y_SPLIT, Z_SPLIT))
+    lip_br = Part.makeBox(1.5, 3.0, OUT_D - Z_SPLIT - 1.5, Vector(OUT_W - 3.0, Y_SPLIT, Z_SPLIT))
     lower_back = lower_back.fuse(lip_bl).fuse(lip_br)
 
     print(f"Lower Back complete: Vol = {lower_back.Volume:.2f} mm3, isClosed: {lower_back.isClosed()}", flush=True)
@@ -506,14 +554,14 @@ def build_4piece_system():
     through  = Part.makeBox(135.0, ROOF_T + 4.0, 39.5, Vector(fan_cx - 67.5, OUT_H - ROOF_T - 2.0, 167.5))
     upper_back = upper_back.cut(rebate).cut(through)
 
-    # Bottom grooves receiving lower back side tongues
-    grv_bl = Part.makeBox(1.8, 2.3, OUT_D - Z_SPLIT - 1.2, Vector(1.35, Y_SPLIT - 0.1, Z_SPLIT))
-    grv_br = Part.makeBox(1.8, 2.3, OUT_D - Z_SPLIT - 1.2, Vector(OUT_W - 3.15, Y_SPLIT - 0.1, Z_SPLIT))
+    # Bottom grooves receiving lower back side tongues (enlarged to 3.2mm depth)
+    grv_bl = Part.makeBox(1.8, 3.2, OUT_D - Z_SPLIT - 1.2, Vector(1.35, Y_SPLIT - 0.1, Z_SPLIT))
+    grv_br = Part.makeBox(1.8, 3.2, OUT_D - Z_SPLIT - 1.2, Vector(OUT_W - 3.15, Y_SPLIT - 0.1, Z_SPLIT))
     upper_back = upper_back.cut(grv_bl).cut(grv_br)
 
-    # 2 recessed rear corner snap sockets
-    s_rl = make_vert_snap_socket(181.0, 8.0, is_right=False)
-    s_rr = make_vert_snap_socket(181.0, 8.0, is_right=True)
+    # 2 large heavy-duty recessed snap sockets (20mm wide, 2.6mm deep pocket)
+    s_rl = make_large_snap_socket(165.0, 20.0, is_right=False)
+    s_rr = make_large_snap_socket(165.0, 20.0, is_right=True)
     upper_back = upper_back.cut(s_rl).cut(s_rr)
 
     print(f"Upper Back complete: Vol = {upper_back.Volume:.2f} mm3, isClosed: {upper_back.isClosed()}", flush=True)

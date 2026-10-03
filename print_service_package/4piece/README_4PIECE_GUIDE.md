@@ -11,11 +11,11 @@ The **4-Piece Modular Architecture** separates the enclosure horizontally along 
 | Deliverable (.3mf) | Support Configuration | Filament Usage | Estimated Print Time |
 | :--- | :--- | :--- | :--- |
 | `01A_dl380_lower_front.3mf` | None (100% Support-Free) | **163.5 g** | **9h 46m 44s** |
-| `01B_dl380_upper_front.3mf` | None (100% Support-Free) | **364.4 g** | **1d 4h 35m 17s** |
-| `02A_dl380_lower_back.3mf` | None (100% Support-Free) | **91.9 g** | **5h 49m 45s** |
-| `02B_dl380_upper_back.3mf` | Normal Auto (Build Plate) | **286.8 g** | **22h 47m 29s** |
+| `01B_dl380_upper_front.3mf` | None (100% Support-Free) | **364.4 g** | **1d 4h 34m 54s** |
+| `02A_dl380_lower_back.3mf` | None (100% Support-Free) | **94.0 g** | **5h 50m 27s** |
+| `02B_dl380_upper_back.3mf` | Normal Auto (Build Plate) | **288.7 g** | **22h 52m 0s** |
 | `03_dl380_service_lid.3mf` | None (100% Support-Free) | **17.0 g** | **1h 2m 10s** |
-| **TOTAL ASSEMBLY** | — | **923.7 g** | **~2.8 days total (spread over 5 fast plates)** |
+| **TOTAL ASSEMBLY** | — | **927.7 g** | **~2.8 days total (spread over 5 fast plates)** |
 
 ---
 
