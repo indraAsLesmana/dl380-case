@@ -272,6 +272,55 @@ def make_large_snap_socket(z=165.0, length=20.0, is_right=False):
         pocket = Part.makeBox(2.6, 6.5,  length + 1.0, Vector(OUT_W - WALL - 0.8, Y_SPLIT + 5.0, z - 0.5))
         return slot.fuse(pocket)
 
+def make_part_04_drive_cage_pin():
+    """
+    Parametric 3D-printable 4.0mm Retention Pin ('Filament Nail') for DL380 Drive Cage.
+    Designed for tool-free, screw-free locking of the HP DL380 drive cage rear tabs.
+    Prints 100% support-free flat on build plate with flanged head down (Z=0).
+    Dimensions:
+      - Head: 8.5mm diameter x 2.4mm height with 45° ergonomic perimeter chamfer.
+      - Friction Collar: 4.00mm -> 3.85mm lead-in taper over 1.5mm length.
+      - Shaft: 3.85mm diameter x 5.5mm length (smooth zero-binding slide in 4.0mm printed hole).
+      - Tip: 45° conical self-locating bullet nose (3.85mm -> 2.20mm over 1.5mm length).
+      - Total Height: 10.9mm (2.4mm head + 8.5mm stem; locks 1.0mm sheet metal tab into 5.5mm shelf).
+    """
+    head_d = 8.5
+    head_h = 2.4
+    stem_d_main = 3.85
+    stem_d_base = 4.00
+    stem_h = 8.5
+    tip_h  = 1.5
+
+    # 1. Flanged Head (Z from 0 to head_h)
+    head = Part.makeCylinder(head_d / 2.0, head_h, Vector(0, 0, 0), Vector(0, 0, 1))
+
+    # Undercut chamfer on shoulder of head for effortless fingernail / tool lifting
+    trim_cyl = Part.makeCylinder(head_d / 2.0 + 1.0, 0.6, Vector(0, 0, head_h - 0.6), Vector(0, 0, 1))
+    chamf = Part.makeCone(head_d / 2.0, head_d / 2.0 - 0.6, 0.6, Vector(0, 0, head_h - 0.6), Vector(0, 0, 1))
+    head_shaped = head.cut(trim_cyl).fuse(chamf)
+
+    # 2. Friction alignment collar (tapers 4.00mm to 3.85mm over 1.5mm)
+    collar = Part.makeCone(stem_d_base / 2.0, stem_d_main / 2.0, 1.5, Vector(0, 0, head_h), Vector(0, 0, 1))
+
+    # 3. Main Stem (3.85mm diameter)
+    main_stem = Part.makeCylinder(stem_d_main / 2.0, stem_h - 1.5 - tip_h, Vector(0, 0, head_h + 1.5), Vector(0, 0, 1))
+
+    # 4. Conical self-locating bullet nose tip (3.85mm to 2.20mm)
+    tip = Part.makeCone(stem_d_main / 2.0, 2.2 / 2.0, tip_h, Vector(0, 0, head_h + stem_h - tip_h), Vector(0, 0, 1))
+
+    return head_shaped.fuse(collar).fuse(main_stem).fuse(tip)
+
+def make_part_04_drive_cage_pins_x4():
+    """Batch plate of 4 retention pins arranged in a 2x2 grid (16mm pitch) for quick batch printing."""
+    p = make_part_04_drive_cage_pin()
+    pins = []
+    for dx in (-8.0, 8.0):
+        for dy in (-8.0, 8.0):
+            p_c = p.copy()
+            p_c.translate(Vector(dx, dy, 0))
+            pins.append(p_c)
+    return Part.Compound(pins)
+
 # ------------------------------------------------------------------------------
 # 3. BUILD 4-PIECE MODULAR PARTS
 # ------------------------------------------------------------------------------
@@ -522,6 +571,15 @@ def build_4piece_system():
                               Vector(X_CAGE_0 + 114.0, Y_SPLIT - 2.0, 140.0))
     upper_back = upper_back.cut(power_slot)
 
+    # Disc cage tail 4.0mm retention pin holes (Z=156.0 mm, centered on rear tabs)
+    # Allows tool-free locking of drive cage using 3D printed filament nails / pins
+    for hx in (X_CAGE_0 + 50.0, X_CAGE_0 + 95.5):  # X = 70.0 mm (left tab) and 115.5 mm (right tab)
+        hole = Part.makeCylinder(4.0 / 2.0, MID_DECK_T + 4.0,
+                                 Vector(hx, Y_SPLIT - 2.0, 156.0), Vector(0, 1, 0))
+        chamf = Part.makeCone(2.6, 2.0, 0.8,
+                              Vector(hx, Y_SPLIT + MID_DECK_T - 0.8, 156.0), Vector(0, 1, 0))
+        upper_back = upper_back.cut(hole).cut(chamf)
+
     # Dual horizontal snap-fit latch arms
     l_arm = make_left_latch()
     r_arm = make_right_latch()
@@ -593,26 +651,32 @@ def build_4piece_system():
 
     print(f"Service Lid complete: Vol = {lid.Volume:.2f} mm3, isClosed: {lid.isClosed()}", flush=True)
 
+    pin = make_part_04_drive_cage_pin()
+    pins_x4 = make_part_04_drive_cage_pins_x4()
+    print(f"Drive Cage Pin complete: Vol = {pin.Volume:.2f} mm3, isClosed: {pin.isClosed()}", flush=True)
+
     assert lower_front.isClosed(), "ERROR: Lower Front is not closed!"
     assert upper_front.isClosed(), "ERROR: Upper Front is not closed!"
     assert lower_back.isClosed(),  "ERROR: Lower Back is not closed!"
     assert upper_back.isClosed(),  "ERROR: Upper Back is not closed!"
     assert lid.isClosed(),         "ERROR: Service Lid is not closed!"
+    assert pin.isClosed(),         "ERROR: Drive Cage Pin is not closed!"
 
-    return lower_front, upper_front, lower_back, upper_back, lid
+    return lower_front, upper_front, lower_back, upper_back, lid, pin, pins_x4
 
 # ------------------------------------------------------------------------------
 # 4. EXPORT DELIVERABLES
 # ------------------------------------------------------------------------------
-def export_4piece_deliverables(lf, uf, lb, ub, lid):
+def export_4piece_deliverables(lf, uf, lb, ub, lid, pin, pins_x4):
     print("\n--- Exporting 4-Piece STEP & STL Models ---", flush=True)
     
     parts = [
-        ("01A_lower_front", lf),
-        ("01B_upper_front", uf),
-        ("02A_lower_back",  lb),
-        ("02B_upper_back",  ub),
-        ("03_service_lid",  lid)
+        ("01A_lower_front",   lf),
+        ("01B_upper_front",   uf),
+        ("02A_lower_back",    lb),
+        ("02B_upper_back",    ub),
+        ("03_service_lid",    lid),
+        ("04_drive_cage_pin", pin),
     ]
     
     # 1. Export STEP models
@@ -620,8 +684,15 @@ def export_4piece_deliverables(lf, uf, lb, ub, lid):
         step_path = os.path.join(OUT_DIR, f"{name}.step")
         shape.exportStep(step_path)
         print(f"   - Exported STEP: {step_path}")
-        
-    compound = Part.Compound([lf, uf, lb, ub, lid])
+
+    # Full Assembly STEP with pins installed through drive cage tail tabs into mid-deck shelf
+    rot_pin_install = Rotation(Vector(1, 0, 0), -90.0)
+    pin_inst_l = pin.copy()
+    pin_inst_l.Placement = Placement(Vector(X_CAGE_0 + 50.0, Y_SPLIT + MID_DECK_T + 1.0, 156.0), rot_pin_install)
+    pin_inst_r = pin.copy()
+    pin_inst_r.Placement = Placement(Vector(X_CAGE_0 + 95.5, Y_SPLIT + MID_DECK_T + 1.0, 156.0), rot_pin_install)
+
+    compound = Part.Compound([lf, uf, lb, ub, lid, pin_inst_l, pin_inst_r])
     comp_step = os.path.join(OUT_DIR, "dl380_4piece_assembly.step")
     compound.exportStep(comp_step)
     print(f"   - Exported Assembly STEP: {comp_step}")
@@ -632,16 +703,19 @@ def export_4piece_deliverables(lf, uf, lb, ub, lid):
     # 01B: Rear face Z=138 flat on bed (Rotation around X by 180) -> 100% Support-Free!
     # 02B: Mid-deck Y=48.5 flat on bed (Rotation around X by +90) -> Only minor support under latch arms
     # 03:  Roof top flat on bed (Rotation around X by -90) -> 100% Support-Free!
+    # 04:  Pin head flat on bed (No rotation needed) -> 100% Support-Free!
     rot_floor_down = Rotation(Vector(1, 0, 0), 90.0)
     rot_rear_down  = Rotation(Vector(1, 0, 0), 180.0)
     rot_lid_down   = Rotation(Vector(1, 0, 0), -90.0)
+    rot_pin_up     = Rotation(Vector(1, 0, 0), 0.0)
 
     orientations = {
-        "01A_lower_front": rot_floor_down,
-        "01B_upper_front": rot_rear_down,
-        "02A_lower_back":  rot_floor_down,
-        "02B_upper_back":  rot_floor_down,
-        "03_service_lid":  rot_lid_down,
+        "01A_lower_front":   rot_floor_down,
+        "01B_upper_front":   rot_rear_down,
+        "02A_lower_back":    rot_floor_down,
+        "02B_upper_back":    rot_floor_down,
+        "03_service_lid":    rot_lid_down,
+        "04_drive_cage_pin": rot_pin_up,
     }
 
     for name, shape in parts:
@@ -650,16 +724,26 @@ def export_4piece_deliverables(lf, uf, lb, ub, lid):
         p.Placement = Placement(Vector(0, 0, 0), rot)
         p.translate(Vector(-p.BoundBox.XMin, -p.BoundBox.YMin, -p.BoundBox.ZMin))
         
-        mesh = MeshPart.meshFromShape(p, LinearDeflection=0.08, AngularDeflection=0.35)
+        lin_def = 0.04 if name == "04_drive_cage_pin" else 0.08
+        ang_def = 0.20 if name == "04_drive_cage_pin" else 0.35
+        mesh = MeshPart.meshFromShape(p, LinearDeflection=lin_def, AngularDeflection=ang_def)
         stl_out = os.path.join(OUT_DIR, f"{name}_bed.stl")
         stl_pkg = os.path.join(PKG_DIR, f"{name}_bed.stl")
         mesh.write(stl_out)
         mesh.write(stl_pkg)
         print(f"   - Bed STL: {stl_pkg} ({mesh.CountFacets:,} facets | Height: {p.BoundBox.ZLength:.1f} mm)")
 
+    # Also export 4-pack of pins on single bed plate
+    p4 = pins_x4.copy()
+    p4.translate(Vector(-p4.BoundBox.XMin, -p4.BoundBox.YMin, -p4.BoundBox.ZMin))
+    mesh_x4 = MeshPart.meshFromShape(p4, LinearDeflection=0.04, AngularDeflection=0.20)
+    mesh_x4.write(os.path.join(OUT_DIR, "04_drive_cage_pins_x4_bed.stl"))
+    mesh_x4.write(os.path.join(PKG_DIR, "04_drive_cage_pins_x4_bed.stl"))
+    print(f"   - Bed STL: {os.path.join(PKG_DIR, '04_drive_cage_pins_x4_bed.stl')} ({mesh_x4.CountFacets:,} facets | Height: {p4.BoundBox.ZLength:.1f} mm)")
+
     # 3. Write Report
     report_file = os.path.join(OUT_DIR, "dl380_4piece_report.txt")
-    total_vol = lf.Volume + uf.Volume + lb.Volume + ub.Volume + lid.Volume
+    total_vol = lf.Volume + uf.Volume + lb.Volume + ub.Volume + lid.Volume + pin.Volume * 2.0
     with open(report_file, "w") as f:
         f.write("=" * 80 + "\n")
         f.write("DL380 4-PIECE MODULAR ENCLOSURE - BUILD REPORT\n")
@@ -669,12 +753,13 @@ def export_4piece_deliverables(lf, uf, lb, ub, lid):
         f.write(f"Part 02A (Lower Back):  {lb.Volume:,.2f} mm3 (isClosed: {lb.isClosed()})\n")
         f.write(f"Part 02B (Upper Back):  {ub.Volume:,.2f} mm3 (isClosed: {ub.isClosed()})\n")
         f.write(f"Part 03  (Service Lid): {lid.Volume:,.2f} mm3 (isClosed: {lid.isClosed()})\n")
+        f.write(f"Part 04  (Cage Pin x1): {pin.Volume:,.2f} mm3 (isClosed: {pin.isClosed()})\n")
         f.write(f"Total Volume:           {total_vol:,.2f} mm3 ({total_vol/1000:,.1f} cm3, ~{total_vol*1.26/1000:,.1f} g PETG)\n")
         f.write("=" * 80 + "\n")
     print(f"\nReport written to {report_file}", flush=True)
 
 if __name__ == "__main__":
     t0 = time.time()
-    lf, uf, lb, ub, lid = build_4piece_system()
-    export_4piece_deliverables(lf, uf, lb, ub, lid)
+    lf, uf, lb, ub, lid, pin, pins_x4 = build_4piece_system()
+    export_4piece_deliverables(lf, uf, lb, ub, lid, pin, pins_x4)
     print(f"\nSUCCESS: 4-Piece Modular System Generated in {time.time() - t0:.2f} s!", flush=True)

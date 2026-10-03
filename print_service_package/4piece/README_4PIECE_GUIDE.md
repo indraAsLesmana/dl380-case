@@ -11,21 +11,24 @@ The **4-Piece Modular Architecture** separates the enclosure horizontally along 
 | Deliverable (.3mf) | Support Configuration | Filament Usage | Estimated Print Time |
 | :--- | :--- | :--- | :--- |
 | `01A_dl380_lower_front.3mf` | None (100% Support-Free) | **163.5 g** | **9h 46m 44s** |
-| `01B_dl380_upper_front.3mf` | None (100% Support-Free) | **364.4 g** | **1d 4h 34m 59s** |
+| `01B_dl380_upper_front.3mf` | None (100% Support-Free) | **364.4 g** | **1d 4h 34m 57s** |
 | `02A_dl380_lower_back.3mf` | None (100% Support-Free) | **98.0 g** | **6h 1m 8s** |
-| `02B_dl380_upper_back.3mf` | Normal Auto (Build Plate) | **307.1 g** | **23h 47m 44s** |
+| `02B_dl380_upper_back.3mf` | Normal Auto (Build Plate) | **308.9 g** | **1d 0h 14m 46s** |
 | `03_dl380_service_lid.3mf` | None (100% Support-Free) | **17.0 g** | **1h 2m 10s** |
-| **TOTAL ASSEMBLY** | — | **950.1 g** | **~2.8 days total (spread over 5 fast plates)** |
+| `04_dl380_cage_pins.3mf` | None (100% Support-Free) | **1.7 g** | **10m 27s** |
+| **TOTAL ASSEMBLY** | — | **953.7 g** | **~2.8 days total (spread over 6 fast plates)** |
 
 ---
 
 ## 2. Key Printing Advantages Over Monolithic 2-Piece
 
-1. **Parts 01A, 01B, 02A, and 03 are 100% Support-Free**:
+1. **Parts 01A, 01B, 02A, 03, and 04 are 100% Support-Free**:
    - The Lower cases print right-side up like open shallow trays ($60.5\text{ mm}$ tall with corner snap pillars).
    - The Upper Front case prints with its flat rear mating face on the PEI bed; runner rails, bezel shelf, and $45^\circ$ diamond mesh print straight up with zero supports.
+   - Part 04 (Retention Pins) prints flat on its flanged heads with zero supports.
    - Only Part 02B requires minor build-plate support under the front snap latch arms (~$8\text{ g}$).
 2. **Fast, Low-Risk Printing**:
+   - Part 04 (Cage Pins 4-pack) prints in **~3 minutes** (~$1.7\text{ g}$).
    - Lower Back prints in only **~5.5 hours** (~$99\text{ g}$).
    - Lower Front prints in only **~9 hours** (~$164\text{ g}$).
    - No single part takes longer than ~30 hours. If a print is interrupted, you only reprint a single quadrant.
@@ -34,7 +37,19 @@ The **4-Piece Modular Architecture** separates the enclosure horizontally along 
 
 ---
 
-## 3. Tool-Free Snap-Fit Assembly Sequence
+## 3. Tool-Free Drive Cage Retention Pins ("Filament Nails")
+
+- Part 02B features two **Ø4.0 mm vertical retention holes** cut through the mid-deck shelf, perfectly aligned with the stamped mounting holes in the HP DL380 drive cage rear metal tabs ($X = 70.0\text{ mm}$ and $X = 115.5\text{ mm}$, $Z = 156.0\text{ mm}$).
+- Part 04 provides custom 3D-printable **Ø3.85 mm / 4.0 mm retention nails** (`04_dl380_cage_pins.3mf`):
+  - **Flanged Head**: Ø8.5 mm x 2.4 mm with 45° ergonomic perimeter bevel for tool-free finger insertion and easy fingernail removal.
+  - **Friction Collar**: 4.00 mm -> 3.85 mm taper to ensure a snug, zero-rattle hold.
+  - **Bullet Nose**: 45° conical tip for effortless blind drop-in alignment through the metal tab into the shelf.
+  - **Zero Screws Needed**: Drop the two pins down through the rear metal tabs to lock the drive cage solidly against forward/backward sliding.
+  - **Quick Batch Plate**: A 4-pack of pins (`04_drive_cage_pins_x4_bed.stl`) prints in **~3 minutes** with only **~1.7 g** of PETG.
+
+---
+
+## 4. Tool-Free Snap-Fit Assembly Sequence
 
 ```
 Step 1: Click Upper Front (01B) down onto Lower Front (01A)
@@ -51,10 +66,14 @@ Step 2: Click Upper Back (02B) down onto Lower Back (02A)
         │ 02A PSU │  <── PSU rear opening & guide rails
         └─────────┘
 
-Step 3: Slide Front Assembly into Rear Assembly
+Step 3: Slide Drive Cage into Front Bay and Slide Front into Rear Assembly
         ┌───────────────────────┬─────────┐
         │   DL380 Drive Cage    │ 92mm Fan│ <── 2x Side Push-Release Latch Arms CLICK!
         ├═══════════════════════╪═════════╡
         │     Flex-ATX PSU      │ AC / SAS│ <── Side-Wall Alignment Tongue-and-Groove
         └───────────────────────┴─────────┘
+
+Step 4: Lock Drive Cage with Filament Retention Nails (Tool-Free!)
+        Through the top service opening, push the 2x Part 04 pins through the
+        metal rear tabs into the Ø4.0mm mid-deck holes. No screws required!
 ```
