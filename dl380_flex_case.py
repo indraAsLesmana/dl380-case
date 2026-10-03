@@ -81,10 +81,10 @@ RUNNER_W        =   6.0    # mm  width of left/right runner tracks
 RAMP_L          =   6.0    # mm  length of 45-degree front lead-in ramp
 
 # ---- Flex-ATX PSU Basement (Lower Story) -------------------------------------
-PSU_W           =  81.5    # mm  Enhance ENP-2320 width
-PSU_H           =  40.5    # mm  Enhance ENP-2320 height
-PSU_L           = 150.0    # mm  Enhance ENP-2320 length
-BASEMENT_H      =  45.0    # mm  clear internal height of basement
+PSU_W           =  82.32   # mm  Enhance ENP-2320 measured width (caliper: 82.32 mm)
+PSU_H           =  42.58   # mm  Enhance ENP-2320 measured height (caliper: 42.58 mm)
+PSU_L           = 150.07   # mm  Enhance ENP-2320 measured length (caliper: 150.07 mm)
+BASEMENT_H      =  45.0    # mm  clear internal height of basement (2.42 mm vertical clearance)
 
 SWITCH_DIA      =  16.2    # mm  standard 16 mm metal push-button switch
 
@@ -123,7 +123,7 @@ Z_REAR_OUT      = OUT_D                                             # 215.0 mm
 
 fan_cx          = OUT_W / 2.0                                       # 93.00 mm (centered)
 fan_cy          = Y_UPPER_FLOOR + UPPER_H / 2.0                     # 101.00 mm (centered in 94mm upper chamber)
-psu_cx          = WALL + 2.0 + PSU_W / 2.0                          # 45.75 mm
+psu_cx          = (WALL + 87.5) / 2.0                               # 45.25 mm (centered in 84.5 mm basement pocket)
 
 REPO_DIR        = os.path.dirname(os.path.abspath(__file__))
 OUT_DIR         = os.path.join(REPO_DIR, "out")
@@ -586,15 +586,29 @@ for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
                                  Vector(fan_cx + dx, fan_cy + dy, Z_PLEN_END - 2.0), Vector(0, 0, 1))
         back_case = back_case.cut(hole)
 
-# Rear PSU C14 cutout and #6-32 screw holes (PSU sits directly on flat floor)
+# Rear Flex-ATX PSU Ports & Calibrated Enhance ENP-2320 #6-32 Screw Holes
+# PSU sits directly on flat floor (Y=3.5 mm), centered in left basement bay (X=3.0 to 87.5 mm)
 
-c14_cut = Part.makeBox(72.0, 32.0, REAR_WALL_T + 4.0, Vector(psu_cx - 36.0, FLOOR_T + 6.0, Z_PLEN_END - 2.0))
-back_case = back_case.cut(c14_cut)
+# 1. IEC C14 AC inlet opening (31.0 mm W x 32.5 mm H, clean 1.0 mm perimeter clearance)
+c14_cut = Part.makeBox(31.0, 32.5, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
 
-for s_pt in [Vector(psu_cx - 36.0, FLOOR_T + 36.0, Z_PLEN_END - 2.0),
-             Vector(psu_cx - 36.0, FLOOR_T + 6.0,  Z_PLEN_END - 2.0),
-             Vector(psu_cx + 36.0, FLOOR_T + 6.0,  Z_PLEN_END - 2.0)]:
-    s_hole = Part.makeCylinder(1.9, REAR_WALL_T + 4.0, s_pt, Vector(0, 0, 1))
+# 2. Dedicated 40mm fan exhaust bore (38.0 mm dia, centered at X=62.8, Y=24.8 mm for 100% open airflow)
+fan40_bore = Part.makeCylinder(19.0, REAR_WALL_T + 4.0, Vector(62.8, 24.8, Z_PLEN_END - 2.0), Vector(0, 0, 1))
+
+back_case = back_case.cut(c14_cut).cut(fan40_bore)
+
+# 3. 3x #6-32 UNC mounting screw through-holes (4.0 mm dia / 2.0 mm rad, full 360° clamping seats)
+# Calibrated from digital caliper measurements:
+# - Top-Left:     X = 10.1 mm, Y = 40.2 mm
+# - Top-Right:    X = 79.1 mm, Y = 40.2 mm
+# - Bottom-Right: X = 78.1 mm, Y =  9.0 mm
+psu_screw_pts = [
+    Vector(10.1, 40.2, Z_PLEN_END - 2.0),
+    Vector(79.1, 40.2, Z_PLEN_END - 2.0),
+    Vector(78.1,  9.0, Z_PLEN_END - 2.0),
+]
+for s_pt in psu_screw_pts:
+    s_hole = Part.makeCylinder(2.0, REAR_WALL_T + 4.0, s_pt, Vector(0, 0, 1))
     back_case = back_case.cut(s_hole)
 
 # Rear SAS ports flanking fan
