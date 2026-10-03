@@ -8,12 +8,12 @@ Target PSU:       Enhance ENP-2320 (Flex-ATX 200W, 150 x 81.5 x 40.5 mm)
 Target Fan:       92 mm Arctic P9 PWM PST / Noctua NF-A9 (92 x 92 x 25 mm)
 
 Outer Dimensions: 186.00 mm (W) x 151.50 mm (H) x 215.00 mm (D)
-Front Case Vol:   784645.39 mm3 (isClosed: True)
-Back Case Vol:    564553.85 mm3 (isClosed: True)
+Front Case Vol:   782319.61 mm3 (isClosed: True)
+Back Case Vol:    563213.71 mm3 (isClosed: True)
 Lid Volume:       21875.90 mm3 (isClosed: True)
-Total Volume:     1371075.14 mm3 (1,371.1 cm3)
-Front Facets:     4,370
-Back Facets:      4,054
+Total Volume:     1367409.22 mm3 (1,367.4 cm3)
+Front Facets:     3,862
+Back Facets:      3,842
 Lid Facets:       300
 
 Print Bed:        Fits Elegoo Centauri Carbon 256 x 256 x 256 mm build plate
