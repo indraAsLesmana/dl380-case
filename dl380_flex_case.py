@@ -614,14 +614,13 @@ wedge_br = Part.Face(poly_br).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_
 back_case = back_case.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(wedge_br)
 
 # DfAM sacrificial breakaway fins in Back Case first floor (basement: Y=3.5 to 48.5 mm)
-# Left bay: X=40.0, 52.0 (center PSU hole), 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
+# Left bay: X=40.0 (Support 2, extends to end of PSU hole), 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
 # Zero cross-fins; completely clear of power pass-through slot (X=134 to 164 mm)
 b_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin_c = make_corrugated_cubic_support(52.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0, channel_w=7.0)
 b_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
 b_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
 
-back_case = back_case.fuse(b_fin1).fuse(b_fin_c).fuse(b_fin2).fuse(b_fin3)
+back_case = back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3)
 
 # DfAM sacrificial breakaway fins for Second Floor / Upper Chamber Top Roof Bridge (Y=54.0 to 148.0 mm)
 # 100% SOLID GROUND: Every fin rests on a solid floor, completely clear of the 10-pin power slot (X=134-164 mm)
@@ -740,11 +739,11 @@ for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
 psu_window = Part.makeBox(74.0, 36.0, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
 back_case = back_case.cut(psu_window)
 
-# Sacrificial breakaway support column directly inside the PSU window opening (X=52.0 mm)
-# Seamlessly supports the 74mm wide top bridge edge of the PSU hole at Y=41.5 mm
-psu_win_sup = make_window_bridge_support(52.0, y_bottom=5.5, y_top=41.5,
+# Support 2 window extension: reaches to the outer end of the PSU hole (X=40.0 mm, Z=205.0 to 214.5 mm)
+# Rises from the window sill (Y=5.5 mm) to support the 74mm top bridge edge of the PSU hole (Y=41.5 mm)
+psu_win_sup = make_window_bridge_support(40.0, y_bottom=5.5, y_top=41.5,
                                          z_start=Z_PLEN_END - 5.0, z_end=Z_PLEN_END + REAR_WALL_T - 0.5,
-                                         width_x=7.0)
+                                         width_x=8.5)
 back_case = back_case.fuse(psu_win_sup)
 
 # Rear SAS ports flanking fan

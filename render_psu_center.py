@@ -40,7 +40,7 @@ ax.set_zlim(140, 216)
 # Looking from rear into the case: azim=-90 (from +Z looking to -Z), slight elevation to see depth
 ax.view_init(elev=5, azim=-90)
 
-ax.set_title("DL380 Back Case: Center Support Column in Power Supply Hole (X = 52.0 mm)\nTriple-Column Symmetrical Support (Left @ 40mm, Center @ 52mm, Right @ 64mm)", 
+ax.set_title("DL380 Back Case: Support 2 Extended to End of PSU Hole (X = 40.0 mm)\nSupport 1 Removed | Clean, Open & Rigid Structure", 
              color='#58a6ff', fontsize=12, fontweight='bold', pad=15)
 ax.set_xlabel('Chassis X (mm)', color='#8b949e')
 ax.set_ylabel('Chassis Y (mm)', color='#8b949e')
