@@ -4,8 +4,8 @@ DL380 4-PIECE MODULAR ENCLOSURE - BUILD REPORT
 
 Part 01A (Lower Front): 171,821.72 mm3 (isClosed: True)
 Part 01B (Upper Front): 634,305.48 mm3 (isClosed: True)
-Part 02A (Lower Back):  104,560.75 mm3 (isClosed: True)
+Part 02A (Lower Back):  108,916.75 mm3 (isClosed: True)
 Part 02B (Upper Back):  427,940.66 mm3 (isClosed: True)
 Part 03  (Service Lid): 21,891.54 mm3 (isClosed: True)
-Total Volume:           1,360,520.15 mm3 (1,360.5 cm3, ~1,714.3 g PETG)
+Total Volume:           1,364,876.15 mm3 (1,364.9 cm3, ~1,719.7 g PETG)
 ================================================================================

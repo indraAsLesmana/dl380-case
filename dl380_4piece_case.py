@@ -448,23 +448,31 @@ def build_4piece_system():
                             Vector(WALL, FLOOR_T, Z_SPLIT - 1.0))
     lower_back = lb_shell.cut(lb_void)
 
-    # PSU guide rails and lead-in wedges
+    # PSU guide rails: 3.8mm heavy-duty right rail with base gusset + calibrated left wall rail
     b_rail_l = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(3.0, FLOOR_T, 144.0))
-    b_rail_r = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(86.70, FLOOR_T, 144.0))
-
     p1_l = Vector(3.00, 0, 138.0)
     p2_l = Vector(3.00, 0, 144.0)
     p3_l = Vector(3.80, 0, 144.0)
     poly_bl = Part.makePolygon([p1_l, p2_l, p3_l, p1_l])
     wedge_bl = Part.Face(poly_bl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, FLOOR_T, 0))
 
-    p1_r = Vector(87.50, 0, 138.0)
-    p2_r = Vector(86.70, 0, 144.0)
-    p3_r = Vector(87.50, 0, 144.0)
-    poly_br = Part.makePolygon([p1_r, p2_r, p3_r, p1_r])
-    wedge_br = Part.Face(poly_br).extrude(Vector(0, 16.5, 0)).translate(Vector(0, FLOOR_T, 0))
+    # Reinforced 3.80mm right guide rail (X in [86.70, 90.50], 16.5mm tall)
+    b_rail_r = Part.makeBox(3.80, 16.5, Z_PLEN_END - 144.0, Vector(86.70, FLOOR_T, 144.0))
 
-    lower_back = lower_back.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(wedge_br)
+    # 45° triangular base gusset on open right side (4mm wide x 6mm tall foot)
+    p1_g = Vector(90.50, FLOOR_T + 6.0, 144.0)
+    p2_g = Vector(94.50, FLOOR_T,       144.0)
+    p3_g = Vector(90.50, FLOOR_T,       144.0)
+    gusset_br = Part.Face(Part.makePolygon([p1_g, p2_g, p3_g, p1_g])).extrude(Vector(0, 0, Z_PLEN_END - 144.0))
+
+    # Smooth front lead-in wedge (Z in [138.0, 144.0])
+    p1_r = Vector(87.50, FLOOR_T, 138.0)
+    p2_r = Vector(86.70, FLOOR_T, 144.0)
+    p3_r = Vector(90.50, FLOOR_T, 144.0)
+    p4_r = Vector(90.50, FLOOR_T, 138.0)
+    wedge_br = Part.Face(Part.makePolygon([p1_r, p2_r, p3_r, p4_r, p1_r])).extrude(Vector(0, 16.5, 0))
+
+    lower_back = lower_back.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(gusset_br).fuse(wedge_br)
 
     # Rear PSU cutout (open U-channel to top of basement for 100% support-free print)
     psu_window = Part.makeBox(74.0, BASEMENT_H + 5.0, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
