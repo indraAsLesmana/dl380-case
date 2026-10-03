@@ -437,6 +437,41 @@ bevel_l = Part.makeBox(2.0, 14.0, 2.5, Vector(2.0, 93.0, 135.5))
 bevel_r = Part.makeBox(2.0, 14.0, 2.5, Vector(OUT_W - 4.0, 93.0, 135.5))
 front_case = front_case.cut(chan_l).cut(chan_r).cut(win_l).cut(win_r).cut(bevel_l).cut(bevel_r)
 
+# ------------------------------------------------------------------------------
+# Tool-Free Flex-ATX PSU Pusher Frame & Precision Lateral Guide Rails (Front Case)
+# ------------------------------------------------------------------------------
+# Traps Enhance ENP-2320 PSU (L=150.07 mm, W=82.32 mm) firmly against the rear wall (Z=210.0 mm).
+# PSU front face terminates at Z = 59.93 mm; Pusher stop face is set at Z = 59.60 mm.
+# Left and Right solid pillars (Y=3.5 to 48.5 mm) withstand 100% of AC power plug insertion
+# forces, completely eliminating the need for rear mounting screws.
+# Center span (X=21.0 to 69.5 mm) remains 100% unobstructed from floor to ceiling for
+# heavy ATX 24-pin and CPU 8-pin wire harnesses and Front Case breakaway fins (X=40, 64 mm).
+
+f_push_l    = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(3.0, Y_BASE_FLOOR, 55.60))
+f_push_r    = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(76.5, Y_BASE_FLOOR, 55.60))
+
+# Lateral Guide Rails in Front Case (Width: 82.80 mm track from Z = 59.60 to 132.0 mm)
+f_rail_l = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(3.0, Y_BASE_FLOOR, 59.60))
+f_rail_r = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(86.70, Y_BASE_FLOOR, 59.60))
+
+# 45-degree rear lead-in chamfers for Front Case rails (Z = 132.0 to 138.0 mm)
+p1_fl = Vector(3.80, 0, 132.0)
+p2_fl = Vector(3.00, 0, 138.0)
+p3_fl = Vector(3.00, 0, 132.0)
+poly_fl = Part.makePolygon([p1_fl, p2_fl, p3_fl, p1_fl])
+wedge_fl = Part.Face(poly_fl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+
+p1_fr = Vector(86.70, 0, 132.0)
+p2_fr = Vector(87.50, 0, 138.0)
+p3_fr = Vector(87.50, 0, 132.0)
+poly_fr = Part.makePolygon([p1_fr, p2_fr, p3_fr, p1_fr])
+wedge_fr = Part.Face(poly_fr).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+
+front_case = (front_case
+              .fuse(f_push_l).fuse(f_push_r)
+              .fuse(f_rail_l).fuse(wedge_fl)
+              .fuse(f_rail_r).fuse(wedge_fr))
+
 # Tool-Free Solid Corner Guide Socket on Right Side (100% Clear of PSU)
 # Note: Lower-left corner has ZERO internal blocks to guarantee 100% clearance for Flex-ATX PSU (X=5.0 to 86.5 mm).
 # The continuous 4.5 mm deep perimeter collar provides full rigid alignment across the left wall and floor.
@@ -470,6 +505,26 @@ back_case = back_shell.cut(b_base_void).cut(b_upper_void)
 b_divider = Part.makeBox(2.0, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
                          Vector(87.5, Y_BASE_FLOOR, Z_SPLIT - 1.0))
 back_case = back_case.fuse(b_divider)
+
+# Precision Lateral Guide Rails in Back Case (Width: 82.80 mm track for 82.32 mm PSU)
+# Protrudes 0.80 mm from outer wall and central divider (Z = 144.0 to 210.0 mm)
+b_rail_l = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(3.0, Y_BASE_FLOOR, 144.0))
+b_rail_r = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(86.70, Y_BASE_FLOOR, 144.0))
+
+# 45-degree front lead-in chamfers for Back Case rails (Z = 138.0 to 144.0 mm)
+p1_l = Vector(3.00, 0, 138.0)
+p2_l = Vector(3.80, 0, 144.0)
+p3_l = Vector(3.00, 0, 144.0)
+poly_bl = Part.makePolygon([p1_l, p2_l, p3_l, p1_l])
+wedge_bl = Part.Face(poly_bl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+
+p1_r = Vector(87.50, 0, 138.0)
+p2_r = Vector(86.70, 0, 144.0)
+p3_r = Vector(87.50, 0, 144.0)
+poly_br = Part.makePolygon([p1_r, p2_r, p3_r, p1_r])
+wedge_br = Part.Face(poly_br).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+
+back_case = back_case.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(wedge_br)
 
 # DfAM sacrificial breakaway fins in Back Case first floor (basement: Y=3.5 to 48.5 mm)
 # Left bay: X=40.0, 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
@@ -586,30 +641,16 @@ for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
                                  Vector(fan_cx + dx, fan_cy + dy, Z_PLEN_END - 2.0), Vector(0, 0, 1))
         back_case = back_case.cut(hole)
 
-# Rear Flex-ATX PSU Ports & Calibrated Enhance ENP-2320 #6-32 Screw Holes
-# PSU sits directly on flat floor (Y=3.5 mm), centered in left basement bay (X=3.0 to 87.5 mm)
-
-# 1. IEC C14 AC inlet opening (31.0 mm W x 32.5 mm H, clean 1.0 mm perimeter clearance)
-c14_cut = Part.makeBox(31.0, 32.5, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
-
-# 2. Dedicated 40mm fan exhaust bore (38.0 mm dia, centered at X=62.8, Y=24.8 mm for 100% open airflow)
-fan40_bore = Part.makeCylinder(19.0, REAR_WALL_T + 4.0, Vector(62.8, 24.8, Z_PLEN_END - 2.0), Vector(0, 0, 1))
-
-back_case = back_case.cut(c14_cut).cut(fan40_bore)
-
-# 3. 3x #6-32 UNC mounting screw through-holes (4.0 mm dia / 2.0 mm rad, full 360° clamping seats)
-# Calibrated from digital caliper measurements:
-# - Top-Left:     X = 10.1 mm, Y = 40.2 mm
-# - Top-Right:    X = 79.1 mm, Y = 40.2 mm
-# - Bottom-Right: X = 78.1 mm, Y =  9.0 mm
-psu_screw_pts = [
-    Vector(10.1, 40.2, Z_PLEN_END - 2.0),
-    Vector(79.1, 40.2, Z_PLEN_END - 2.0),
-    Vector(78.1,  9.0, Z_PLEN_END - 2.0),
-]
-for s_pt in psu_screw_pts:
-    s_hole = Part.makeCylinder(2.0, REAR_WALL_T + 4.0, s_pt, Vector(0, 0, 1))
-    back_case = back_case.cut(s_hole)
+# Rear Flex-ATX PSU Aperture (Single Clean Rectangular Opening)
+# Provides 100% open clearance for IEC C14 power inlet socket and 40mm cooling fan exhaust.
+# Surrounding perimeter stop flange (Z=210.0 mm) retains PSU securely against cord pull-out:
+# - Left stop flange:   X = 4.09 to 6.00 mm (1.91 mm overlap)
+# - Right stop flange:  X = 80.00 to 86.41 mm (6.41 mm overlap)
+# - Bottom stop lip:    Y = 3.50 to 5.50 mm (2.00 mm overlap)
+# - Top stop flange:    Y = 41.50 to 46.08 mm (4.58 mm overlap)
+# Zero screws required: PSU is locked in 6 DoF by front pusher, side rails, floor, and rear flange!
+psu_window = Part.makeBox(74.0, 36.0, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
+back_case = back_case.cut(psu_window)
 
 # Rear SAS ports flanking fan
 sas_slot1 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,

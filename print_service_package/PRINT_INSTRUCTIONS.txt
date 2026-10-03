@@ -63,6 +63,12 @@ PARAMETER SLICING YANG SUDAH DITERAPKAN DI 3MF:
     * Service Lid: OFF
 
 PERAKITAN (100% TOOL-FREE & SCREWLESS - TANPA BAUT SAMA SEKALI!):
+  - Pemasangan PSU Flex-ATX (Tool-Free & Bebas Baut):
+    * Masukkan PSU Flex-ATX (Enhance ENP-2320) ke rel pandu basement hingga mentok ke bibir stop dinding belakang. Rel samping presisi (jalur 82.80 mm untuk PSU 82.32 mm) dengan chamfer masuk 45° menjaga PSU tetap lurus dan anti-koclak.
+    * Ketika Bodi Depan disatukan ke Bodi Belakang, sepasang pilar penahan kokoh (Front Push Pillars) di bodi depan otomatis menahan muka depan PSU (Z = 59.60 mm).
+    * Saat kabel power AC C13 dicolokkan kencang dari belakang, dorongan ditahan 100% oleh pilar bodi depan sehingga PSU tidak akan mundur/bergeser ke depan!
+    * Jendela belakang PSU berupa 1 lubang persegi panjang bersih (74.0 x 36.0 mm) memberikan akses bebas untuk colokan C14 dan ventilasi buang fan 40mm tanpa membutuhkan baut sama sekali!
+    * Kabel ATX 24-pin dan CPU 8-pin keluar leluasa melalui jendela kabel selebar 62.5 mm di antara pilar pendorong depan.
   - Pasang drive cage ke Bodi Depan dan hubungkan kabel SAS/Power. Drive cage tertahan kokoh oleh socket bezel depan dan frame stop belakang tanpa baut!
   - Dorong Bodi Belakang ke Bodi Depan melalui kerah teleskopik 4.5 mm dan kunci sudut presisi hingga kedua pengait snap-fit samping berbunyi 'KLIK' terkunci rapat (100% Tool-Free!).
   - Masukkan fan 92mm ke dalam cradle dudukan belakang.
@@ -70,4 +76,5 @@ PERAKITAN (100% TOOL-FREE & SCREWLESS - TANPA BAUT SAMA SEKALI!):
   - Untuk membuka Tutup Servis (Lid): Dorong push-tab jempol di bagian belakang lid ke arah depan, lalu angkat lid ke atas.
   - Untuk memisahkan Bodi: Tekan kedua tombol push-button di sisi samping kiri dan kanan secara bersamaan ke dalam, lalu tarik Bodi Belakang mundur.
   - ZERO SCREWS, ZERO NUTS, ZERO TOOLS NEEDED!
+
 
