@@ -204,6 +204,34 @@ def make_scored_breakaway_fin(x_pos, y_bottom, y_top, z_start, z_end, thickness=
         fin = fin.fuse(t)
     return fin
 
+def make_through_hole_breakaway_fin(x_pos, y_bottom, y_mid, y_top, z_base_start, z_base_end, z_top_start, z_top_end, thickness=0.85, neck_t=0.28, neck_h=0.3):
+    """Continuous bottom-to-top DfAM sacrificial support fin passing through a floor cutout.
+    - Starts on the basement floor (Y = y_bottom) anchored directly to the build plate with a 68mm foot.
+    - Rises through the basement to support the cavity below the 1st floor hole.
+    - Passes cleanly through the 1st floor cable hole without obstruction.
+    - Continues through the upper chamber all the way to the top roof bridge (Y = y_top).
+    - Micro-teeth at the roof ceiling and rear basement ceiling prevent fusing.
+    - Entire continuous pillar snaps out in one piece when twisted with pliers."""
+    root = Part.makeBox(thickness, 0.6, z_base_end - z_base_start, Vector(x_pos, y_bottom, z_base_start))
+    neck = Part.makeBox(neck_t, neck_h, z_base_end - z_base_start, Vector(x_pos + (thickness - neck_t)/2.0, y_bottom + 0.6, z_base_start))
+    body_low = Part.makeBox(thickness, (y_mid - 0.4) - (y_bottom + 0.6 + neck_h), z_base_end - z_base_start, Vector(x_pos, y_bottom + 0.6 + neck_h, z_base_start))
+    body_up = Part.makeBox(thickness, (y_top - 0.4) - (y_mid - 0.4), z_top_end - z_top_start, Vector(x_pos, y_mid - 0.4, z_top_start))
+    fin = root.fuse(neck).fuse(body_low).fuse(body_up)
+
+    curr_z = 167.0
+    while curr_z + 1.2 <= z_base_end:
+        t = Part.makeBox(thickness, 0.4, 1.2, Vector(x_pos, y_mid - 0.4, curr_z))
+        fin = fin.fuse(t)
+        curr_z += 5.0
+
+    curr_z = z_top_start + 1.5
+    while curr_z + 1.2 <= z_top_end:
+        t = Part.makeBox(thickness, 0.4, 1.2, Vector(x_pos, y_top - 0.4, curr_z))
+        fin = fin.fuse(t)
+        curr_z += 5.0
+
+    return fin
+
 def make_cross_breakaway_fin(x_start, x_end, y_bottom, y_top, z_pos, thickness=0.45):
     """Single-perimeter DfAM sacrificial breakaway cross-fin running along X.
     Perpendicular to Y' bridge travel direction, providing intermediate anvil points every ~25mm."""
@@ -294,13 +322,14 @@ f_divider = Part.makeBox(2.0, BASEMENT_H, Z_SPLIT - 20.0, Vector(87.5, Y_BASE_FL
 front_case = front_case.fuse(f_divider)
 
 # DfAM sacrificial breakaway fins in Front Case basement (aligned with vertical load columns)
-# Left bay: X=40.0, 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
-# Spans are ~24-37 mm across, snaps out in seconds with zero cross-fins
+# Left bay: X=40.0, 64.0 mm | Right bay: X=120.0, 148.0 mm | Permanent divider at X=87.5 mm
+# Spans are ~24-35 mm across, snaps out in seconds with zero cross-fins
 f_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
 f_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
 f_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+f_fin4 = make_scored_breakaway_fin(148.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
 
-front_case = front_case.fuse(f_fin1).fuse(f_fin2).fuse(f_fin3)
+front_case = front_case.fuse(f_fin1).fuse(f_fin2).fuse(f_fin3).fuse(f_fin4)
 
 # ------------------------------------------------------------------------------
 # 4. Large-Pattern Diamond Mesh on Top Roof & Both Side Walls
@@ -496,6 +525,13 @@ back_case = back_case.fuse(boss1).fuse(boss2)
 power_slot = Part.makeBox(30.0, MID_DECK_T + 4.0, 26.0,
                           Vector(X_CAGE_0 + 114.0, Y_UPPER_FLOOR - MID_DECK_T - 2.0, 140.0))
 back_case = back_case.cut(power_slot)
+
+# Continuous bottom-to-end-top sacrificial support pillar at X=148.0 mm
+# Anchored on the basement floor (Y=3.5 mm) with a wide 68mm foot, supports the basement cavity
+# below the 1st floor hole, passes through the cable hole, and rises to the top roof bridge (Y=148.0 mm)
+thru_fin = make_through_hole_breakaway_fin(148.0, Y_BASE_FLOOR, Y_MID_DECK, Y_ROOF_LOWER,
+                                           Z_SPLIT - 1.0, Z_PLEN_END - 5.0, 142.0, 164.0)
+back_case = back_case.fuse(thru_fin)
 
 # Dual Cantilever Snap-Fit Arms on Back Case
 l_arm = make_left_latch()
