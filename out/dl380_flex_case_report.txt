@@ -9,11 +9,11 @@ Target Fan:       92 mm Arctic P9 PWM PST / Noctua NF-A9 (92 x 92 x 25 mm)
 
 Outer Dimensions: 186.00 mm (W) x 151.50 mm (H) x 215.00 mm (D)
 Front Case Vol:   893933.96 mm3 (isClosed: True)
-Back Case Vol:    599248.09 mm3 (isClosed: True)
+Back Case Vol:    606514.61 mm3 (isClosed: True)
 Lid Volume:       21875.90 mm3 (isClosed: True)
-Total Volume:     1515057.95 mm3 (1,515.1 cm3)
+Total Volume:     1522324.47 mm3 (1,522.3 cm3)
 Front Facets:     10,866
-Back Facets:      6,170
+Back Facets:      7,062
 Lid Facets:       300
 
 Print Bed:        Fits Elegoo Centauri Carbon 256 x 256 x 256 mm build plate

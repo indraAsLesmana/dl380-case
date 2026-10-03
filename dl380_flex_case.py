@@ -291,6 +291,41 @@ def make_through_hole_breakaway_fin(x_pos, y_bottom, y_mid, y_top, z_base_start,
                                            z_base_start, z_base_end, z_top_start, z_top_end,
                                            channel_w=8.5, wall_t=thickness, neck_t=neck_t, neck_h=neck_h)
 
+def make_window_bridge_support(x_center, y_bottom=5.5, y_top=41.5, z_start=205.0, z_end=214.5,
+                               width_x=7.0, wall_t=0.85, neck_t=0.35, neck_h=0.35):
+    """Sacrificial breakaway support column directly inside the PSU window opening.
+    - Sits on the bottom sill of the PSU window (Y = 5.5 mm) with scored perimeter base.
+    - Rises through the 36 mm tall opening to support the 74 mm top bridge edge (Y = 41.5 mm).
+    - Castellated top contact teeth prevent PETG fusion while guaranteeing a 100% flat bridge.
+    - Fused seamlessly to the basement center column so the entire pillar pulls out in one piece."""
+    length = z_end - z_start
+    hw = width_x / 2.0
+    x_min = x_center - hw
+    
+    # Base pad on window sill
+    base = Part.makeBox(width_x, 0.6, length, Vector(x_min, y_bottom, z_start))
+    
+    # Scored neck
+    neck_out = Part.makeBox(width_x - 0.4, neck_h, length, Vector(x_min + 0.2, y_bottom + 0.6, z_start))
+    neck_in = Part.makeBox(width_x - 0.4 - 2*neck_t, neck_h + 1.0, length + 2.0,
+                          Vector(x_min + 0.2 + neck_t, y_bottom + 0.1, z_start - 1.0))
+    neck = neck_out.cut(neck_in)
+    
+    # Body
+    body_h = (y_top - 0.4) - (y_bottom + 0.6 + neck_h)
+    body_out = Part.makeBox(width_x, body_h, length, Vector(x_min, y_bottom + 0.6 + neck_h, z_start))
+    body_in = Part.makeBox(width_x - 2*wall_t, body_h + 2.0, length - 2*wall_t,
+                           Vector(x_min + wall_t, y_bottom + 0.1, z_start + wall_t))
+    body = body_out.cut(body_in)
+    
+    col = base.fuse(neck).fuse(body)
+    
+    # Top teeth along longitudinal rails
+    t1 = Part.makeBox(wall_t, 0.4, length - 1.0, Vector(x_min, y_top - 0.4, z_start + 0.5))
+    t2 = Part.makeBox(wall_t, 0.4, length - 1.0, Vector(x_min + width_x - wall_t, y_top - 0.4, z_start + 0.5))
+    col = col.fuse(t1).fuse(t2)
+    return col
+
 # ==============================================================================
 # 3. BUILD PART 1: FRONT DISC CAGE CASE (Z = 0 to 138.0 mm)
 # ==============================================================================
@@ -579,13 +614,14 @@ wedge_br = Part.Face(poly_br).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_
 back_case = back_case.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(wedge_br)
 
 # DfAM sacrificial breakaway fins in Back Case first floor (basement: Y=3.5 to 48.5 mm)
-# Left bay: X=40.0, 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
+# Left bay: X=40.0, 52.0 (center PSU hole), 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
 # Zero cross-fins; completely clear of power pass-through slot (X=134 to 164 mm)
 b_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+b_fin_c = make_corrugated_cubic_support(52.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0, channel_w=7.0)
 b_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
 b_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
 
-back_case = back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3)
+back_case = back_case.fuse(b_fin1).fuse(b_fin_c).fuse(b_fin2).fuse(b_fin3)
 
 # DfAM sacrificial breakaway fins for Second Floor / Upper Chamber Top Roof Bridge (Y=54.0 to 148.0 mm)
 # 100% SOLID GROUND: Every fin rests on a solid floor, completely clear of the 10-pin power slot (X=134-164 mm)
@@ -703,6 +739,13 @@ for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
 # Zero screws required: PSU is locked in 6 DoF by front pusher, side rails, floor, and rear flange!
 psu_window = Part.makeBox(74.0, 36.0, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
 back_case = back_case.cut(psu_window)
+
+# Sacrificial breakaway support column directly inside the PSU window opening (X=52.0 mm)
+# Seamlessly supports the 74mm wide top bridge edge of the PSU hole at Y=41.5 mm
+psu_win_sup = make_window_bridge_support(52.0, y_bottom=5.5, y_top=41.5,
+                                         z_start=Z_PLEN_END - 5.0, z_end=Z_PLEN_END + REAR_WALL_T - 0.5,
+                                         width_x=7.0)
+back_case = back_case.fuse(psu_win_sup)
 
 # Rear SAS ports flanking fan
 sas_slot1 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
