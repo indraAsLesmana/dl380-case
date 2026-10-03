@@ -312,9 +312,6 @@ for row in range(-1, 3):
             vent = make_hex_prism(6.5, WALL + 4.0, cx, cy, -2.0)
             front_case = front_case.cut(vent)
 
-# PSU front support plinth
-plinth1 = Part.makeBox(PSU_W + 4.0, 2.0, 15.0, Vector(WALL, FLOOR_T, 60.0 + 10.0))
-front_case = front_case.fuse(plinth1)
 
 # Permanent central vertical structural rib in Front Case separating Flex-ATX PSU from right bay
 # Provides rigid column support for the mid-deck shelf and DL380 drive cage
@@ -589,9 +586,7 @@ for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
                                  Vector(fan_cx + dx, fan_cy + dy, Z_PLEN_END - 2.0), Vector(0, 0, 1))
         back_case = back_case.cut(hole)
 
-# Rear PSU C14 cutout, #6-32 screw holes, and rear plinth
-plinth2 = Part.makeBox(PSU_W + 4.0, 2.0, 15.0, Vector(WALL, FLOOR_T, Z_PLEN_END - 25.0))
-back_case = back_case.fuse(plinth2)
+# Rear PSU C14 cutout and #6-32 screw holes (PSU sits directly on flat floor)
 
 c14_cut = Part.makeBox(72.0, 32.0, REAR_WALL_T + 4.0, Vector(psu_cx - 36.0, FLOOR_T + 6.0, Z_PLEN_END - 2.0))
 back_case = back_case.cut(c14_cut)
