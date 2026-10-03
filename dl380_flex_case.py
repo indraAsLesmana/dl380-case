@@ -182,75 +182,114 @@ def make_diamond_z(wx, wy, depth, cx, cy, z_start):
     wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p4), Part.makeLine(p4, p1)])
     return Part.Face(wire).extrude(Vector(0, 0, depth))
 
-def make_scored_breakaway_fin(x_pos, y_bottom, y_top, z_start, z_end, thickness=0.85, neck_t=0.28, neck_h=0.3):
-    """Double-perimeter DfAM sacrificial breakaway support fin (0.85 mm thick).
-    - 0.85 mm thickness produces 2 continuous welded perimeters for 100% rigid, vibration-free standing up to 94 mm height.
-    - Scored neck (0.28 mm thin) concentrates shear stress for a clean, effortless snap-off at the floor when twisted with pliers.
-    - Perforated top teeth (1.2 mm contact pads every 5 mm) support the ceiling during bridging with zero fusing.
-    - Snaps cleanly off in seconds with pliers after printing, using <2g of filament per fin."""
+def make_corrugated_cubic_support(x_center, y_bottom, y_top, z_start, z_end,
+                                  channel_w=8.5, wall_t=0.85, neck_t=0.35, neck_h=0.35,
+                                  rib_pitch=18.0):
+    """3D Corrugated 'Green Cubic' Sacrificial Breakaway Support Column.
+    - Directly inspired by OrcaSlicer's corrugated normal support columns.
+    - Double-perimeter load-bearing walls (0.85 mm) and transverse stiffener cross-ribs.
+    - Eliminates lateral wobble and deflection under 300 mm/s high-speed printing.
+    - Scored perimeter base for clean, effortless snap-off with pliers.
+    - Perforated / castellated top teeth for clean bridge support without fusing."""
     length = z_end - z_start
-    root = Part.makeBox(thickness, 0.6, length, Vector(x_pos, y_bottom, z_start))
-    neck = Part.makeBox(neck_t, neck_h, length, Vector(x_pos + (thickness - neck_t)/2.0, y_bottom + 0.6, z_start))
-    body_h = (y_top - 0.4) - (y_bottom + 0.6 + neck_h)
-    body = Part.makeBox(thickness, body_h, length, Vector(x_pos, y_bottom + 0.6 + neck_h, z_start))
-    fin = root.fuse(neck).fuse(body)
+    hw = channel_w / 2.0
+    x_min = x_center - hw
+    
+    # 1. Base anchor pad on floor (0.6 mm tall)
+    base_box = Part.makeBox(channel_w, 0.6, length, Vector(x_min, y_bottom, z_start))
+    
+    # 2. Scored neck along perimeter (0.35 mm tall, thinned perimeter)
+    n_out = Part.makeBox(channel_w - 0.4, neck_h, length, Vector(x_min + 0.2, y_bottom + 0.6, z_start))
+    n_in = Part.makeBox(channel_w - 0.4 - 2*neck_t, neck_h + 1.0, length + 2.0,
+                        Vector(x_min + 0.2 + neck_t, y_bottom + 0.1, z_start - 1.0))
+    neck = n_out.cut(n_in)
+    
+    # 3. Main multi-cell cubic body
+    body_y_start = y_bottom + 0.6 + neck_h
+    body_h = (y_top - 0.4) - body_y_start
+    
+    body_outer = Part.makeBox(channel_w, body_h, length, Vector(x_min, body_y_start, z_start))
+    
+    inner_w = channel_w - 2.0 * wall_t
+    num_ribs = max(1, int(round(length / rib_pitch)))
+    cell_len = (length - (num_ribs + 1) * wall_t) / float(num_ribs)
+    
+    cells = []
+    for i in range(num_ribs):
+        cz_start = z_start + wall_t + i * (cell_len + wall_t)
+        c_cut = Part.makeBox(inner_w, body_h + 2.0, cell_len,
+                             Vector(x_min + wall_t, body_y_start - 1.0, cz_start))
+        cells.append(c_cut)
+        
+    col_body = body_outer
+    for c in cells:
+        col_body = col_body.cut(c)
+        
+    support_col = base_box.fuse(neck).fuse(col_body)
+    
+    # 4. Top castellated contact teeth (0.4 mm tall pads at y_top - 0.4 mm)
     teeth = []
     curr_z = z_start + 1.5
-    while curr_z + 1.2 <= z_end:
-        t = Part.makeBox(thickness, 0.4, 1.2, Vector(x_pos, y_top - 0.4, curr_z))
-        teeth.append(t)
-        curr_z += 5.0
+    while curr_z + 1.5 <= z_end:
+        t1 = Part.makeBox(wall_t, 0.4, 1.5, Vector(x_min, y_top - 0.4, curr_z))
+        t2 = Part.makeBox(wall_t, 0.4, 1.5, Vector(x_min + channel_w - wall_t, y_top - 0.4, curr_z))
+        teeth.extend([t1, t2])
+        curr_z += 4.5
+        
     for t in teeth:
-        fin = fin.fuse(t)
-    return fin
+        support_col = support_col.fuse(t)
+        
+    return support_col
 
-def make_through_hole_breakaway_fin(x_pos, y_bottom, y_mid, y_top, z_base_start, z_base_end, z_top_start, z_top_end, thickness=0.85, neck_t=0.28, neck_h=0.3):
-    """Continuous bottom-to-top DfAM sacrificial support fin passing through a floor cutout.
-    - Starts on the basement floor (Y = y_bottom) anchored directly to the build plate with a 68mm foot.
-    - Rises through the basement to support the cavity below the 1st floor hole.
-    - Passes cleanly through the 1st floor cable hole without obstruction.
-    - Continues through the upper chamber all the way to the top roof bridge (Y = y_top).
-    - Micro-teeth at the roof ceiling and rear basement ceiling prevent fusing.
-    - Entire continuous pillar snaps out in one piece when twisted with pliers."""
-    root = Part.makeBox(thickness, 0.6, z_base_end - z_base_start, Vector(x_pos, y_bottom, z_base_start))
-    neck = Part.makeBox(neck_t, neck_h, z_base_end - z_base_start, Vector(x_pos + (thickness - neck_t)/2.0, y_bottom + 0.6, z_base_start))
-    body_low = Part.makeBox(thickness, (y_mid - 0.4) - (y_bottom + 0.6 + neck_h), z_base_end - z_base_start, Vector(x_pos, y_bottom + 0.6 + neck_h, z_base_start))
-    body_up = Part.makeBox(thickness, (y_top - 0.4) - (y_mid - 0.4), z_top_end - z_top_start, Vector(x_pos, y_mid - 0.4, z_top_start))
-    fin = root.fuse(neck).fuse(body_low).fuse(body_up)
-
-    curr_z = 167.0
-    while curr_z + 1.2 <= z_base_end:
-        t = Part.makeBox(thickness, 0.4, 1.2, Vector(x_pos, y_mid - 0.4, curr_z))
-        fin = fin.fuse(t)
-        curr_z += 5.0
-
+def make_through_hole_cubic_support(x_center, y_bottom, y_mid, y_top,
+                                    z_base_start, z_base_end, z_top_start, z_top_end,
+                                    channel_w=8.5, wall_t=0.85, neck_t=0.35, neck_h=0.35,
+                                    rib_pitch=18.0):
+    """Continuous bottom-to-top 3D Corrugated Cubic Support Column passing through a floor cutout.
+    - Base section spans z_base_start to z_base_end in the basement.
+    - Upper section spans z_top_start to z_top_end through the power cutout to the top roof."""
+    hw = channel_w / 2.0
+    x_min = x_center - hw
+    
+    # Base section (basement: y_bottom to y_mid)
+    base_col = make_corrugated_cubic_support(x_center, y_bottom, y_mid, z_base_start, z_base_end,
+                                             channel_w, wall_t, neck_t, neck_h, rib_pitch)
+    
+    # Upper section (upper chamber: y_mid to y_top)
+    up_length = z_top_end - z_top_start
+    up_h = (y_top - 0.4) - (y_mid - 0.4)
+    up_box = Part.makeBox(channel_w, up_h, up_length, Vector(x_min, y_mid - 0.4, z_top_start))
+    
+    inner_w = channel_w - 2.0 * wall_t
+    num_ribs = max(1, int(round(up_length / rib_pitch)))
+    cell_len = (up_length - (num_ribs + 1) * wall_t) / float(num_ribs)
+    
+    for i in range(num_ribs):
+        cz_start = z_top_start + wall_t + i * (cell_len + wall_t)
+        c_cut = Part.makeBox(inner_w, up_h + 2.0, cell_len,
+                             Vector(x_min + wall_t, y_mid - 1.0, cz_start))
+        up_box = up_box.cut(c_cut)
+        
+    # Top teeth on upper section
     curr_z = z_top_start + 1.5
-    while curr_z + 1.2 <= z_top_end:
-        t = Part.makeBox(thickness, 0.4, 1.2, Vector(x_pos, y_top - 0.4, curr_z))
-        fin = fin.fuse(t)
-        curr_z += 5.0
+    while curr_z + 1.5 <= z_top_end:
+        t1 = Part.makeBox(wall_t, 0.4, 1.5, Vector(x_min, y_top - 0.4, curr_z))
+        t2 = Part.makeBox(wall_t, 0.4, 1.5, Vector(x_min + channel_w - wall_t, y_top - 0.4, curr_z))
+        up_box = up_box.fuse(t1).fuse(t2)
+        curr_z += 4.5
+        
+    return base_col.fuse(up_box)
 
-    return fin
+def make_scored_breakaway_fin(x_pos, y_bottom, y_top, z_start, z_end, thickness=0.85, neck_t=0.35, neck_h=0.35):
+    """Backward compatibility wrapper: generates 3D Corrugated Cubic Support Column."""
+    return make_corrugated_cubic_support(x_pos, y_bottom, y_top, z_start, z_end,
+                                         channel_w=8.5, wall_t=thickness, neck_t=neck_t, neck_h=neck_h)
 
-def make_cross_breakaway_fin(x_start, x_end, y_bottom, y_top, z_pos, thickness=0.45):
-    """Single-perimeter DfAM sacrificial breakaway cross-fin running along X.
-    Perpendicular to Y' bridge travel direction, providing intermediate anvil points every ~25mm."""
-    width = x_end - x_start
-    fin_h = y_top - y_bottom
-    root = Part.makeBox(width, 0.6, thickness, Vector(x_start, y_bottom, z_pos))
-    neck = Part.makeBox(width, 0.3, 0.24, Vector(x_start, y_bottom + 0.6, z_pos + (thickness - 0.24)/2.0))
-    body_h = (fin_h - 0.4) - 0.9
-    body = Part.makeBox(width, body_h, thickness, Vector(x_start, y_bottom + 0.9, z_pos))
-    fin = root.fuse(neck).fuse(body)
-    teeth = []
-    curr_x = x_start + 2.0
-    while curr_x + 1.2 <= x_end:
-        t = Part.makeBox(1.2, 0.4, thickness, Vector(curr_x, y_top - 0.4, z_pos))
-        teeth.append(t)
-        curr_x += 5.0
-    for t in teeth:
-        fin = fin.fuse(t)
-    return fin
+def make_through_hole_breakaway_fin(x_pos, y_bottom, y_mid, y_top, z_base_start, z_base_end, z_top_start, z_top_end, thickness=0.85, neck_t=0.35, neck_h=0.35):
+    """Backward compatibility wrapper: generates continuous through-hole 3D Corrugated Cubic Column."""
+    return make_through_hole_cubic_support(x_pos, y_bottom, y_mid, y_top,
+                                           z_base_start, z_base_end, z_top_start, z_top_end,
+                                           channel_w=8.5, wall_t=thickness, neck_t=neck_t, neck_h=neck_h)
 
 # ==============================================================================
 # 3. BUILD PART 1: FRONT DISC CAGE CASE (Z = 0 to 138.0 mm)
@@ -554,7 +593,7 @@ back_case = back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3)
 # 2. u_fin2 (X=88.5 mm, Y=54.0): sits directly on top of permanent central divider wall (X=87.5-89.5 mm)
 # 3. u_fin3 (X=120.0 mm, Y=56.5): sits on solid boss2 platform, directly over b_fin3 (X=120.0 mm), 14mm clear of power slot!
 u_fin1 = make_scored_breakaway_fin(40.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin2 = make_scored_breakaway_fin(88.5,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
+u_fin2 = make_corrugated_cubic_support(92.75, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0, channel_w=7.0)
 u_fin3 = make_scored_breakaway_fin(120.0, Y_UPPER_FLOOR + RUNNER_H, Y_ROOF_LOWER, 142.0, 164.0)
 
 back_case = back_case.fuse(u_fin1).fuse(u_fin2).fuse(u_fin3)

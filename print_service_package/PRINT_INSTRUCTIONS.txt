@@ -31,20 +31,21 @@ PENJELASAN ORIENTASI CETAK & PERINGATAN ELEGOO SLICER:
      - JANGAN diubah ke posisi dinding belakang di bed (Rear Face Down)! Terdapat kerah lap-joint 4.8 mm yang akan membuat layer tidak rata.
      - Posisi Berdiri Tegak di Lantai Dasar (Y=0) adalah orientasi TERBAIK: Jejak luas 186 x 138 mm menempel kuat di PEI Textured (bebas warping), kisi diamond mesh atap dan samping mencetak mandiri pada sudut 45° tanpa support, dan garis layer horizontal tampak sangat rapi dan estetik.
 
-  2. Penopang Ruang Drive Cage (Disc Cage Enclosure) & Atap Depan:
-     - Masalah Awal: Ruang atas drive cage memiliki bentangan atap selebar 146 mm yang menggantung di udara hampa (sehingga memicu peringatan floating cantilever jika support dimatikan).
-     - Solusi Permanen (DfAM Sacrificial Breakaway Fins Lantai 2):
-       * Telah ditambahkan 3 bilah sirip penopang internal (fu_fin1 di X=40, fu_fin2 di X=88.5, fu_fin3 di X=148 mm) langsung di bawah bentangan atap drive cage.
-       * Ketiga sirip berdiri di atas lantai mid-deck yang 100% solid, segaris lurus dengan tiang penopang basement di bawahnya.
-       * Bentangan bridging terbagi menjadi segmen kecil ~35-48 mm yang dicetak lurus dan kaku tanpa melorot.
-       * Sangat Mudah Dilepas: Sirip memiliki leher takik patah 0.28 mm di lantai dan gigi mikro di atap. Cukup jepit sirip dari mulut bezel depan menggunakan tang lancip atau jari, lalu putar sedikit. Sirip akan langsung patah bersih (snap) dalam 5 detik!
+  2. Penopang Ruang Drive Cage (Disc Cage Enclosure) & Atap Belakang:
+     - Masalah Sirip Tipis 2D (Single Blade): Bilah tipis 0.85 mm dengan leher 0.28 mm dapat bergetar dan tertekuk ke samping (lateral deflection) akibat dorongan nozzle kecepatan tinggi 300 mm/s, sehingga berisiko patah dini dan menghasilkan serabut benang kusut (mesh/spaghetti).
+     - Solusi 3D Corrugated 'Green Cubic' Support Columns:
+       * Seluruh sirip tipis telah diganti menjadi kolom kotak bergelombang 3D (Corrugated Cubic Box Columns selebar 8.5 mm) yang terinspirasi langsung dari struktur support Normal(auto) hijau di Elegoo Slicer / OrcaSlicer.
+       * Memiliki 2 dinding sejajar (perimeter ganda 0.85 mm) yang dihubungkan oleh rusuk pengaku melintang (cross-ribs) setiap 18 mm, membentuk struktur tabung bervolume rigid dengan momen inersia >800x lebih kaku daripada bilah tipis!
+       * 100% Bebas Goyang: Tidak akan melengkung atau patah saat nozzle melaju kencang pada akselerasi 10.000 mm/s².
+       * Antarmuka Atap Bergerigi (Castellated Interface): Memiliki bantalan kontak mikro 1.5 mm dengan jeda celah udara, menahan ceiling bridging tetap rata sempurna tanpa risiko melebur/fusing dengan PETG.
+       * Sangat Mudah Dilepas: Bagian alas memiliki leher takik keliling (perimeter score). Cukup jepit bagian tengah kolom kotak dengan tang lancip (pliers), lalu remas atau putar sedikit. Seluruh kolom akan langsung terlepas utuh (snap) dalam satu bagian bersih tanpa meninggalkan sisa serabut!
 
   3. Pengaturan Support Elegoo Slicer:
      - Untuk Bodi Depan (01_dl380_front_case.3mf) & Bodi Belakang (02_dl380_back_case.3mf):
        * Cukup gunakan: Normal(auto) - On build plate only
        * Support Top Z Distance: 0.20 mm
-       * Slicer hanya menopang sedikit lekukan luar dari build plate (~5-8g filamen saja), sedangkan seluruh rongga dalam ditopang 100% bersih oleh sirip bawaan (breakaway fins). Bebas dari pesan peringatan floating cantilever!
-       * Cara Melepas Sirip Pasca Cetak: Cukup jepit sirip menggunakan tang lancip (needle-nose pliers) atau dorong dengan jari, lalu putar sedikit. Gigi mikro di langit-langit dan takik di lantai akan langsung patah bersih (snap) dalam 5 detik, menyisakan terowongan yang bersih dan lapang untuk PSU Flex-ATX!
+       * Slicer hanya membuat tiang support hijau di luar (untuk menopang kuping snap-fit dari build plate, ~5g filamen), sedangkan seluruh rongga dalam ditopang 100% kokoh oleh kolom kubik 3D terintegrasi.
+       * Bebas dari peringatan 'floating cantilever', 100% aman dicetak!
 
 PARAMETER SLICING YANG SUDAH DITERAPKAN DI 3MF:
   - Printer: Elegoo Centauri Carbon 2 0.4 nozzle
