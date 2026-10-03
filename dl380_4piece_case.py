@@ -490,7 +490,7 @@ def build_4piece_system():
     print("4. Modeling Upper Back Case (92mm Fan Plenum & Service Bay)...", flush=True)
     ub_shell = Part.makeBox(OUT_W, OUT_H - Y_SPLIT, OUT_D - Z_SPLIT, Vector(0, Y_SPLIT, Z_SPLIT))
     ub_void  = Part.makeBox(INT_W, UPPER_H + 2.0, Z_PLEN_END + 2.0 - (Z_SPLIT - 1.0),
-                            Vector(WALL, Y_SPLIT + MID_DECK_T, Z_SPLIT - 1.0))
+                            Vector(X_CAGE_0, Y_SPLIT + MID_DECK_T, Z_SPLIT - 1.0))
     upper_back = ub_shell.cut(ub_void)
 
     # Front male tongue flange on upper back side walls & roof
