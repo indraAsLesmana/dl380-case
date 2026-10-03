@@ -176,7 +176,7 @@ def generate_3mf_files(stl_f, stl_b, stl_l, proc_nosup, proc_sup):
     print("2. Generating ready-to-slice 3MF project files...", flush=True)
 
     items = [
-        ("01_dl380_front_case.3mf", stl_f, proc_nosup, False),
+        ("01_dl380_front_case.3mf", stl_f, proc_sup,   True),
         ("02_dl380_back_case.3mf",  stl_b, proc_sup,   True),
         ("03_dl380_service_lid.3mf", stl_l, proc_nosup, False),
     ]

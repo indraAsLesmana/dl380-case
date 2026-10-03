@@ -351,6 +351,19 @@ if cuts_top:
         all_top = all_top.fuse(c)
     front_case = front_case.cut(all_top)
 
+# DfAM sacrificial breakaway fins for Second Floor / Disc Cage Enclosure Roof Bridge (Y=54.0 to 148.0 mm)
+# 100% SOLID GROUND: Every fin rests on a solid floor directly above vertical basement load columns:
+# 1. fu_fin1 (X=40.0 mm): sits directly on top of f_fin1 (X=40.0 mm) via mid-deck
+# 2. fu_fin2 (X=88.5 mm): sits directly on top of permanent central divider rib (X=87.5-89.5 mm)
+# 3. fu_fin3 (X=148.0 mm): sits directly on top of f_fin4 (X=148.0 mm) via mid-deck
+# Spans are ~35-48 mm across, eliminating the 146 mm wide open bridging gap under the roof.
+# Accessible directly through the front bezel opening: snaps out in seconds with needle-nose pliers!
+fu_fin1 = make_scored_breakaway_fin(40.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
+fu_fin2 = make_scored_breakaway_fin(88.5,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
+fu_fin3 = make_scored_breakaway_fin(148.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
+
+front_case = front_case.fuse(fu_fin1).fuse(fu_fin2).fuse(fu_fin3)
+
 print("3. Cutting Large-Pattern Diamond Mesh on Both Side Walls...", flush=True)
 # Side wall diamond lattice: 18 mm x 18 mm cells through the 20mm side blocks
 cuts_side = []

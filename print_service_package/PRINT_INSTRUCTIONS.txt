@@ -21,28 +21,29 @@ FILE YANG DICETAK (PRINT FILES):
 
 FILE PROYEK SIAP CETAK (ELEGOO SLICER 3MF - 1-CLICK SLICING):
   Telah disediakan file proyek .3mf yang sudah terkonfigurasi otomatis dengan profil Elegoo Centauri Carbon 2, filamen Elegoo Rapid PETG, dan Textured PEI Plate (Suhu Bed 70°C, Nozzle 250°C):
-  1. 01_dl380_front_case.3mf -> Bodi Depan (Support: OFF / Bebas Support)
-  2. 02_dl380_back_case.3mf  -> Bodi Belakang (Support: ON -> Tree Auto / On build plate only)
+  1. 01_dl380_front_case.3mf -> Bodi Depan (Support: ON -> Normal Auto / On build plate only)
+  2. 02_dl380_back_case.3mf  -> Bodi Belakang (Support: ON -> Normal Auto / On build plate only)
   3. 03_dl380_service_lid.3mf -> Tutup Servis (Support: OFF / Bebas Support)
 
-PENJELASAN PERINGATAN ELEGOO SLICER & CARA MENGATASINYA:
-  1. "03_service_lid_bed.stl has floating regions":
-     - Penyebab: Tonjolan grip jempol sebelumnya terangkat di atas permukaan atap, sehingga saat dibalik menghadap bed, pelat melayang di udara.
-     - Solusi: Telah diperbarui! Tonjolan diubah menjadi celah bertekstur masuk ke dalam (recessed deboss -0.6 mm gaya tutup baterai remote/mainan). Kini seluruh permukaan tutup 100% rata menempel pada bed PEI dan dicetak 100% BEBAS SUPPORT tanpa peringatan apapun!
-  2. "02_back_case_bed.stl has floating cantilever":
-     - Penyebab: Lengan snap-fit sepanjang 23 mm berada pada ketinggian Z = 94.5 mm melayang horizontal di udara saat bodi belakang berdiri tegak di bed. Slicer mendeteksi ini menggantung jika Support dimatikan.
-     - Solusi (Cukup 1 Klik di Elegoo Slicer):
-       * Centang [x] Enable Support
-       * Type: Normal(auto) - Sangat hemat filamen (~8.8g vs >185g pada Tree) & tiang tegak kokoh
-       * Centang [x] On build plate only (hanya membuat tiang penopang untuk lengan luar snap-fit)
-       * Support Top Z Distance: 0.20 mm (agar mudah dilepas bersih dari bahan PETG)
+PENJELASAN ORIENTASI CETAK & PERINGATAN ELEGOO SLICER:
+  1. Mengapa Orientasi Cetak TETAP Berdiri Tegak (Lantai Bawah Menempel di Bed PEI)?
+     - JANGAN diubah ke posisi muka depan menempel di bed (Front Face Down)! Bezel depan memiliki ceruk recessed sedalam 11.5 mm (180 x 86 mm). Jika dibalik, seluruh muka depan akan melayang di udara dan membutuhkan ratusan gram support yang akan merusak permukaan kosmetik depan!
+     - JANGAN diubah ke posisi dinding belakang di bed (Rear Face Down)! Terdapat kerah lap-joint 4.8 mm yang akan membuat layer tidak rata.
+     - Posisi Berdiri Tegak di Lantai Dasar (Y=0) adalah orientasi TERBAIK: Jejak luas 186 x 138 mm menempel kuat di PEI Textured (bebas warping), kisi diamond mesh atap dan samping mencetak mandiri pada sudut 45° tanpa support, dan garis layer horizontal tampak sangat rapi dan estetik.
 
-  3. Langit-langit Terowongan Basement (Mid-Deck Floor):
-     - Masalah Awal: Terowongan basement selebar 180 mm di bawah mid-deck shelf sebelumnya mencoba melakukan bridging 18 cm di udara hampa (sehingga filamen PETG melorot/mesh). Jika Tree Support dinyalakan di seluruh model, slicer mengisi seluruh ruang atas (fan chamber) dengan 190g pohon support yang boros dan sulit dicopot.
-     - Solusi Permanen (DfAM Sacrificial Breakaway Fins):
-       * Telah ditambahkan dinding pembatas tengah permanen (2.0 mm) di X = 87.5 mm yang membagi bentangan menjadi dua dan menopang beban drive cage.
-       * Telah ditambahkan kisi sirip penopang tipis (0.45 mm sacrificial fins) di dalam basement dengan gigi mikro (micro-teeth) di bagian langit-langit dan leher takik patah (0.24 mm scored neck) di bagian lantai.
-       * Seluruh bentangan bridging terbagi menjadi segmen kecil ~21 - 25 mm yang dicetak 100% lurus, rata, dan tanpa melorot sama sekali!
+  2. Penopang Ruang Drive Cage (Disc Cage Enclosure) & Atap Depan:
+     - Masalah Awal: Ruang atas drive cage memiliki bentangan atap selebar 146 mm yang menggantung di udara hampa (sehingga memicu peringatan floating cantilever jika support dimatikan).
+     - Solusi Permanen (DfAM Sacrificial Breakaway Fins Lantai 2):
+       * Telah ditambahkan 3 bilah sirip penopang internal (fu_fin1 di X=40, fu_fin2 di X=88.5, fu_fin3 di X=148 mm) langsung di bawah bentangan atap drive cage.
+       * Ketiga sirip berdiri di atas lantai mid-deck yang 100% solid, segaris lurus dengan tiang penopang basement di bawahnya.
+       * Bentangan bridging terbagi menjadi segmen kecil ~35-48 mm yang dicetak lurus dan kaku tanpa melorot.
+       * Sangat Mudah Dilepas: Sirip memiliki leher takik patah 0.28 mm di lantai dan gigi mikro di atap. Cukup jepit sirip dari mulut bezel depan menggunakan tang lancip atau jari, lalu putar sedikit. Sirip akan langsung patah bersih (snap) dalam 5 detik!
+
+  3. Pengaturan Support Elegoo Slicer:
+     - Untuk Bodi Depan (01_dl380_front_case.3mf) & Bodi Belakang (02_dl380_back_case.3mf):
+       * Cukup gunakan: Normal(auto) - On build plate only
+       * Support Top Z Distance: 0.20 mm
+       * Slicer hanya menopang sedikit lekukan luar dari build plate (~5-8g filamen saja), sedangkan seluruh rongga dalam ditopang 100% bersih oleh sirip bawaan (breakaway fins). Bebas dari pesan peringatan floating cantilever!
        * Cara Melepas Sirip Pasca Cetak: Cukup jepit sirip menggunakan tang lancip (needle-nose pliers) atau dorong dengan jari, lalu putar sedikit. Gigi mikro di langit-langit dan takik di lantai akan langsung patah bersih (snap) dalam 5 detik, menyisakan terowongan yang bersih dan lapang untuk PSU Flex-ATX!
 
 PARAMETER SLICING YANG SUDAH DITERAPKAN DI 3MF:
