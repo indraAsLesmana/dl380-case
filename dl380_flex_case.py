@@ -326,140 +326,6 @@ def make_window_bridge_support(x_center, y_bottom=5.5, y_top=41.5, z_start=205.0
     col = col.fuse(t1).fuse(t2)
     return col
 
-# ==============================================================================
-# 3. BUILD PART 1: FRONT DISC CAGE CASE (Z = 0 to 138.0 mm)
-# ==============================================================================
-
-print("1. Modeling Front Disc Cage Case...", flush=True)
-front_shell = Part.makeBox(OUT_W, OUT_H, Z_SPLIT, Vector(0, 0, 0))
-
-# Basement void in front case
-f_base_void = Part.makeBox(OUT_W - 2 * WALL, BASEMENT_H, Z_SPLIT - 3.5 + 1.0,
-                           Vector(WALL, Y_BASE_FLOOR, 3.5))
-
-# Upper cage void (146 mm wide from Z = BEZEL_D to Z_SPLIT + 1.0 mm)
-f_upper_void = Part.makeBox(INT_W, UPPER_H, Z_SPLIT + 1.0 - BEZEL_D,
-                            Vector(X_CAGE_0, Y_UPPER_FLOOR, BEZEL_D))
-
-# Recessed front bezel socket (180 mm wide x 86 mm high x 11.5 mm deep)
-f_bezel_void = Part.makeBox(BEZEL_W, BEZEL_H, BEZEL_D + 2.0,
-                            Vector(X_BEZEL_0, 50.5, -2.0))
-
-front_case = front_shell.cut(f_base_void).cut(f_upper_void).cut(f_bezel_void)
-
-# Low-friction runner rails in front case
-p1 = Vector(0, 0, 0)
-p2 = Vector(0, 0, RAMP_L)
-p3 = Vector(0, RUNNER_H, RAMP_L)
-ramp_wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p1)])
-ramp_face = Part.Face(ramp_wire)
-
-ramp_l = ramp_face.extrude(Vector(RUNNER_W, 0, 0)).translate(Vector(X_CAGE_0, Y_UPPER_FLOOR, BEZEL_D))
-ramp_r = ramp_face.extrude(Vector(RUNNER_W, 0, 0)).translate(Vector(X_CAGE_1 - RUNNER_W, Y_UPPER_FLOOR, BEZEL_D))
-
-track_l = Part.makeBox(RUNNER_W, RUNNER_H, Z_SPLIT - (BEZEL_D + RAMP_L),
-                       Vector(X_CAGE_0, Y_UPPER_FLOOR, BEZEL_D + RAMP_L))
-track_r = Part.makeBox(RUNNER_W, RUNNER_H, Z_SPLIT - (BEZEL_D + RAMP_L),
-                       Vector(X_CAGE_1 - RUNNER_W, Y_UPPER_FLOOR, BEZEL_D + RAMP_L))
-
-front_case = front_case.fuse(ramp_l).fuse(ramp_r).fuse(track_l).fuse(track_r)
-
-# Floor relief channels for bottom 5.0 mm shoulder studs
-for sx in (45.25, 45.25 + 54.25):
-    cx = X_CAGE_0 + sx
-    chan = Part.makeBox(16.0, 4.0, Z_SPLIT - BEZEL_D + 2.0,
-                         Vector(cx - 8.0, Y_UPPER_FLOOR - 2.5, BEZEL_D - 1.0))
-    front_case = front_case.cut(chan)
-
-# Lower front: 16mm illuminated switch port + hexagonal PSU intake vents
-sw_cx  = OUT_W - WALL - 38.0
-sw_cy  = FLOOR_T + BASEMENT_H / 2.0
-sw_hole = Part.makeCylinder(SWITCH_DIA / 2.0, WALL + 4.0, Vector(sw_cx, sw_cy, -2.0), Vector(0, 0, 1))
-front_case = front_case.cut(sw_hole)
-
-for row in range(-1, 3):
-    cy = FLOOR_T + 22.0 + row * 8.0
-    row_off = 4.0 if (row % 2 != 0) else 0.0
-    for col in range(-3, 4):
-        cx = psu_cx + col * 9.0 + row_off
-        if abs(cx - psu_cx) < 32.0:
-            vent = make_hex_prism(6.5, WALL + 4.0, cx, cy, -2.0)
-            front_case = front_case.cut(vent)
-
-
-# Permanent central vertical structural rib in Front Case separating Flex-ATX PSU from right bay
-# Provides rigid column support for the mid-deck shelf and DL380 drive cage
-f_divider = Part.makeBox(2.0, BASEMENT_H, Z_SPLIT - 20.0, Vector(87.5, Y_BASE_FLOOR, 20.0))
-front_case = front_case.fuse(f_divider)
-
-# DfAM sacrificial breakaway fins in Front Case basement (aligned with vertical load columns)
-# Left bay: X=40.0, 64.0 mm | Right bay: X=120.0, 148.0 mm | Permanent divider at X=87.5 mm
-# Spans are ~24-35 mm across, snaps out in seconds with zero cross-fins
-f_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-f_fin4 = make_scored_breakaway_fin(148.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
-
-front_case = front_case.fuse(f_fin1).fuse(f_fin2).fuse(f_fin3).fuse(f_fin4)
-
-# ------------------------------------------------------------------------------
-# 4. Large-Pattern Diamond Mesh on Top Roof & Both Side Walls
-# ------------------------------------------------------------------------------
-print("2. Cutting Large-Pattern Diamond Mesh on Top Roof...", flush=True)
-# Roof diamond lattice over the drive cage: 19 mm x 19 mm cells with 3.5 mm struts
-step_dx = 22.5
-step_dz = 22.5
-cuts_top = []
-for row in range(-2, 4):
-    cz = 73.0 + row * step_dz
-    offset_x = (step_dx * 0.5) if (row % 2 != 0) else 0.0
-    for col in range(-2, 3):
-        cx = fan_cx + col * step_dx + offset_x
-        if 32.0 < cx < 154.0 and 18.0 < cz < 128.0:
-            d = make_diamond_y(19.0, 19.0, ROOF_T + 4.0, cx, cz, OUT_H - ROOF_T - 2.0)
-            cuts_top.append(d)
-
-if cuts_top:
-    all_top = cuts_top[0]
-    for c in cuts_top[1:]:
-        all_top = all_top.fuse(c)
-    front_case = front_case.cut(all_top)
-
-# DfAM sacrificial breakaway fins for Second Floor / Disc Cage Enclosure Roof Bridge (Y=54.0 to 148.0 mm)
-# 100% SOLID GROUND: Every fin rests on a solid floor directly above vertical basement load columns:
-# 1. fu_fin1 (X=40.0 mm): sits directly on top of f_fin1 (X=40.0 mm) via mid-deck
-# 2. fu_fin2 (X=88.5 mm): sits directly on top of permanent central divider rib (X=87.5-89.5 mm)
-# 3. fu_fin3 (X=148.0 mm): sits directly on top of f_fin4 (X=148.0 mm) via mid-deck
-# Spans are ~35-48 mm across, eliminating the 146 mm wide open bridging gap under the roof.
-# Accessible directly through the front bezel opening: snaps out in seconds with needle-nose pliers!
-fu_fin1 = make_scored_breakaway_fin(40.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
-fu_fin2 = make_scored_breakaway_fin(88.5,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
-fu_fin3 = make_scored_breakaway_fin(148.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
-
-front_case = front_case.fuse(fu_fin1).fuse(fu_fin2).fuse(fu_fin3)
-
-print("3. Cutting Large-Pattern Diamond Mesh on Both Side Walls...", flush=True)
-# Side wall diamond lattice: 18 mm x 18 mm cells through the 20mm side blocks
-cuts_side = []
-for row in range(-1, 3):
-    cy = 100.0 + row * 22.0
-    offset_z = 11.0 if (row % 2 != 0) else 0.0
-    for col in range(-2, 3):
-        cz = 73.0 + col * 22.0 + offset_z
-        if 18.0 < cz < 114.0 and 62.0 < cy < 138.0:
-            d_l = make_diamond_x(18.0, 18.0, X_CAGE_0 + 4.0, cz, cy, -2.0)
-            d_r = make_diamond_x(18.0, 18.0, X_CAGE_0 + 4.0, cz, cy, X_CAGE_1 - 2.0)
-            cuts_side.append(d_l)
-            cuts_side.append(d_r)
-
-if cuts_side:
-    all_side = cuts_side[0]
-    for c in cuts_side[1:]:
-        all_side = all_side.fuse(c)
-    front_case = front_case.cut(all_side)
-
-# ------------------------------------------------------------------------------
-
 def make_left_latch():
     pts = [
         Vector(0.0, 0, 142.0),
@@ -504,422 +370,595 @@ def make_right_latch():
         arm = arm.fuse(rib)
     return arm
 
-# 5. Rear Interlocking Interface on Front Case (Lap-Joint & M3 Lugs)
-# ------------------------------------------------------------------------------
-print("4. Modeling interlocking female lap-joint and 4x M3 screw lugs on Front Case...", flush=True)
-# Perimeter female alignment rebate (4.8 mm deep x 2.4 mm wide at Z = 133.2 to 138.0 mm)
-# Deep collar design (Option A) prevents any pitch/clam-shell gaping under heavy loads
-rebate_top = Part.makeBox(OUT_W + 4.0, 2.4, 5.5, Vector(-2.0, OUT_H - 2.4, Z_SPLIT - 4.8))
-rebate_bot = Part.makeBox(OUT_W + 4.0, 2.4, 5.5, Vector(-2.0, 0.0, Z_SPLIT - 4.8))
-rebate_l   = Part.makeBox(2.4, OUT_H + 4.0, 5.5, Vector(0.0, -2.0, Z_SPLIT - 4.8))
-rebate_r   = Part.makeBox(2.4, OUT_H + 4.0, 5.5, Vector(OUT_W - 2.4, -2.0, Z_SPLIT - 4.8))
-front_case = front_case.cut(rebate_top).cut(rebate_bot).cut(rebate_l).cut(rebate_r)
 
-# Dual Snap-Fit Detent Windows & Internal Flex Channels (Tool-Free Quick Latch)
-chan_l = Part.makeBox(12.0, 16.0, 24.5, Vector(3.0, 92.0, 114.0))
-chan_r = Part.makeBox(12.0, 16.0, 24.5, Vector(OUT_W - 15.0, 92.0, 114.0))
-win_l  = Part.makeBox(5.5, 12.4, 12.9, Vector(-1.0, 93.8, 114.5))
-win_r  = Part.makeBox(5.5, 12.4, 12.9, Vector(OUT_W - 4.5, 93.8, 114.5))
-bevel_l = Part.makeBox(2.0, 14.0, 2.5, Vector(2.0, 93.0, 135.5))
-bevel_r = Part.makeBox(2.0, 14.0, 2.5, Vector(OUT_W - 4.0, 93.0, 135.5))
-front_case = front_case.cut(chan_l).cut(chan_r).cut(win_l).cut(win_r).cut(bevel_l).cut(bevel_r)
+def build_enclosure(with_cad_supports: bool = True):
+    # ==============================================================================
+    # 3. BUILD PART 1: FRONT DISC CAGE CASE (Z = 0 to 138.0 mm)
+    # ==============================================================================
+    
+    print("1. Modeling Front Disc Cage Case...", flush=True)
+    front_shell = Part.makeBox(OUT_W, OUT_H, Z_SPLIT, Vector(0, 0, 0))
+    
+    # Basement void in front case
+    f_base_void = Part.makeBox(OUT_W - 2 * WALL, BASEMENT_H, Z_SPLIT - 3.5 + 1.0,
+                               Vector(WALL, Y_BASE_FLOOR, 3.5))
+    
+    # Upper cage void (146 mm wide from Z = BEZEL_D to Z_SPLIT + 1.0 mm)
+    f_upper_void = Part.makeBox(INT_W, UPPER_H, Z_SPLIT + 1.0 - BEZEL_D,
+                                Vector(X_CAGE_0, Y_UPPER_FLOOR, BEZEL_D))
+    
+    # Recessed front bezel socket (180 mm wide x 86 mm high x 11.5 mm deep)
+    f_bezel_void = Part.makeBox(BEZEL_W, BEZEL_H, BEZEL_D + 2.0,
+                                Vector(X_BEZEL_0, 50.5, -2.0))
+    
+    front_case = front_shell.cut(f_base_void).cut(f_upper_void).cut(f_bezel_void)
+    
+    # Low-friction runner rails in front case
+    p1 = Vector(0, 0, 0)
+    p2 = Vector(0, 0, RAMP_L)
+    p3 = Vector(0, RUNNER_H, RAMP_L)
+    ramp_wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p1)])
+    ramp_face = Part.Face(ramp_wire)
+    
+    ramp_l = ramp_face.extrude(Vector(RUNNER_W, 0, 0)).translate(Vector(X_CAGE_0, Y_UPPER_FLOOR, BEZEL_D))
+    ramp_r = ramp_face.extrude(Vector(RUNNER_W, 0, 0)).translate(Vector(X_CAGE_1 - RUNNER_W, Y_UPPER_FLOOR, BEZEL_D))
+    
+    track_l = Part.makeBox(RUNNER_W, RUNNER_H, Z_SPLIT - (BEZEL_D + RAMP_L),
+                           Vector(X_CAGE_0, Y_UPPER_FLOOR, BEZEL_D + RAMP_L))
+    track_r = Part.makeBox(RUNNER_W, RUNNER_H, Z_SPLIT - (BEZEL_D + RAMP_L),
+                           Vector(X_CAGE_1 - RUNNER_W, Y_UPPER_FLOOR, BEZEL_D + RAMP_L))
+    
+    front_case = front_case.fuse(ramp_l).fuse(ramp_r).fuse(track_l).fuse(track_r)
+    
+    # Floor relief channels for bottom 5.0 mm shoulder studs
+    for sx in (45.25, 45.25 + 54.25):
+        cx = X_CAGE_0 + sx
+        chan = Part.makeBox(16.0, 4.0, Z_SPLIT - BEZEL_D + 2.0,
+                             Vector(cx - 8.0, Y_UPPER_FLOOR - 2.5, BEZEL_D - 1.0))
+        front_case = front_case.cut(chan)
+    
+    # Lower front: 16mm illuminated switch port + hexagonal PSU intake vents
+    sw_cx  = OUT_W - WALL - 38.0
+    sw_cy  = FLOOR_T + BASEMENT_H / 2.0
+    sw_hole = Part.makeCylinder(SWITCH_DIA / 2.0, WALL + 4.0, Vector(sw_cx, sw_cy, -2.0), Vector(0, 0, 1))
+    front_case = front_case.cut(sw_hole)
+    
+    for row in range(-1, 3):
+        cy = FLOOR_T + 22.0 + row * 8.0
+        row_off = 4.0 if (row % 2 != 0) else 0.0
+        for col in range(-3, 4):
+            cx = psu_cx + col * 9.0 + row_off
+            if abs(cx - psu_cx) < 32.0:
+                vent = make_hex_prism(6.5, WALL + 4.0, cx, cy, -2.0)
+                front_case = front_case.cut(vent)
+    
+    
+    # Permanent central vertical structural rib in Front Case separating Flex-ATX PSU from right bay
+    # Provides rigid column support for the mid-deck shelf and DL380 drive cage
+    f_divider = Part.makeBox(2.0, BASEMENT_H, Z_SPLIT - 20.0, Vector(87.5, Y_BASE_FLOOR, 20.0))
+    front_case = front_case.fuse(f_divider)
+    
+    # DfAM sacrificial breakaway fins in Front Case basement (aligned with vertical load columns)
+    # Left bay: X=40.0, 64.0 mm | Right bay: X=120.0, 148.0 mm | Permanent divider at X=87.5 mm
+    # Spans are ~24-35 mm across, snaps out in seconds with zero cross-fins
+    f_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+    f_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+    f_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+    f_fin4 = make_scored_breakaway_fin(148.0, Y_BASE_FLOOR, Y_MID_DECK, 20.0, Z_SPLIT - 2.0)
+    
+    if with_cad_supports:
+        front_case = front_case.fuse(f_fin1).fuse(f_fin2).fuse(f_fin3).fuse(f_fin4)
+    
+    # ------------------------------------------------------------------------------
+    # 4. Large-Pattern Diamond Mesh on Top Roof & Both Side Walls
+    # ------------------------------------------------------------------------------
+    print("2. Cutting Large-Pattern Diamond Mesh on Top Roof...", flush=True)
+    # Roof diamond lattice over the drive cage: 19 mm x 19 mm cells with 3.5 mm struts
+    step_dx = 22.5
+    step_dz = 22.5
+    cuts_top = []
+    for row in range(-2, 4):
+        cz = 73.0 + row * step_dz
+        offset_x = (step_dx * 0.5) if (row % 2 != 0) else 0.0
+        for col in range(-2, 3):
+            cx = fan_cx + col * step_dx + offset_x
+            if 32.0 < cx < 154.0 and 18.0 < cz < 128.0:
+                d = make_diamond_y(19.0, 19.0, ROOF_T + 4.0, cx, cz, OUT_H - ROOF_T - 2.0)
+                cuts_top.append(d)
+    
+    if cuts_top:
+        all_top = cuts_top[0]
+        for c in cuts_top[1:]:
+            all_top = all_top.fuse(c)
+        front_case = front_case.cut(all_top)
+    
+    # DfAM sacrificial breakaway fins for Second Floor / Disc Cage Enclosure Roof Bridge (Y=54.0 to 148.0 mm)
+    # 100% SOLID GROUND: Every fin rests on a solid floor directly above vertical basement load columns:
+    # 1. fu_fin1 (X=40.0 mm): sits directly on top of f_fin1 (X=40.0 mm) via mid-deck
+    # 2. fu_fin2 (X=88.5 mm): sits directly on top of permanent central divider rib (X=87.5-89.5 mm)
+    # 3. fu_fin3 (X=148.0 mm): sits directly on top of f_fin4 (X=148.0 mm) via mid-deck
+    # Spans are ~35-48 mm across, eliminating the 146 mm wide open bridging gap under the roof.
+    # Accessible directly through the front bezel opening: snaps out in seconds with needle-nose pliers!
+    fu_fin1 = make_scored_breakaway_fin(40.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
+    fu_fin2 = make_scored_breakaway_fin(88.5,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
+    fu_fin3 = make_scored_breakaway_fin(148.0, Y_UPPER_FLOOR, Y_ROOF_LOWER, 15.0, Z_SPLIT - 4.0)
+    
+    if with_cad_supports:
+        front_case = front_case.fuse(fu_fin1).fuse(fu_fin2).fuse(fu_fin3)
+    
+    print("3. Cutting Large-Pattern Diamond Mesh on Both Side Walls...", flush=True)
+    # Side wall diamond lattice: 18 mm x 18 mm cells through the 20mm side blocks
+    cuts_side = []
+    for row in range(-1, 3):
+        cy = 100.0 + row * 22.0
+        offset_z = 11.0 if (row % 2 != 0) else 0.0
+        for col in range(-2, 3):
+            cz = 73.0 + col * 22.0 + offset_z
+            if 18.0 < cz < 114.0 and 62.0 < cy < 138.0:
+                d_l = make_diamond_x(18.0, 18.0, X_CAGE_0 + 4.0, cz, cy, -2.0)
+                d_r = make_diamond_x(18.0, 18.0, X_CAGE_0 + 4.0, cz, cy, X_CAGE_1 - 2.0)
+                cuts_side.append(d_l)
+                cuts_side.append(d_r)
+    
+    if cuts_side:
+        all_side = cuts_side[0]
+        for c in cuts_side[1:]:
+            all_side = all_side.fuse(c)
+        front_case = front_case.cut(all_side)
+    
+    # ------------------------------------------------------------------------------
+    
+    # 5. Rear Interlocking Interface on Front Case (Lap-Joint & M3 Lugs)
+    # ------------------------------------------------------------------------------
+    print("4. Modeling interlocking female lap-joint and 4x M3 screw lugs on Front Case...", flush=True)
+    # Perimeter female alignment rebate (4.8 mm deep x 2.4 mm wide at Z = 133.2 to 138.0 mm)
+    # Deep collar design (Option A) prevents any pitch/clam-shell gaping under heavy loads
+    rebate_top = Part.makeBox(OUT_W + 4.0, 2.4, 5.5, Vector(-2.0, OUT_H - 2.4, Z_SPLIT - 4.8))
+    rebate_bot = Part.makeBox(OUT_W + 4.0, 2.4, 5.5, Vector(-2.0, 0.0, Z_SPLIT - 4.8))
+    rebate_l   = Part.makeBox(2.4, OUT_H + 4.0, 5.5, Vector(0.0, -2.0, Z_SPLIT - 4.8))
+    rebate_r   = Part.makeBox(2.4, OUT_H + 4.0, 5.5, Vector(OUT_W - 2.4, -2.0, Z_SPLIT - 4.8))
+    front_case = front_case.cut(rebate_top).cut(rebate_bot).cut(rebate_l).cut(rebate_r)
+    
+    # Dual Snap-Fit Detent Windows & Internal Flex Channels (Tool-Free Quick Latch)
+    chan_l = Part.makeBox(12.0, 16.0, 24.5, Vector(3.0, 92.0, 114.0))
+    chan_r = Part.makeBox(12.0, 16.0, 24.5, Vector(OUT_W - 15.0, 92.0, 114.0))
+    win_l  = Part.makeBox(5.5, 12.4, 12.9, Vector(-1.0, 93.8, 114.5))
+    win_r  = Part.makeBox(5.5, 12.4, 12.9, Vector(OUT_W - 4.5, 93.8, 114.5))
+    bevel_l = Part.makeBox(2.0, 14.0, 2.5, Vector(2.0, 93.0, 135.5))
+    bevel_r = Part.makeBox(2.0, 14.0, 2.5, Vector(OUT_W - 4.0, 93.0, 135.5))
+    front_case = front_case.cut(chan_l).cut(chan_r).cut(win_l).cut(win_r).cut(bevel_l).cut(bevel_r)
+    
+    # ------------------------------------------------------------------------------
+    # Tool-Free Flex-ATX PSU Pusher Frame & Precision Lateral Guide Rails (Front Case)
+    # ------------------------------------------------------------------------------
+    # Traps Enhance ENP-2320 PSU (L=150.07 mm, W=82.32 mm) firmly against the rear wall (Z=210.0 mm).
+    # PSU front face terminates at Z = 59.93 mm; Pusher stop face is set at Z = 59.60 mm.
+    # Left and Right solid pillars (Y=3.5 to 48.5 mm) withstand 100% of AC power plug insertion
+    # forces, completely eliminating the need for rear mounting screws.
+    # Center span (X=21.0 to 69.5 mm) remains 100% unobstructed from floor to ceiling for
+    # heavy ATX 24-pin and CPU 8-pin wire harnesses and Front Case breakaway fins (X=40, 64 mm).
+    
+    f_push_l    = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(3.0, Y_BASE_FLOOR, 55.60))
+    f_push_r    = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(76.5, Y_BASE_FLOOR, 55.60))
+    
+    # Lateral Guide Rails in Front Case (Width: 82.80 mm track from Z = 59.60 to 132.0 mm)
+    f_rail_l = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(3.0, Y_BASE_FLOOR, 59.60))
+    f_rail_r = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(86.70, Y_BASE_FLOOR, 59.60))
+    
+    # 45-degree rear lead-in chamfers for Front Case rails (Z = 132.0 to 138.0 mm)
+    p1_fl = Vector(3.80, 0, 132.0)
+    p2_fl = Vector(3.00, 0, 138.0)
+    p3_fl = Vector(3.00, 0, 132.0)
+    poly_fl = Part.makePolygon([p1_fl, p2_fl, p3_fl, p1_fl])
+    wedge_fl = Part.Face(poly_fl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+    
+    p1_fr = Vector(86.70, 0, 132.0)
+    p2_fr = Vector(87.50, 0, 138.0)
+    p3_fr = Vector(87.50, 0, 132.0)
+    poly_fr = Part.makePolygon([p1_fr, p2_fr, p3_fr, p1_fr])
+    wedge_fr = Part.Face(poly_fr).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+    
+    front_case = (front_case
+                  .fuse(f_push_l).fuse(f_push_r)
+                  .fuse(f_rail_l).fuse(wedge_fl)
+                  .fuse(f_rail_r).fuse(wedge_fr))
+    
+    # Tool-Free Solid Corner Guide Socket on Right Side (100% Clear of PSU)
+    # Note: Lower-left corner has ZERO internal blocks to guarantee 100% clearance for Flex-ATX PSU (X=5.0 to 86.5 mm).
+    # The continuous 4.5 mm deep perimeter collar provides full rigid alignment across the left wall and floor.
+    lug_f_lr = Part.makeBox(13.0, 11.0, 10.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT - 10.0))
+    front_case = front_case.fuse(lug_f_lr)
+    
+    sock_lr = Part.makeBox(10.0, 8.5, 9.0, Vector(OUT_W - WALL - 11.2, Y_BASE_FLOOR + 1.2, Z_SPLIT - 8.5))
+    front_case = front_case.cut(sock_lr)
+    
+    print(f"Front Case complete: Volume = {front_case.Volume:.2f} mm3, isClosed: {front_case.isClosed()}", flush=True)
+    
+    # ==============================================================================
+    # 6. BUILD PART 2: REAR COOLING & POWER BACKCASE (Z = 138.0 to 215.0 mm)
+    # ==============================================================================
+    
+    print("5. Modeling Rear Cooling & Power Backcase...", flush=True)
+    back_shell = Part.makeBox(OUT_W, OUT_H, OUT_D - Z_SPLIT, Vector(0, 0, Z_SPLIT))
+    
+    # Basement void in back case (extends cleanly from Z_SPLIT - 1.0 to Z_PLEN_END)
+    b_base_void = Part.makeBox(OUT_W - 2 * WALL, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
+                               Vector(WALL, Y_BASE_FLOOR, Z_SPLIT - 1.0))
+    
+    # Upper plenum void (146 mm wide from Z = Z_SPLIT - 1.0 to Z_PLEN_END + 2.0 mm)
+    b_upper_void = Part.makeBox(INT_W, UPPER_H, Z_PLEN_END + 2.0 - (Z_SPLIT - 1.0),
+                                Vector(X_CAGE_0, Y_UPPER_FLOOR, Z_SPLIT - 1.0))
+    
+    back_case = back_shell.cut(b_base_void).cut(b_upper_void)
+    
+    # Permanent central vertical structural rib separating Flex-ATX PSU from right bay
+    # Provides rigid column support for the mid-deck shelf and DL380 drive cage
+    b_divider = Part.makeBox(2.0, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
+                             Vector(87.5, Y_BASE_FLOOR, Z_SPLIT - 1.0))
+    back_case = back_case.fuse(b_divider)
+    
+    # Precision Lateral Guide Rails in Back Case (Width: 82.80 mm track for 82.32 mm PSU)
+    # Protrudes 0.80 mm from outer wall and central divider (Z = 144.0 to 210.0 mm)
+    b_rail_l = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(3.0, Y_BASE_FLOOR, 144.0))
+    b_rail_r = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(86.70, Y_BASE_FLOOR, 144.0))
+    
+    # 45-degree front lead-in chamfers for Back Case rails (Z = 138.0 to 144.0 mm)
+    p1_l = Vector(3.00, 0, 138.0)
+    p2_l = Vector(3.80, 0, 144.0)
+    p3_l = Vector(3.00, 0, 144.0)
+    poly_bl = Part.makePolygon([p1_l, p2_l, p3_l, p1_l])
+    wedge_bl = Part.Face(poly_bl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+    
+    p1_r = Vector(87.50, 0, 138.0)
+    p2_r = Vector(86.70, 0, 144.0)
+    p3_r = Vector(87.50, 0, 144.0)
+    poly_br = Part.makePolygon([p1_r, p2_r, p3_r, p1_r])
+    wedge_br = Part.Face(poly_br).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
+    
+    back_case = back_case.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(wedge_br)
+    
+    # DfAM sacrificial breakaway fins in Back Case first floor (basement: Y=3.5 to 48.5 mm)
+    # Left bay: X=40.0 (Support 2, extends to end of PSU hole), 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
+    # Zero cross-fins; completely clear of power pass-through slot (X=134 to 164 mm)
+    b_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+    b_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+    b_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
+    
+    if with_cad_supports:
+        back_case = back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3)
+    
+    # DfAM sacrificial breakaway fins for Second Floor / Upper Chamber Top Roof Bridge (Y=54.0 to 148.0 mm)
+    # 100% SOLID GROUND: Every fin rests on a solid floor, completely clear of the 10-pin power slot (X=134-164 mm)
+    # 1. u_fin1 (X=40.0 mm, Y=54.0): sits directly on top of b_fin1 (X=40.0 mm) via mid-deck
+    # 2. u_fin2 (X=88.5 mm, Y=54.0): sits directly on top of permanent central divider wall (X=87.5-89.5 mm)
+    # 3. u_fin3 (X=120.0 mm, Y=56.5): sits on solid boss2 platform, directly over b_fin3 (X=120.0 mm), 14mm clear of power slot!
+    u_fin1 = make_scored_breakaway_fin(40.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
+    u_fin2 = make_corrugated_cubic_support(92.75, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0, channel_w=7.0)
+    u_fin3 = make_scored_breakaway_fin(120.0, Y_UPPER_FLOOR + RUNNER_H, Y_ROOF_LOWER, 142.0, 164.0)
+    
+    if with_cad_supports:
+        back_case = back_case.fuse(u_fin1).fuse(u_fin2).fuse(u_fin3)
+    
+    # Matching perimeter male tongue flange on Back Case (Z = 133.5 to 138.0 mm)
+    # Deep 4.5 mm collar gives massive structural bending resistance against pitch and yaw
+    tongue_box = Part.makeBox(OUT_W, OUT_H, 4.5, Vector(0, 0, Z_SPLIT - 4.5))
+    t_inner_cut = Part.makeBox(OUT_W - 4.2, OUT_H - 4.2, 6.5, Vector(2.1, 2.1, Z_SPLIT - 5.5))
+    tongue_flange = tongue_box.cut(t_inner_cut)
+    back_case = back_case.fuse(tongue_flange)
+    
+    # Rear stop frame at Z = 138.0 to 141.0 mm with dual tab clearance windows
+    stop_box = Part.makeBox(INT_W, UPPER_H, 3.0, Vector(X_CAGE_0, Y_UPPER_FLOOR, Z_SPLIT))
+    stop_hole = Part.makeBox(INT_W - 20.0, UPPER_H - 16.0, 5.0,
+                             Vector(X_CAGE_0 + 10.0, Y_UPPER_FLOOR + 8.0, Z_SPLIT - 1.0))
+    stop_frame = stop_box.cut(stop_hole)
+    
+    # Tab clearance windows (34 mm wide x 8 mm tall)
+    tab_win1 = Part.makeBox(34.0, 8.0, 5.0, Vector(X_CAGE_0 + 33.0, Y_UPPER_FLOOR, Z_SPLIT - 1.0))
+    tab_win2 = Part.makeBox(34.0, 8.0, 5.0, Vector(X_CAGE_0 + 78.5, Y_UPPER_FLOOR, Z_SPLIT - 1.0))
+    stop_frame = stop_frame.cut(tab_win1).cut(tab_win2)
+    back_case = back_case.fuse(stop_frame)
+    
+    # Mid-deck tab support bosses with M3 screw pilot holes (Z = 142.0 to 166.0 mm)
+    boss1 = Part.makeBox(30.0, RUNNER_H, 24.0, Vector(X_CAGE_0 + 35.0, Y_UPPER_FLOOR, 142.0))
+    boss2 = Part.makeBox(30.0, RUNNER_H, 24.0, Vector(X_CAGE_0 + 80.5, Y_UPPER_FLOOR, 142.0))
+    back_case = back_case.fuse(boss1).fuse(boss2)
+    
+    # Mid-deck bosses support the cage rear tabs securely without screws (zero tools needed)
+    # (Cage is trapped in all 6 DoF by front bezel socket, stop frame, runners and roof)
+    
+    # 10-pin power pass-through slot on right side
+    power_slot = Part.makeBox(30.0, MID_DECK_T + 4.0, 26.0,
+                              Vector(X_CAGE_0 + 114.0, Y_UPPER_FLOOR - MID_DECK_T - 2.0, 140.0))
+    back_case = back_case.cut(power_slot)
+    
+    # Continuous bottom-to-end-top sacrificial support pillar at X=148.0 mm
+    # Anchored on the basement floor (Y=3.5 mm) with a wide 68mm foot, supports the basement cavity
+    # below the 1st floor hole, passes through the cable hole, and rises to the top roof bridge (Y=148.0 mm)
+    thru_fin = make_through_hole_breakaway_fin(148.0, Y_BASE_FLOOR, Y_MID_DECK, Y_ROOF_LOWER,
+                                               Z_SPLIT - 1.0, Z_PLEN_END - 5.0, 142.0, 164.0)
+    if with_cad_supports:
+        back_case = back_case.fuse(thru_fin)
+    
+    # Dual Cantilever Snap-Fit Arms on Back Case
+    l_arm = make_left_latch()
+    r_arm = make_right_latch()
+    back_case = back_case.fuse(l_arm).fuse(r_arm)
+    
+    # Tool-Free Solid Corner Guide Key on Right Side (100% Clear of PSU)
+    # Lower-left corner is completely flush (clear of PSU envelope X=5.0 to 86.5 mm).
+    key_b_lr = Part.makeBox(9.2, 7.8, 8.0, Vector(OUT_W - WALL - 10.8, Y_BASE_FLOOR + 1.6, Z_SPLIT - 8.0))
+    anchor_lr = Part.makeBox(13.0, 11.0, 8.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT))
+    back_case = back_case.fuse(key_b_lr).fuse(anchor_lr)
+    
+    # Bottom Fan Cradle Stand
+    b_pad_l = Part.makeBox(15.4, 1.0, 24.5, Vector(fan_cx - 46.4, Y_UPPER_FLOOR, 184.6))
+    b_pad_r = Part.makeBox(15.4, 1.0, 24.5, Vector(fan_cx + 31.0, Y_UPPER_FLOOR, 184.6))
+    
+    b_lip = Part.makeBox(95.6, 9.0, 2.4, Vector(fan_cx - 47.8, Y_UPPER_FLOOR, 182.2))
+    scoop = Part.makeBox(56.0, 6.0, 3.0, Vector(fan_cx - 28.0, Y_UPPER_FLOOR + 3.5, 182.0))
+    b_lip = b_lip.cut(scoop)
+    
+    cable_notch = Part.makeBox(6.5, 4.0, 3.0, Vector(fan_cx - 46.0, Y_UPPER_FLOOR, 182.0))
+    b_lip = b_lip.cut(cable_notch)
+    
+    b_sh_l = Part.makeBox(2.8, 10.5, 11.4, Vector(fan_cx - 49.2, Y_UPPER_FLOOR, 184.6))
+    b_sh_r = Part.makeBox(2.8, 10.5, 11.4, Vector(fan_cx + 46.4, Y_UPPER_FLOOR, 184.6))
+    
+    back_case = back_case.fuse(b_pad_l).fuse(b_pad_r).fuse(b_lip).fuse(b_sh_l).fuse(b_sh_r)
+    
+    # Rear 45° Diamond Mesh Fan Grille & M4 holes (100% Self-Supporting, Zero Sagging)
+    # Directly applies DfAM principles: 45° struts require ZERO support material when printed vertically (Y-up)
+    # Matches the Large Diamond Mesh pattern on the top roof and both side walls
+    d_cell  = 13.0
+    d_pitch = 16.0
+    r_max   = (FAN_APERTURE / 2.0) - 1.5
+    
+    diamond_cuts = []
+    for row in range(-6, 7):
+        cy = fan_cy + row * (d_pitch / 2.0)
+        row_offset = (d_pitch / 2.0) if (row % 2 != 0) else 0.0
+        for col in range(-6, 7):
+            cx = fan_cx + col * d_pitch + row_offset
+            dist = math.hypot(cx - fan_cx, cy - fan_cy)
+            if dist + d_cell / 2.0 < r_max + 1.0 and dist < r_max:
+                diamond_cuts.append(make_diamond_z(d_cell, d_cell, REAR_WALL_T + 4.0, cx, cy, Z_PLEN_END - 2.0))
+    
+    if diamond_cuts:
+        all_diamonds = diamond_cuts[0]
+        for d in diamond_cuts[1:]:
+            all_diamonds = all_diamonds.fuse(d)
+        back_case = back_case.cut(all_diamonds)
+    
+    for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
+        for dy in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
+            hole = Part.makeCylinder(2.1, REAR_WALL_T + 4.0,
+                                     Vector(fan_cx + dx, fan_cy + dy, Z_PLEN_END - 2.0), Vector(0, 0, 1))
+            back_case = back_case.cut(hole)
+    
+    # Rear Flex-ATX PSU Aperture (Single Clean Rectangular Opening)
+    # Provides 100% open clearance for IEC C14 power inlet socket and 40mm cooling fan exhaust.
+    # Surrounding perimeter stop flange (Z=210.0 mm) retains PSU securely against cord pull-out:
+    # - Left stop flange:   X = 4.09 to 6.00 mm (1.91 mm overlap)
+    # - Right stop flange:  X = 80.00 to 86.41 mm (6.41 mm overlap)
+    # - Bottom stop lip:    Y = 3.50 to 5.50 mm (2.00 mm overlap)
+    # - Top stop flange:    Y = 41.50 to 46.08 mm (4.58 mm overlap)
+    # Zero screws required: PSU is locked in 6 DoF by front pusher, side rails, floor, and rear flange!
+    psu_window = Part.makeBox(74.0, 36.0, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
+    back_case = back_case.cut(psu_window)
+    
+    # Support 2 window extension: reaches to the outer end of the PSU hole (X=40.0 mm, Z=205.0 to 214.5 mm)
+    # Rises from the window sill (Y=5.5 mm) to support the 74mm top bridge edge of the PSU hole (Y=41.5 mm)
+    psu_win_sup = make_window_bridge_support(40.0, y_bottom=5.5, y_top=41.5,
+                                             z_start=Z_PLEN_END - 5.0, z_end=Z_PLEN_END + REAR_WALL_T - 0.5,
+                                             width_x=8.5)
+    if with_cad_supports:
+        back_case = back_case.fuse(psu_win_sup)
+    
+    # Rear SAS ports flanking fan
+    sas_slot1 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
+                             Vector(X_CAGE_0 + 6.0, Y_UPPER_FLOOR + UPPER_H - 22.0, Z_PLEN_END - 2.0))
+    sas_slot2 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
+                             Vector(X_CAGE_1 - 24.0, Y_UPPER_FLOOR + UPPER_H - 22.0, Z_PLEN_END - 2.0))
+    back_case = back_case.cut(sas_slot1).cut(sas_slot2)
+    
+    # Top Service Aperture in Back Case (with Battery-Door Snap Receptors)
+    roof_shelf_y = OUT_H - ROOF_T + 1.7 # 149.7 mm
+    aperture = Part.makeBox(135.8, ROOF_T + 2.0, 40.5, Vector(fan_cx - 67.9, OUT_H - ROOF_T - 1.0, 168.0))
+    rebate   = Part.makeBox(143.8, 2.0, 44.5, Vector(fan_cx - 71.9, roof_shelf_y, 165.0))
+    
+    # Front capture slots for Lid front locating tabs
+    slot_l = Part.makeBox(19.0, 1.8, 4.2, Vector(fan_cx - 50.5, roof_shelf_y - 1.7, 161.5))
+    slot_r = Part.makeBox(19.0, 1.8, 4.2, Vector(fan_cx + 31.5, roof_shelf_y - 1.7, 161.5))
+    
+    # Rear detent notch for Lid cantilever snap hook
+    rear_notch = Part.makeBox(15.0, 3.0, 2.5, Vector(fan_cx - 7.5, roof_shelf_y - 1.2, 209.0))
+    thumb_clearance = Part.makeBox(16.0, 2.0, 3.5, Vector(fan_cx - 8.0, OUT_H - 1.0, 208.5))
+    
+    back_case = back_case.cut(aperture).cut(rebate).cut(slot_l).cut(slot_r).cut(rear_notch).cut(thumb_clearance)
+    
+    print(f"Back Case complete:  Volume = {back_case.Volume:.2f} mm3, isClosed: {back_case.isClosed()}", flush=True)
+    
+    # ==============================================================================
+    # 7. BUILD PART 3: SERVICE LID WITH TOP FAN CLAMP
+    # ==============================================================================
+    
+    print("6. Modeling Battery-Door Style Snap-Fit Service Lid...", flush=True)
+    plug   = Part.makeBox(135.0, 1.7, 39.7, Vector(fan_cx - 67.5, OUT_H - ROOF_T, 168.4))
+    flange = Part.makeBox(143.0, 1.8, 43.7, Vector(fan_cx - 71.5, roof_shelf_y, 165.4))
+    lid = plug.fuse(flange)
+    
+    # 1. Front Locating Tabs (2x) that slide forward into the Backcase roof capture slots
+    tab_l = Part.makeBox(18.0, 1.5, 3.5, Vector(fan_cx - 50.0, roof_shelf_y - 1.5, 161.9))
+    tab_r = Part.makeBox(18.0, 1.5, 3.5, Vector(fan_cx + 32.0, roof_shelf_y - 1.5, 161.9))
+    lid = lid.fuse(tab_l).fuse(tab_r)
+    
+    # 2. Rear Cantilever Snap Latch (Battery-Door Style with Push-to-Pull Tab)
+    slit_l = Part.makeBox(1.5, 4.0, 16.0, Vector(fan_cx - 9.5, roof_shelf_y - 1.0, 193.0))
+    slit_r = Part.makeBox(1.5, 4.0, 16.0, Vector(fan_cx + 8.0, roof_shelf_y - 1.0, 193.0))
+    lid = lid.cut(slit_l).cut(slit_r)
+    
+    # Rear Hook / Catch Tab projecting past Z = 209.1 mm into rear notch
+    hook = Part.makeBox(14.0, 2.2, 1.8, Vector(fan_cx - 7.0, roof_shelf_y - 1.0, 209.1))
+    p1 = Vector(0, roof_shelf_y - 1.0, 209.1)
+    p2 = Vector(0, roof_shelf_y - 1.0, 210.9)
+    p3 = Vector(0, roof_shelf_y + 0.5, 210.9)
+    wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p1)])
+    wedge = Part.Face(wire).extrude(Vector(16.0, 0, 0)).translate(Vector(fan_cx - 8.0, 0, 0))
+    hook = hook.cut(wedge)
+    
+    lid = lid.fuse(hook)
+    
+    # Push-to-release thumb pad with recessed non-slip grip ridges (Battery-Door style)
+    # Recessed ridges ensure top face of lid is 100% planar and rests flat on PEI bed with ZERO supports!
+    for rz in [204.5, 206.0, 207.5]:
+        recess = Part.makeBox(12.0, 0.6, 0.7, Vector(fan_cx - 6.0, OUT_H - 0.6, rz - 0.35))
+        lid = lid.cut(recess)
+    
+    # 3. Integrated Top Fan Stand on Service Lid (Clamps 92mm fan automatically!)
+    t_lip = Part.makeBox(86.0, 5.0, 2.4, Vector(fan_cx - 43.0, OUT_H - ROOF_T - 5.0, 182.2))
+    cut_wire = Part.Wire([
+        Part.makeLine(Vector(0, OUT_H - ROOF_T - 5.1, 183.0), Vector(0, OUT_H - ROOF_T - 5.1, 184.7)),
+        Part.makeLine(Vector(0, OUT_H - ROOF_T - 5.1, 184.7), Vector(0, OUT_H - ROOF_T - 3.4, 184.7)),
+        Part.makeLine(Vector(0, OUT_H - ROOF_T - 3.4, 184.7), Vector(0, OUT_H - ROOF_T - 5.1, 183.0))
+    ])
+    cut_prism = Part.Face(cut_wire).extrude(Vector(90.0, 0, 0)).translate(Vector(fan_cx - 45.0, 0, 0))
+    t_lip = t_lip.cut(cut_prism)
+    
+    t_pad_l = Part.makeBox(14.0, 1.0, 20.0, Vector(fan_cx - 44.0, OUT_H - ROOF_T - 1.0, 186.0))
+    t_pad_r = Part.makeBox(14.0, 1.0, 20.0, Vector(fan_cx + 30.0, OUT_H - ROOF_T - 1.0, 186.0))
+    top_stand = t_lip.fuse(t_pad_l).fuse(t_pad_r)
+    lid = lid.fuse(top_stand)
+    
+    # Side grip pull-grooves for effortless two-finger lifting (recessed into top surface)
+    for dx in (-45.0, -38.0, 38.0, 45.0):
+        g_cut = Part.makeBox(2.0, 0.6, 12.0, Vector(fan_cx + dx - 1.0, OUT_H - 0.6, 186.0 - 6.0))
+        lid = lid.cut(g_cut)
+    
+    print(f"Service Lid complete: Volume = {lid.Volume:.2f} mm3, isClosed: {lid.isClosed()}", flush=True)
+    
+    # Check watertightness
+    assert front_case.isClosed(), "ERROR: Front Case solid is not closed/watertight!"
+    assert back_case.isClosed(),  "ERROR: Back Case solid is not closed/watertight!"
+    assert lid.isClosed(),        "ERROR: Service Lid solid is not closed/watertight!"
+    
 
-# ------------------------------------------------------------------------------
-# Tool-Free Flex-ATX PSU Pusher Frame & Precision Lateral Guide Rails (Front Case)
-# ------------------------------------------------------------------------------
-# Traps Enhance ENP-2320 PSU (L=150.07 mm, W=82.32 mm) firmly against the rear wall (Z=210.0 mm).
-# PSU front face terminates at Z = 59.93 mm; Pusher stop face is set at Z = 59.60 mm.
-# Left and Right solid pillars (Y=3.5 to 48.5 mm) withstand 100% of AC power plug insertion
-# forces, completely eliminating the need for rear mounting screws.
-# Center span (X=21.0 to 69.5 mm) remains 100% unobstructed from floor to ceiling for
-# heavy ATX 24-pin and CPU 8-pin wire harnesses and Front Case breakaway fins (X=40, 64 mm).
-
-f_push_l    = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(3.0, Y_BASE_FLOOR, 55.60))
-f_push_r    = Part.makeBox(11.0, BASEMENT_H, 4.0, Vector(76.5, Y_BASE_FLOOR, 55.60))
-
-# Lateral Guide Rails in Front Case (Width: 82.80 mm track from Z = 59.60 to 132.0 mm)
-f_rail_l = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(3.0, Y_BASE_FLOOR, 59.60))
-f_rail_r = Part.makeBox(0.80, 16.5, 132.0 - 59.60, Vector(86.70, Y_BASE_FLOOR, 59.60))
-
-# 45-degree rear lead-in chamfers for Front Case rails (Z = 132.0 to 138.0 mm)
-p1_fl = Vector(3.80, 0, 132.0)
-p2_fl = Vector(3.00, 0, 138.0)
-p3_fl = Vector(3.00, 0, 132.0)
-poly_fl = Part.makePolygon([p1_fl, p2_fl, p3_fl, p1_fl])
-wedge_fl = Part.Face(poly_fl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
-
-p1_fr = Vector(86.70, 0, 132.0)
-p2_fr = Vector(87.50, 0, 138.0)
-p3_fr = Vector(87.50, 0, 132.0)
-poly_fr = Part.makePolygon([p1_fr, p2_fr, p3_fr, p1_fr])
-wedge_fr = Part.Face(poly_fr).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
-
-front_case = (front_case
-              .fuse(f_push_l).fuse(f_push_r)
-              .fuse(f_rail_l).fuse(wedge_fl)
-              .fuse(f_rail_r).fuse(wedge_fr))
-
-# Tool-Free Solid Corner Guide Socket on Right Side (100% Clear of PSU)
-# Note: Lower-left corner has ZERO internal blocks to guarantee 100% clearance for Flex-ATX PSU (X=5.0 to 86.5 mm).
-# The continuous 4.5 mm deep perimeter collar provides full rigid alignment across the left wall and floor.
-lug_f_lr = Part.makeBox(13.0, 11.0, 10.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT - 10.0))
-front_case = front_case.fuse(lug_f_lr)
-
-sock_lr = Part.makeBox(10.0, 8.5, 9.0, Vector(OUT_W - WALL - 11.2, Y_BASE_FLOOR + 1.2, Z_SPLIT - 8.5))
-front_case = front_case.cut(sock_lr)
-
-print(f"Front Case complete: Volume = {front_case.Volume:.2f} mm3, isClosed: {front_case.isClosed()}", flush=True)
-
-# ==============================================================================
-# 6. BUILD PART 2: REAR COOLING & POWER BACKCASE (Z = 138.0 to 215.0 mm)
-# ==============================================================================
-
-print("5. Modeling Rear Cooling & Power Backcase...", flush=True)
-back_shell = Part.makeBox(OUT_W, OUT_H, OUT_D - Z_SPLIT, Vector(0, 0, Z_SPLIT))
-
-# Basement void in back case (extends cleanly from Z_SPLIT - 1.0 to Z_PLEN_END)
-b_base_void = Part.makeBox(OUT_W - 2 * WALL, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
-                           Vector(WALL, Y_BASE_FLOOR, Z_SPLIT - 1.0))
-
-# Upper plenum void (146 mm wide from Z = Z_SPLIT - 1.0 to Z_PLEN_END + 2.0 mm)
-b_upper_void = Part.makeBox(INT_W, UPPER_H, Z_PLEN_END + 2.0 - (Z_SPLIT - 1.0),
-                            Vector(X_CAGE_0, Y_UPPER_FLOOR, Z_SPLIT - 1.0))
-
-back_case = back_shell.cut(b_base_void).cut(b_upper_void)
-
-# Permanent central vertical structural rib separating Flex-ATX PSU from right bay
-# Provides rigid column support for the mid-deck shelf and DL380 drive cage
-b_divider = Part.makeBox(2.0, BASEMENT_H, Z_PLEN_END - (Z_SPLIT - 1.0),
-                         Vector(87.5, Y_BASE_FLOOR, Z_SPLIT - 1.0))
-back_case = back_case.fuse(b_divider)
-
-# Precision Lateral Guide Rails in Back Case (Width: 82.80 mm track for 82.32 mm PSU)
-# Protrudes 0.80 mm from outer wall and central divider (Z = 144.0 to 210.0 mm)
-b_rail_l = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(3.0, Y_BASE_FLOOR, 144.0))
-b_rail_r = Part.makeBox(0.80, 16.5, Z_PLEN_END - 144.0, Vector(86.70, Y_BASE_FLOOR, 144.0))
-
-# 45-degree front lead-in chamfers for Back Case rails (Z = 138.0 to 144.0 mm)
-p1_l = Vector(3.00, 0, 138.0)
-p2_l = Vector(3.80, 0, 144.0)
-p3_l = Vector(3.00, 0, 144.0)
-poly_bl = Part.makePolygon([p1_l, p2_l, p3_l, p1_l])
-wedge_bl = Part.Face(poly_bl).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
-
-p1_r = Vector(87.50, 0, 138.0)
-p2_r = Vector(86.70, 0, 144.0)
-p3_r = Vector(87.50, 0, 144.0)
-poly_br = Part.makePolygon([p1_r, p2_r, p3_r, p1_r])
-wedge_br = Part.Face(poly_br).extrude(Vector(0, 16.5, 0)).translate(Vector(0, Y_BASE_FLOOR, 0))
-
-back_case = back_case.fuse(b_rail_l).fuse(wedge_bl).fuse(b_rail_r).fuse(wedge_br)
-
-# DfAM sacrificial breakaway fins in Back Case first floor (basement: Y=3.5 to 48.5 mm)
-# Left bay: X=40.0 (Support 2, extends to end of PSU hole), 64.0 mm | Right bay: X=120.0 mm | Permanent divider at X=87.5 mm
-# Zero cross-fins; completely clear of power pass-through slot (X=134 to 164 mm)
-b_fin1 = make_scored_breakaway_fin(40.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin2 = make_scored_breakaway_fin(64.0,  Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-b_fin3 = make_scored_breakaway_fin(120.0, Y_BASE_FLOOR, Y_MID_DECK, Z_SPLIT - 1.0, Z_PLEN_END - 5.0)
-
-back_case = back_case.fuse(b_fin1).fuse(b_fin2).fuse(b_fin3)
-
-# DfAM sacrificial breakaway fins for Second Floor / Upper Chamber Top Roof Bridge (Y=54.0 to 148.0 mm)
-# 100% SOLID GROUND: Every fin rests on a solid floor, completely clear of the 10-pin power slot (X=134-164 mm)
-# 1. u_fin1 (X=40.0 mm, Y=54.0): sits directly on top of b_fin1 (X=40.0 mm) via mid-deck
-# 2. u_fin2 (X=88.5 mm, Y=54.0): sits directly on top of permanent central divider wall (X=87.5-89.5 mm)
-# 3. u_fin3 (X=120.0 mm, Y=56.5): sits on solid boss2 platform, directly over b_fin3 (X=120.0 mm), 14mm clear of power slot!
-u_fin1 = make_scored_breakaway_fin(40.0,  Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0)
-u_fin2 = make_corrugated_cubic_support(92.75, Y_UPPER_FLOOR, Y_ROOF_LOWER, 142.0, 164.0, channel_w=7.0)
-u_fin3 = make_scored_breakaway_fin(120.0, Y_UPPER_FLOOR + RUNNER_H, Y_ROOF_LOWER, 142.0, 164.0)
-
-back_case = back_case.fuse(u_fin1).fuse(u_fin2).fuse(u_fin3)
-
-# Matching perimeter male tongue flange on Back Case (Z = 133.5 to 138.0 mm)
-# Deep 4.5 mm collar gives massive structural bending resistance against pitch and yaw
-tongue_box = Part.makeBox(OUT_W, OUT_H, 4.5, Vector(0, 0, Z_SPLIT - 4.5))
-t_inner_cut = Part.makeBox(OUT_W - 4.2, OUT_H - 4.2, 6.5, Vector(2.1, 2.1, Z_SPLIT - 5.5))
-tongue_flange = tongue_box.cut(t_inner_cut)
-back_case = back_case.fuse(tongue_flange)
-
-# Rear stop frame at Z = 138.0 to 141.0 mm with dual tab clearance windows
-stop_box = Part.makeBox(INT_W, UPPER_H, 3.0, Vector(X_CAGE_0, Y_UPPER_FLOOR, Z_SPLIT))
-stop_hole = Part.makeBox(INT_W - 20.0, UPPER_H - 16.0, 5.0,
-                         Vector(X_CAGE_0 + 10.0, Y_UPPER_FLOOR + 8.0, Z_SPLIT - 1.0))
-stop_frame = stop_box.cut(stop_hole)
-
-# Tab clearance windows (34 mm wide x 8 mm tall)
-tab_win1 = Part.makeBox(34.0, 8.0, 5.0, Vector(X_CAGE_0 + 33.0, Y_UPPER_FLOOR, Z_SPLIT - 1.0))
-tab_win2 = Part.makeBox(34.0, 8.0, 5.0, Vector(X_CAGE_0 + 78.5, Y_UPPER_FLOOR, Z_SPLIT - 1.0))
-stop_frame = stop_frame.cut(tab_win1).cut(tab_win2)
-back_case = back_case.fuse(stop_frame)
-
-# Mid-deck tab support bosses with M3 screw pilot holes (Z = 142.0 to 166.0 mm)
-boss1 = Part.makeBox(30.0, RUNNER_H, 24.0, Vector(X_CAGE_0 + 35.0, Y_UPPER_FLOOR, 142.0))
-boss2 = Part.makeBox(30.0, RUNNER_H, 24.0, Vector(X_CAGE_0 + 80.5, Y_UPPER_FLOOR, 142.0))
-back_case = back_case.fuse(boss1).fuse(boss2)
-
-# Mid-deck bosses support the cage rear tabs securely without screws (zero tools needed)
-# (Cage is trapped in all 6 DoF by front bezel socket, stop frame, runners and roof)
-
-# 10-pin power pass-through slot on right side
-power_slot = Part.makeBox(30.0, MID_DECK_T + 4.0, 26.0,
-                          Vector(X_CAGE_0 + 114.0, Y_UPPER_FLOOR - MID_DECK_T - 2.0, 140.0))
-back_case = back_case.cut(power_slot)
-
-# Continuous bottom-to-end-top sacrificial support pillar at X=148.0 mm
-# Anchored on the basement floor (Y=3.5 mm) with a wide 68mm foot, supports the basement cavity
-# below the 1st floor hole, passes through the cable hole, and rises to the top roof bridge (Y=148.0 mm)
-thru_fin = make_through_hole_breakaway_fin(148.0, Y_BASE_FLOOR, Y_MID_DECK, Y_ROOF_LOWER,
-                                           Z_SPLIT - 1.0, Z_PLEN_END - 5.0, 142.0, 164.0)
-back_case = back_case.fuse(thru_fin)
-
-# Dual Cantilever Snap-Fit Arms on Back Case
-l_arm = make_left_latch()
-r_arm = make_right_latch()
-back_case = back_case.fuse(l_arm).fuse(r_arm)
-
-# Tool-Free Solid Corner Guide Key on Right Side (100% Clear of PSU)
-# Lower-left corner is completely flush (clear of PSU envelope X=5.0 to 86.5 mm).
-key_b_lr = Part.makeBox(9.2, 7.8, 8.0, Vector(OUT_W - WALL - 10.8, Y_BASE_FLOOR + 1.6, Z_SPLIT - 8.0))
-anchor_lr = Part.makeBox(13.0, 11.0, 8.0, Vector(OUT_W - WALL - 13.0, Y_BASE_FLOOR, Z_SPLIT))
-back_case = back_case.fuse(key_b_lr).fuse(anchor_lr)
-
-# Bottom Fan Cradle Stand
-b_pad_l = Part.makeBox(15.4, 1.0, 24.5, Vector(fan_cx - 46.4, Y_UPPER_FLOOR, 184.6))
-b_pad_r = Part.makeBox(15.4, 1.0, 24.5, Vector(fan_cx + 31.0, Y_UPPER_FLOOR, 184.6))
-
-b_lip = Part.makeBox(95.6, 9.0, 2.4, Vector(fan_cx - 47.8, Y_UPPER_FLOOR, 182.2))
-scoop = Part.makeBox(56.0, 6.0, 3.0, Vector(fan_cx - 28.0, Y_UPPER_FLOOR + 3.5, 182.0))
-b_lip = b_lip.cut(scoop)
-
-cable_notch = Part.makeBox(6.5, 4.0, 3.0, Vector(fan_cx - 46.0, Y_UPPER_FLOOR, 182.0))
-b_lip = b_lip.cut(cable_notch)
-
-b_sh_l = Part.makeBox(2.8, 10.5, 11.4, Vector(fan_cx - 49.2, Y_UPPER_FLOOR, 184.6))
-b_sh_r = Part.makeBox(2.8, 10.5, 11.4, Vector(fan_cx + 46.4, Y_UPPER_FLOOR, 184.6))
-
-back_case = back_case.fuse(b_pad_l).fuse(b_pad_r).fuse(b_lip).fuse(b_sh_l).fuse(b_sh_r)
-
-# Rear 45° Diamond Mesh Fan Grille & M4 holes (100% Self-Supporting, Zero Sagging)
-# Directly applies DfAM principles: 45° struts require ZERO support material when printed vertically (Y-up)
-# Matches the Large Diamond Mesh pattern on the top roof and both side walls
-d_cell  = 13.0
-d_pitch = 16.0
-r_max   = (FAN_APERTURE / 2.0) - 1.5
-
-diamond_cuts = []
-for row in range(-6, 7):
-    cy = fan_cy + row * (d_pitch / 2.0)
-    row_offset = (d_pitch / 2.0) if (row % 2 != 0) else 0.0
-    for col in range(-6, 7):
-        cx = fan_cx + col * d_pitch + row_offset
-        dist = math.hypot(cx - fan_cx, cy - fan_cy)
-        if dist + d_cell / 2.0 < r_max + 1.0 and dist < r_max:
-            diamond_cuts.append(make_diamond_z(d_cell, d_cell, REAR_WALL_T + 4.0, cx, cy, Z_PLEN_END - 2.0))
-
-if diamond_cuts:
-    all_diamonds = diamond_cuts[0]
-    for d in diamond_cuts[1:]:
-        all_diamonds = all_diamonds.fuse(d)
-    back_case = back_case.cut(all_diamonds)
-
-for dx in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
-    for dy in (-FAN_PITCH / 2.0, FAN_PITCH / 2.0):
-        hole = Part.makeCylinder(2.1, REAR_WALL_T + 4.0,
-                                 Vector(fan_cx + dx, fan_cy + dy, Z_PLEN_END - 2.0), Vector(0, 0, 1))
-        back_case = back_case.cut(hole)
-
-# Rear Flex-ATX PSU Aperture (Single Clean Rectangular Opening)
-# Provides 100% open clearance for IEC C14 power inlet socket and 40mm cooling fan exhaust.
-# Surrounding perimeter stop flange (Z=210.0 mm) retains PSU securely against cord pull-out:
-# - Left stop flange:   X = 4.09 to 6.00 mm (1.91 mm overlap)
-# - Right stop flange:  X = 80.00 to 86.41 mm (6.41 mm overlap)
-# - Bottom stop lip:    Y = 3.50 to 5.50 mm (2.00 mm overlap)
-# - Top stop flange:    Y = 41.50 to 46.08 mm (4.58 mm overlap)
-# Zero screws required: PSU is locked in 6 DoF by front pusher, side rails, floor, and rear flange!
-psu_window = Part.makeBox(74.0, 36.0, REAR_WALL_T + 4.0, Vector(6.0, 5.5, Z_PLEN_END - 2.0))
-back_case = back_case.cut(psu_window)
-
-# Support 2 window extension: reaches to the outer end of the PSU hole (X=40.0 mm, Z=205.0 to 214.5 mm)
-# Rises from the window sill (Y=5.5 mm) to support the 74mm top bridge edge of the PSU hole (Y=41.5 mm)
-psu_win_sup = make_window_bridge_support(40.0, y_bottom=5.5, y_top=41.5,
-                                         z_start=Z_PLEN_END - 5.0, z_end=Z_PLEN_END + REAR_WALL_T - 0.5,
-                                         width_x=8.5)
-back_case = back_case.fuse(psu_win_sup)
-
-# Rear SAS ports flanking fan
-sas_slot1 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
-                         Vector(X_CAGE_0 + 6.0, Y_UPPER_FLOOR + UPPER_H - 22.0, Z_PLEN_END - 2.0))
-sas_slot2 = Part.makeBox(18.0, 14.0, REAR_WALL_T + 4.0,
-                         Vector(X_CAGE_1 - 24.0, Y_UPPER_FLOOR + UPPER_H - 22.0, Z_PLEN_END - 2.0))
-back_case = back_case.cut(sas_slot1).cut(sas_slot2)
-
-# Top Service Aperture in Back Case (with Battery-Door Snap Receptors)
-roof_shelf_y = OUT_H - ROOF_T + 1.7 # 149.7 mm
-aperture = Part.makeBox(135.8, ROOF_T + 2.0, 40.5, Vector(fan_cx - 67.9, OUT_H - ROOF_T - 1.0, 168.0))
-rebate   = Part.makeBox(143.8, 2.0, 44.5, Vector(fan_cx - 71.9, roof_shelf_y, 165.0))
-
-# Front capture slots for Lid front locating tabs
-slot_l = Part.makeBox(19.0, 1.8, 4.2, Vector(fan_cx - 50.5, roof_shelf_y - 1.7, 161.5))
-slot_r = Part.makeBox(19.0, 1.8, 4.2, Vector(fan_cx + 31.5, roof_shelf_y - 1.7, 161.5))
-
-# Rear detent notch for Lid cantilever snap hook
-rear_notch = Part.makeBox(15.0, 3.0, 2.5, Vector(fan_cx - 7.5, roof_shelf_y - 1.2, 209.0))
-thumb_clearance = Part.makeBox(16.0, 2.0, 3.5, Vector(fan_cx - 8.0, OUT_H - 1.0, 208.5))
-
-back_case = back_case.cut(aperture).cut(rebate).cut(slot_l).cut(slot_r).cut(rear_notch).cut(thumb_clearance)
-
-print(f"Back Case complete:  Volume = {back_case.Volume:.2f} mm3, isClosed: {back_case.isClosed()}", flush=True)
-
-# ==============================================================================
-# 7. BUILD PART 3: SERVICE LID WITH TOP FAN CLAMP
-# ==============================================================================
-
-print("6. Modeling Battery-Door Style Snap-Fit Service Lid...", flush=True)
-plug   = Part.makeBox(135.0, 1.7, 39.7, Vector(fan_cx - 67.5, OUT_H - ROOF_T, 168.4))
-flange = Part.makeBox(143.0, 1.8, 43.7, Vector(fan_cx - 71.5, roof_shelf_y, 165.4))
-lid = plug.fuse(flange)
-
-# 1. Front Locating Tabs (2x) that slide forward into the Backcase roof capture slots
-tab_l = Part.makeBox(18.0, 1.5, 3.5, Vector(fan_cx - 50.0, roof_shelf_y - 1.5, 161.9))
-tab_r = Part.makeBox(18.0, 1.5, 3.5, Vector(fan_cx + 32.0, roof_shelf_y - 1.5, 161.9))
-lid = lid.fuse(tab_l).fuse(tab_r)
-
-# 2. Rear Cantilever Snap Latch (Battery-Door Style with Push-to-Pull Tab)
-slit_l = Part.makeBox(1.5, 4.0, 16.0, Vector(fan_cx - 9.5, roof_shelf_y - 1.0, 193.0))
-slit_r = Part.makeBox(1.5, 4.0, 16.0, Vector(fan_cx + 8.0, roof_shelf_y - 1.0, 193.0))
-lid = lid.cut(slit_l).cut(slit_r)
-
-# Rear Hook / Catch Tab projecting past Z = 209.1 mm into rear notch
-hook = Part.makeBox(14.0, 2.2, 1.8, Vector(fan_cx - 7.0, roof_shelf_y - 1.0, 209.1))
-p1 = Vector(0, roof_shelf_y - 1.0, 209.1)
-p2 = Vector(0, roof_shelf_y - 1.0, 210.9)
-p3 = Vector(0, roof_shelf_y + 0.5, 210.9)
-wire = Part.Wire([Part.makeLine(p1, p2), Part.makeLine(p2, p3), Part.makeLine(p3, p1)])
-wedge = Part.Face(wire).extrude(Vector(16.0, 0, 0)).translate(Vector(fan_cx - 8.0, 0, 0))
-hook = hook.cut(wedge)
-
-lid = lid.fuse(hook)
-
-# Push-to-release thumb pad with recessed non-slip grip ridges (Battery-Door style)
-# Recessed ridges ensure top face of lid is 100% planar and rests flat on PEI bed with ZERO supports!
-for rz in [204.5, 206.0, 207.5]:
-    recess = Part.makeBox(12.0, 0.6, 0.7, Vector(fan_cx - 6.0, OUT_H - 0.6, rz - 0.35))
-    lid = lid.cut(recess)
-
-# 3. Integrated Top Fan Stand on Service Lid (Clamps 92mm fan automatically!)
-t_lip = Part.makeBox(86.0, 5.0, 2.4, Vector(fan_cx - 43.0, OUT_H - ROOF_T - 5.0, 182.2))
-cut_wire = Part.Wire([
-    Part.makeLine(Vector(0, OUT_H - ROOF_T - 5.1, 183.0), Vector(0, OUT_H - ROOF_T - 5.1, 184.7)),
-    Part.makeLine(Vector(0, OUT_H - ROOF_T - 5.1, 184.7), Vector(0, OUT_H - ROOF_T - 3.4, 184.7)),
-    Part.makeLine(Vector(0, OUT_H - ROOF_T - 3.4, 184.7), Vector(0, OUT_H - ROOF_T - 5.1, 183.0))
-])
-cut_prism = Part.Face(cut_wire).extrude(Vector(90.0, 0, 0)).translate(Vector(fan_cx - 45.0, 0, 0))
-t_lip = t_lip.cut(cut_prism)
-
-t_pad_l = Part.makeBox(14.0, 1.0, 20.0, Vector(fan_cx - 44.0, OUT_H - ROOF_T - 1.0, 186.0))
-t_pad_r = Part.makeBox(14.0, 1.0, 20.0, Vector(fan_cx + 30.0, OUT_H - ROOF_T - 1.0, 186.0))
-top_stand = t_lip.fuse(t_pad_l).fuse(t_pad_r)
-lid = lid.fuse(top_stand)
-
-# Side grip pull-grooves for effortless two-finger lifting (recessed into top surface)
-for dx in (-45.0, -38.0, 38.0, 45.0):
-    g_cut = Part.makeBox(2.0, 0.6, 12.0, Vector(fan_cx + dx - 1.0, OUT_H - 0.6, 186.0 - 6.0))
-    lid = lid.cut(g_cut)
-
-print(f"Service Lid complete: Volume = {lid.Volume:.2f} mm3, isClosed: {lid.isClosed()}", flush=True)
-
-# Check watertightness
-assert front_case.isClosed(), "ERROR: Front Case solid is not closed/watertight!"
-assert back_case.isClosed(),  "ERROR: Back Case solid is not closed/watertight!"
-assert lid.isClosed(),        "ERROR: Service Lid solid is not closed/watertight!"
+    return front_case, back_case, lid
 
 # ==============================================================================
 # 8. EXPORT DELIVERABLES
 # ==============================================================================
 
-step_front = os.path.join(OUT_DIR, "dl380_front_case.step")
-step_back  = os.path.join(OUT_DIR, "dl380_back_case.step")
-step_lid   = os.path.join(OUT_DIR, "dl380_service_lid.step")
-step_all   = os.path.join(OUT_DIR, "dl380_flex_case.step")
+def export_variant(front_case, back_case, lid, suffix="", is_clean=False):
+    desc = "Clean (No CAD Supports)" if is_clean else "Standard (with DfAM Supports)"
+    print(f"\n--- Exporting Deliverables: {desc} ---", flush=True)
+    
+    os.makedirs(OUT_DIR, exist_ok=True)
+    os.makedirs(PRINT_DIR, exist_ok=True)
+    pkg_dir = os.path.join(REPO_DIR, "print_service_package")
+    os.makedirs(pkg_dir, exist_ok=True)
+    
+    step_f = os.path.join(OUT_DIR, f"dl380_front_case{suffix}.step")
+    step_b = os.path.join(OUT_DIR, f"dl380_back_case{suffix}.step")
+    step_l = os.path.join(OUT_DIR, f"dl380_service_lid.step")
+    step_a = os.path.join(OUT_DIR, f"dl380_flex_case{suffix}.step")
+    
+    stl_f  = os.path.join(OUT_DIR, f"dl380_front_case{suffix}.stl")
+    stl_b  = os.path.join(OUT_DIR, f"dl380_back_case{suffix}.stl")
+    stl_l  = os.path.join(OUT_DIR, f"dl380_service_lid.stl")
+    
+    stl_p_f = os.path.join(PRINT_DIR, f"dl380_front_case{suffix}.stl")
+    stl_p_b = os.path.join(PRINT_DIR, f"dl380_back_case{suffix}.stl")
+    stl_p_l = os.path.join(PRINT_DIR, f"dl380_service_lid.stl")
+    
+    print(f"Exporting STEP models ({desc})...", flush=True)
+    front_case.exportStep(step_f)
+    back_case.exportStep(step_b)
+    if not os.path.exists(step_l):
+        lid.exportStep(step_l)
+        
+    compound = Part.Compound([front_case, back_case, lid])
+    compound.exportStep(step_a)
+    
+    print(f"Tessellating production STL meshes ({desc})...", flush=True)
+    mesh_f = MeshPart.meshFromShape(Shape=front_case, LinearDeflection=0.08, AngularDeflection=0.35)
+    mesh_b = MeshPart.meshFromShape(Shape=back_case,  LinearDeflection=0.08, AngularDeflection=0.35)
+    mesh_l = MeshPart.meshFromShape(Shape=lid,        LinearDeflection=0.08, AngularDeflection=0.35)
+    
+    mesh_f.write(stl_f)
+    mesh_b.write(stl_b)
+    if not os.path.exists(stl_l):
+        mesh_l.write(stl_l)
+        
+    mesh_f.write(stl_p_f)
+    mesh_b.write(stl_p_b)
+    if not os.path.exists(stl_p_l):
+        mesh_l.write(stl_p_l)
+        
+    if is_clean:
+        clean_dir = os.path.join(pkg_dir, "clean_no_supports")
+        os.makedirs(clean_dir, exist_ok=True)
+        import shutil
+        shutil.copy2(step_f, os.path.join(clean_dir, f"01_dl380_front_case{suffix}.step"))
+        shutil.copy2(step_b, os.path.join(clean_dir, f"02_dl380_back_case{suffix}.step"))
+        shutil.copy2(stl_f,  os.path.join(clean_dir, f"01_dl380_front_case{suffix}.stl"))
+        shutil.copy2(stl_b,  os.path.join(clean_dir, f"02_dl380_back_case{suffix}.stl"))
+    else:
+        import shutil
+        shutil.copy2(step_f, os.path.join(pkg_dir, "01_dl380_front_case.step"))
+        shutil.copy2(step_b, os.path.join(pkg_dir, "02_dl380_back_case.step"))
+        shutil.copy2(step_l, os.path.join(pkg_dir, "03_dl380_service_lid.step"))
+        shutil.copy2(stl_f,  os.path.join(pkg_dir, "01_dl380_front_case.stl"))
+        shutil.copy2(stl_b,  os.path.join(pkg_dir, "02_dl380_back_case.stl"))
+        shutil.copy2(stl_l,  os.path.join(pkg_dir, "03_dl380_service_lid.stl"))
+        
+    return mesh_f, mesh_b, mesh_l
 
-stl_front  = os.path.join(OUT_DIR, "dl380_front_case.stl")
-stl_back   = os.path.join(OUT_DIR, "dl380_back_case.stl")
-stl_lid    = os.path.join(OUT_DIR, "dl380_service_lid.stl")
+if __name__ == "__main__":
+    t0 = time.time()
+    args = sys.argv[1:]
+    
+    clean_only = "--clean" in args or "--no-supports" in args
+    std_only   = "--standard" in args or "--with-supports" in args
+    
+    if clean_only:
+        print("Generating Clean Non-Support Variant only...", flush=True)
+        fc_c, bc_c, lid_c = build_enclosure(with_cad_supports=False)
+        export_variant(fc_c, bc_c, lid_c, suffix="_clean", is_clean=True)
+    elif std_only:
+        print("Generating Standard (DfAM Supported) Variant only...", flush=True)
+        fc_s, bc_s, lid_s = build_enclosure(with_cad_supports=True)
+        export_variant(fc_s, bc_s, lid_s, suffix="", is_clean=False)
+    else:
+        print("Generating BOTH Standard & Clean Non-Support Variants...", flush=True)
+        fc_s, bc_s, lid_s = build_enclosure(with_cad_supports=True)
+        mf_s, mb_s, ml_s = export_variant(fc_s, bc_s, lid_s, suffix="", is_clean=False)
+        
+        fc_c, bc_c, lid_c = build_enclosure(with_cad_supports=False)
+        mf_c, mb_c, ml_c = export_variant(fc_c, bc_c, lid_c, suffix="_clean", is_clean=True)
+        
+        # Write comprehensive comparison report
+        report_path = os.path.join(OUT_DIR, "dl380_flex_case_report.txt")
+        total_vol_s = fc_s.Volume + bc_s.Volume + lid_s.Volume
+        total_vol_c = fc_c.Volume + bc_c.Volume + lid_c.Volume
+        with open(report_path, "w") as f:
+            f.write("=" * 80 + "\n")
+            f.write("DL380 MODULAR 2-PIECE FLEX-ATX ENCLOSURE - BUILD & COMPARISON REPORT\n")
+            f.write("=" * 80 + "\n\n")
+            f.write(f"Target Cage:      HP ProLiant DL380 G6/G7 8-bay 2.5\" SFF (144.81 x 75.52 x 137.25 mm)\n")
+            f.write(f"Target PSU:       Enhance ENP-2320 (Flex-ATX 200W, 150 x 81.5 x 40.5 mm)\n")
+            f.write(f"Target Fan:       92 mm Arctic P9 PWM PST / Noctua NF-A9 (92 x 92 x 25 mm)\n\n")
+            f.write("VARIANT 1: STANDARD (CAD Built-in DfAM Sacrificial Supports)\n")
+            f.write(f"  Front Case Vol: {fc_s.Volume:,.2f} mm3 (isClosed: {fc_s.isClosed()}) | Facets: {mf_s.CountFacets:,}\n")
+            f.write(f"  Back Case Vol:  {bc_s.Volume:,.2f} mm3 (isClosed: {bc_s.isClosed()}) | Facets: {mb_s.CountFacets:,}\n")
+            f.write(f"  Service Lid Vol:{lid_s.Volume:,.2f} mm3 (isClosed: {lid_s.isClosed()}) | Facets: {ml_s.CountFacets:,}\n")
+            f.write(f"  Total Volume:   {total_vol_s:,.2f} mm3 ({total_vol_s/1000:,.1f} cm3)\n\n")
+            f.write("VARIANT 2: CLEAN (Zero CAD Supports - Ready for Slicer Auto-Support Comparison)\n")
+            f.write(f"  Front Case Vol: {fc_c.Volume:,.2f} mm3 (isClosed: {fc_c.isClosed()}) | Facets: {mf_c.CountFacets:,}\n")
+            f.write(f"  Back Case Vol:  {bc_c.Volume:,.2f} mm3 (isClosed: {bc_c.isClosed()}) | Facets: {mb_c.CountFacets:,}\n")
+            f.write(f"  Total Volume:   {total_vol_c:,.2f} mm3 ({total_vol_c/1000:,.1f} cm3)\n")
+            f.write(f"  CAD Support Material Delta: {(total_vol_s - total_vol_c)/1000:,.1f} cm3 (~{(total_vol_s - total_vol_c)*1.26/1000:,.1f} g PETG)\n\n")
+            f.write("=" * 80 + "\n")
+            
+        print(f"\nBuild and Comparison report written to {report_path}", flush=True)
 
-stl_p_front = os.path.join(PRINT_DIR, "dl380_front_case.stl")
-stl_p_back  = os.path.join(PRINT_DIR, "dl380_back_case.stl")
-stl_p_lid   = os.path.join(PRINT_DIR, "dl380_service_lid.stl")
-
-print("7. Exporting STEP models...", flush=True)
-front_case.exportStep(step_front)
-back_case.exportStep(step_back)
-lid.exportStep(step_lid)
-
-compound = Part.Compound([front_case, back_case, lid])
-compound.exportStep(step_all)
-
-print("8. Tessellating production STL meshes...", flush=True)
-mesh_front = MeshPart.meshFromShape(Shape=front_case, LinearDeflection=0.08, AngularDeflection=0.35)
-mesh_back  = MeshPart.meshFromShape(Shape=back_case,  LinearDeflection=0.08, AngularDeflection=0.35)
-mesh_lid   = MeshPart.meshFromShape(Shape=lid,        LinearDeflection=0.08, AngularDeflection=0.35)
-
-mesh_front.write(stl_front)
-mesh_back.write(stl_back)
-mesh_lid.write(stl_lid)
-
-mesh_front.write(stl_p_front)
-mesh_back.write(stl_p_back)
-mesh_lid.write(stl_p_lid)
-
-# Write report
-report_path = os.path.join(OUT_DIR, "dl380_flex_case_report.txt")
-total_vol = front_case.Volume + back_case.Volume + lid.Volume
-with open(report_path, "w") as f:
-    f.write("=" * 80 + "\n")
-    f.write("DL380 MODULAR 2-PIECE FLEX-ATX ENCLOSURE - BUILD REPORT\n")
-    f.write("=" * 80 + "\n\n")
-    f.write(f"Target Cage:      HP ProLiant DL380 G6/G7 8-bay 2.5\" SFF (144.81 x 75.52 x 137.25 mm)\n")
-    f.write(f"Front Bezel:      HP DL380 Plastic Bezel Frame (178.0 x 84.86 x 11.34 mm)\n")
-    f.write(f"Target PSU:       Enhance ENP-2320 (Flex-ATX 200W, 150 x 81.5 x 40.5 mm)\n")
-    f.write(f"Target Fan:       92 mm Arctic P9 PWM PST / Noctua NF-A9 (92 x 92 x 25 mm)\n\n")
-    f.write(f"Outer Dimensions: {OUT_W:.2f} mm (W) x {OUT_H:.2f} mm (H) x {OUT_D:.2f} mm (D)\n")
-    f.write(f"Front Case Vol:   {front_case.Volume:.2f} mm3 (isClosed: {front_case.isClosed()})\n")
-    f.write(f"Back Case Vol:    {back_case.Volume:.2f} mm3 (isClosed: {back_case.isClosed()})\n")
-    f.write(f"Lid Volume:       {lid.Volume:.2f} mm3 (isClosed: {lid.isClosed()})\n")
-    f.write(f"Total Volume:     {total_vol:.2f} mm3 ({total_vol/1000:,.1f} cm3)\n")
-    f.write(f"Front Facets:     {mesh_front.CountFacets:,}\n")
-    f.write(f"Back Facets:      {mesh_back.CountFacets:,}\n")
-    f.write(f"Lid Facets:       {mesh_lid.CountFacets:,}\n\n")
-    f.write(f"Print Bed:        Fits Elegoo Centauri Carbon 256 x 256 x 256 mm build plate\n")
-    f.write(f"Modular Split:    Transverse Z-Split at Z = {Z_SPLIT:.1f} mm (interlocking lap-joint + 4x M3 screws)\n")
-    f.write(f"Diamond Mesh:     Large diamond pattern on Top Roof & Both Side Walls (saves ~125g filament)\n")
-    f.write(f"Bezel Pocket:     180.0 x 86.0 x 11.5 mm recessed front socket with 17 mm stop shoulders\n")
-    f.write(f"Guide Bay:        146.0 mm internal width with 0.6 mm per side smooth sliding clearance\n")
-    f.write(f"Runner Rails:     Elevated 1.5 mm runner tracks with 45° lead-in ramps (>85% less friction)\n")
-    f.write(f"Stud Channels:    Longitudinal floor relief grooves for 5.0 mm bottom shoulder pins\n")
-    f.write(f"Rear Tab Windows: Dual 34x8 mm clearance windows through stop frame for 29.3 mm metal tabs\n")
-    f.write(f"Cage Locking:     Dual M3 screw pilot holes (X=69.65, X=116.35 mm) to secure rear tabs\n")
-    f.write(f"Plenum Clearance: 15.75 mm clear air gap behind 32 mm tabs before 92mm fan front face\n")
-    f.write(f"Fan Stand:        Integrated dual-cradle system (bottom shelf cradle + lid top stand)\n")
-    f.write("=" * 80 + "\n")
-
-
-# Copy production files to print_service_package
-pkg_dir = os.path.join(REPO_DIR, "print_service_package")
-if os.path.exists(pkg_dir):
-    import shutil
-    shutil.copy2(step_front, os.path.join(pkg_dir, "01_dl380_front_case.step"))
-    shutil.copy2(step_back,  os.path.join(pkg_dir, "02_dl380_back_case.step"))
-    shutil.copy2(step_lid,   os.path.join(pkg_dir, "03_dl380_service_lid.step"))
-    shutil.copy2(stl_front,  os.path.join(pkg_dir, "01_dl380_front_case.stl"))
-    shutil.copy2(stl_back,   os.path.join(pkg_dir, "02_dl380_back_case.stl"))
-    shutil.copy2(stl_lid,    os.path.join(pkg_dir, "03_dl380_service_lid.stl"))
-    print("Copied updated STEP and STL files to print_service_package/", flush=True)
-
-print("=" * 80)
-print("SUCCESS: DL380 Modular 2-Piece Enclosure with Diamond Mesh Generated!")
-print(f"  Front Case STEP: {step_front}")
-print(f"  Backcase STEP:   {step_back}")
-print(f"  Lid STEP:        {step_lid}")
-print(f"  Report:          {report_path}")
-print("=" * 80, flush=True)
+    print(f"Total Elapsed Time: {time.time() - t0:.2f} s", flush=True)
